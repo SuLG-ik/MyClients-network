@@ -8,4 +8,6 @@ interface Configuration {
 
     fun buildAssetsConfig(): AssetsConfig
 
+    fun buildSecureConfig(): SecureConfiguration
+
 }

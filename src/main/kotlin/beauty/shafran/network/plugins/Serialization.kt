@@ -1,9 +1,8 @@
 package beauty.shafran.network.plugins
 
-import io.ktor.application.*
-import io.ktor.features.*
-import io.ktor.features.*
-import io.ktor.serialization.*
+import io.ktor.serialization.kotlinx.json.*
+import io.ktor.server.application.*
+import io.ktor.server.plugins.*
 import kotlinx.serialization.json.Json
 
 fun Application.configureSerialization() {

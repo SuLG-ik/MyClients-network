@@ -1,6 +1,6 @@
 package beauty.shafran.network.session
 
-import io.ktor.application.*
+import io.ktor.server.application.*
 import io.ktor.util.pipeline.*
 
 interface SessionsReducer {

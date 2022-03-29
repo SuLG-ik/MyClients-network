@@ -1,17 +1,22 @@
 package beauty.shafran.network.customers
 
-import io.ktor.routing.*
-import org.koin.ktor.ext.inject
+import beauty.shafran.network.api.withApi
+import inject
+import io.ktor.server.routing.*
 
-fun Routing.configureCustomers() {
+
+fun Route.configureCustomers() {
     val customer: CustomersReducer by inject()
     route("/customers") {
-        get("/restoreCustomer", customer.restoreCustomer)
-        post("/createCustomer", customer.createCustomer)
-        get("/getCustomerById", customer.getCustomerById)
-        get("/getCustomerByToken", customer.getCustomerByToken)
-        get("/getAllCustomers", customer.getAllCustomers)
-        post("/createEmptyCustomers", customer.createEmptyCustomers)
-        patch("/editCustomerData", customer.editCustomerData)
+        withApi {
+            get("/searchCustomerByPhone", customer.searchCustomerByPhone)
+            get("/restoreCustomer", customer.restoreCustomer)
+            post("/createCustomer", customer.createCustomer)
+            get("/getCustomerById", customer.getCustomerById)
+            get("/getCustomerByToken", customer.getCustomerByToken)
+            get("/getAllCustomers", customer.getAllCustomers)
+            post("/createEmptyCustomers", customer.createEmptyCustomers)
+            patch("/editCustomerData", customer.editCustomerData)
+        }
     }
 }

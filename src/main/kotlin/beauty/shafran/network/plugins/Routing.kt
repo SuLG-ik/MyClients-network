@@ -4,15 +4,17 @@ import beauty.shafran.network.customers.configureCustomers
 import beauty.shafran.network.employees.configureEmployees
 import beauty.shafran.network.services.configureServices
 import beauty.shafran.network.session.configureSessions
-import io.ktor.application.*
-import io.ktor.routing.*
+import io.ktor.server.application.*
+import io.ktor.server.routing.*
 
 fun Application.configureRouting() {
     // Starting point for a Ktor app:
     routing() {
-        configureServices()
-        configureCustomers()
-        configureSessions()
-        configureEmployees()
+        route("/v1") {
+            configureServices()
+            configureCustomers()
+            configureSessions()
+            configureEmployees()
+        }
     }
 }

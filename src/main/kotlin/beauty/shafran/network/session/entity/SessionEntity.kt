@@ -1,22 +1,17 @@
 package beauty.shafran.network.session.entity
 
-import beauty.shafran.network.customers.entity.CustomerEntity
-import beauty.shafran.network.employees.data.Employee
-import beauty.shafran.network.employees.entity.EmployeeEntity
-import beauty.shafran.network.services.enity.ServiceConfigurationEntity
-import beauty.shafran.network.services.enity.ServiceEntity
 import beauty.shafran.network.session.data.SessionManualDeactivationReason
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.litote.kmongo.Id
 import org.litote.kmongo.newId
+import java.util.*
 
 @Serializable
 data class SessionEntity(
     val activation: SessionActivationEntity,
     val deactivation: SessionManualDeactivationEntity? = null,
-    val usages: List<SessionUsageEntity> = emptyList(),
     @Contextual
     @SerialName("_id")
     val id: Id<SessionEntity> = newId(),
@@ -38,6 +33,7 @@ data class SessionActivationEntity(
 
 @Serializable
 data class SessionUsageEntity(
+    val sessionId: String,
     val data: SessionUsageDataEntity,
     @SerialName("_id")
     @Contextual
@@ -47,6 +43,8 @@ data class SessionUsageEntity(
 @Serializable
 data class SessionUsageDataEntity(
     val employeeId: String,
+    @Contextual
+    val date: Date = Date(),
     val note: String? = null,
 )
 

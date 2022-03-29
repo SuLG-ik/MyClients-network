@@ -1,7 +1,7 @@
 package beauty.shafran.network.session.converters
 
-import beauty.shafran.network.employees.repository.EmployeesRepository
 import beauty.shafran.network.employees.data.GetEmployeeByIdRequest
+import beauty.shafran.network.employees.repository.EmployeesRepository
 import beauty.shafran.network.services.data.ConfiguredService
 import beauty.shafran.network.services.data.GetServiceByIdRequest
 import beauty.shafran.network.services.repository.ServicesRepository
@@ -11,17 +11,17 @@ import beauty.shafran.network.utils.getZonedDateTime
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
-import org.litote.kmongo.toId
+import org.litote.kmongo.MongoOperator
 
 class ServiceSessionsConverterImpl(
     private val employeesRepository: EmployeesRepository,
     private val servicesRepository: ServicesRepository,
 ) : ServiceSessionsConverter {
 
-    override suspend fun SessionEntity.toData(): Session {
+    override suspend fun SessionEntity.toData(usageEnitties: List<SessionUsageEntity>): Session {
         return coroutineScope {
             val activation = async { findActivation(activation) }
-            val usages = async { findUsages(usages) }
+            val usages = async { findUsages(usageEnitties) }
             val deactivation = async { findDeactivation(deactivation) }
             Session(
                 id = id.toString(),
@@ -58,7 +58,7 @@ class ServiceSessionsConverterImpl(
         if (deactivationEntity == null) return null
         val employee = employeesRepository.getEmployeeById(GetEmployeeByIdRequest(deactivationEntity.data.employeeId))
 
-        return SessionManualDeactivation(id = deactivationEntity.id.toString(),
+        return SessionManualDeactivation(id = MongoOperator.id.toString(),
             data = SessionManualDeactivationData(
                 reason = deactivationEntity.data.reason,
                 employee = employee.employee,
@@ -72,7 +72,8 @@ class ServiceSessionsConverterImpl(
         val serviceRequest =
             servicesRepository.getServiceById(GetServiceByIdRequest(configurationEntity.serviceId.toString()))
         val service =
-            serviceRequest.service ?: TODO("throw ServiceDoesNotExistsException(configurationEntity.serviceId.toHexString())")
+            serviceRequest.service
+                ?: TODO("throw ServiceDoesNotExistsException(configurationEntity.serviceId.toHexString())")
 
         val configuration =
             service.data.configurations.firstOrNull { it.id == configurationEntity.configurationId.toString() }

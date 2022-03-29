@@ -1,12 +1,11 @@
 package beauty.shafran.network.customers.exceptions
 
-import io.ktor.application.*
-import io.ktor.features.*
 import io.ktor.http.*
-import io.ktor.response.*
+import io.ktor.server.plugins.*
+import io.ktor.server.response.*
 
-fun StatusPages.Configuration.customersMapper() {
-    exception<CustomersException> { cause ->
+fun StatusPagesConfig.customersMapper() {
+    exception<CustomersException> { call, cause ->
         call.respond(HttpStatusCode(cause.httpCode, ""), cause)
     }
 }

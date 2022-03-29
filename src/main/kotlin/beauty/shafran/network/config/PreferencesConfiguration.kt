@@ -18,4 +18,11 @@ class PreferencesConfiguration : Configuration {
             "ПОСОСИ"
         )
     }
+
+    override fun buildSecureConfig(): SecureConfiguration {
+        return SecureConfiguration(
+            apiKey = System.getenv("api_key"),
+            keyName = "apiKey",
+        )
+    }
 }

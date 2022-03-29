@@ -1,10 +1,11 @@
 package beauty.shafran.network.customers
 
-import io.ktor.application.*
+import io.ktor.server.application.*
 import io.ktor.util.pipeline.*
 
 interface CustomersReducer {
 
+    val searchCustomerByPhone: suspend PipelineContext<Unit, ApplicationCall>.(Unit) -> Unit
     val createCustomer: suspend PipelineContext<Unit, ApplicationCall>.(Unit) -> Unit
     val restoreCustomer: suspend PipelineContext<Unit, ApplicationCall>.(Unit) -> Unit
     val getCustomerById: suspend PipelineContext<Unit, ApplicationCall>.(Unit) -> Unit

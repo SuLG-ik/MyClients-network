@@ -1,19 +1,23 @@
 package beauty.shafran.network.phone.converters
 
-import beauty.shafran.network.PhoneNumber
+import beauty.shafran.network.phone.data.PhoneNumber
 import beauty.shafran.network.phone.entity.PhoneNumberEntity
 
 class PhoneNumberConverterImpl : PhoneNumberConverter {
-    override fun PhoneNumber.toEntity(): PhoneNumberEntity {
-        return PhoneNumberEntity(
-            countryCode = countryCode,
-            number = number,
-        )
+    override fun PhoneNumber.toEntity(): PhoneNumberEntity? {
+        return if (isValid) PhoneNumberEntity(
+            number = number
+        ) else null
     }
+
+
+    private val PhoneNumber.isValid: Boolean
+        get() {
+            return number.length == 11
+        }
 
     override fun PhoneNumberEntity.toData(): PhoneNumber {
         return PhoneNumber(
-            countryCode = countryCode,
             number = number,
         )
     }

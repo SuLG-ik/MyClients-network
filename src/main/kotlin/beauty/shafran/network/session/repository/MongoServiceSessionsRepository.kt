@@ -6,17 +6,15 @@ import beauty.shafran.network.services.repository.ServicesRepository
 import beauty.shafran.network.session.converters.ServiceSessionsConverter
 import beauty.shafran.network.session.data.*
 import beauty.shafran.network.session.entity.*
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.toList
-import kotlinx.coroutines.withContext
 import org.bson.types.ObjectId
+import org.litote.kmongo.`in`
 import org.litote.kmongo.coroutine.CoroutineDatabase
 import org.litote.kmongo.div
 import org.litote.kmongo.eq
-import org.litote.kmongo.id.toId
-import org.litote.kmongo.toId
+import org.litote.kmongo.id.WrappedObjectId
 
 class MongoServiceSessionsRepository(
     client: CoroutineDatabase,
@@ -24,16 +22,33 @@ class MongoServiceSessionsRepository(
     private val servicesRepository: ServicesRepository,
 ) : ServiceSessionsRepository {
 
-    private val collection = client.getCollection<SessionEntity>("sessions")
+    private val sessions = client.getCollection<SessionEntity>("sessions")
+    private val usages = client.getCollection<SessionUsageEntity>("usages")
+
+
+
+
+    override suspend fun getLastSessionForCustomer(customerId: String): Session? {
+        val customerSessions = findSessionsForCustomer(customerId)
+        val sessionUsages = usages.find(SessionUsageEntity::sessionId `in` customerSessions.map { it.id.toString() })
+            .descendingSort(SessionUsageEntity::data / SessionUsageDataEntity::date)
+            .limit(1)
+        val sessionUsage = sessionUsages.first() ?: return null
+        return with(sessionsConverter) {
+            customerSessions.find { it.id.toString() == sessionUsage.sessionId }
+                ?.run { toData(findUsagesForSession(id.toString())) }
+        }
+    }
 
     override suspend fun getSessionsForCustomer(data: GetSessionsForCustomerRequest): GetSessionsForCustomerResponse {
         return coroutineScope {
-            val sessionEntities =
-                collection.find(SessionEntity::activation / SessionActivationEntity::customerId eq data.customerId)
-                    .toFlow()
+            val sessionEntities = findSessionsForCustomer(data.customerId)
+
 
             GetSessionsForCustomerResponse(
-                sessions = sessionEntities.map { with(sessionsConverter) { it.toData() } }.toList()
+                sessions = sessionEntities.map {
+                    with(sessionsConverter) { async { it.toData(findUsagesForSession(it.id.toString())) } }
+                }.toList().awaitAll()
             )
         }
     }
@@ -41,32 +56,48 @@ class MongoServiceSessionsRepository(
     override suspend fun createSessionsForCustomer(data: CreateSessionForCustomerRequest): CreateSessionForCustomerResponse {
         return coroutineScope {
             val session = with(sessionsConverter) { data.toNewEntity() }
-            collection.save(session)
+            sessions.save(session)
             CreateSessionForCustomerResponse(
-                session = with(sessionsConverter) { session.toData() }
+                session = with(sessionsConverter) { session.toData(findUsagesForSession(session.id.toString())) }
             )
         }
     }
 
     override suspend fun useSession(data: UseSessionRequest): UseSessionResponse {
-        val session =
-            collection.findOneById(ObjectId(data.sessionId)) ?: TODO("SessionDoesNotExistsException(data.sessionId)")
+        return coroutineScope {
+            val session =
+                sessions.findOneById(ObjectId(data.sessionId)) ?: TODO("SessionDoesNotExistsException(data.sessionId)")
 
-        val configuration = findConfigurationForService(session.activation.configuration)
-        if (session.usages.size >= configuration.amount)
-            TODO("throw OveruseSessionException(configuration.id, configuration.amount)")
+            val configuration = async { findConfigurationForService(session.activation.configuration) }
+            val usagesCount = async { countUsagesForSession(sessionId = session.id.toString()) }
 
-        val usageEntity = SessionUsageEntity(
-            data = SessionUsageDataEntity(
-                employeeId = data.employeeId,
-                note = data.note,
+            if (usagesCount.await() >= configuration.await().amount) {
+                TODO("throw ServiceDoesNotExistsException(configuration.serviceId.toHexString())")
+            }
+            val usageEntity = SessionUsageEntity(
+                data = SessionUsageDataEntity(
+                    employeeId = data.employeeId,
+                    note = data.note,
+                ),
+                sessionId = session.id.toString(),
             )
-        )
-        val newSession = session.copy(usages = session.usages + usageEntity)
-            collection.save(newSession)
-        return UseSessionResponse(
-            session = with(sessionsConverter) { newSession.toData() }
-        )
+            usages.save(usageEntity)
+            UseSessionResponse(
+                session = with(sessionsConverter) { session.toData(findUsagesForSession(session.id.toString())) }
+            )
+        }
+    }
+
+
+    private suspend fun countUsagesForSession(sessionId: String): Long {
+        if (sessions.countDocuments(SessionEntity::id eq WrappedObjectId(sessionId)) < 1)
+            TODO("throw ServiceDoesNotExistsException(configuration.serviceId.toHexString())")
+        return usages.countDocuments(SessionUsageEntity::sessionId eq sessionId)
+    }
+
+
+    private suspend fun findUsagesForSession(sessionId: String): List<SessionUsageEntity> {
+        return usages.find(SessionUsageEntity::sessionId eq sessionId).toList()
     }
 
     private suspend fun findConfigurationForService(configuration: SessionConfigurationEntity): ServiceConfiguration {
@@ -80,6 +111,11 @@ class MongoServiceSessionsRepository(
             configuration.serviceId.toHexString(),
             configuration.configurationId.toHexString()
         )""")
+    }
+
+    private suspend fun findSessionsForCustomer(customerId: String): List<SessionEntity> {
+        return sessions.find(SessionEntity::activation / SessionActivationEntity::customerId eq customerId)
+            .toList()
     }
 
 }

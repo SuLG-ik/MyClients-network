@@ -1,13 +1,16 @@
 package beauty.shafran.network.session
 
-import io.ktor.routing.*
-import org.koin.ktor.ext.inject
+import beauty.shafran.network.api.withApi
+import inject
+import io.ktor.server.routing.*
 
-fun Routing.configureSessions() {
+fun Route.configureSessions() {
     val reducer by inject<SessionsReducer>()
     route("/sessions") {
-        get("/getServiceSessionsForCustomer", reducer.getServiceSessionsForCustomer)
-        put("/useServiceSession", reducer.useServiceSession)
-        post("/createServiceSessionsForCustomer", reducer.createServiceSessionsForCustomer)
+        withApi {
+            get("/getServiceSessionsForCustomer", reducer.getServiceSessionsForCustomer)
+            put("/useServiceSession", reducer.useServiceSession)
+            post("/createServiceSessionsForCustomer", reducer.createServiceSessionsForCustomer)
+        }
     }
 }

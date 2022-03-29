@@ -5,7 +5,7 @@ import com.arkivanov.essenty.parcelable.Parcelize
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import beauty.shafran.network.Gender
-import beauty.shafran.network.PhoneNumber
+import beauty.shafran.network.phone.data.PhoneNumber
 
 @Serializable
 sealed class Customer {

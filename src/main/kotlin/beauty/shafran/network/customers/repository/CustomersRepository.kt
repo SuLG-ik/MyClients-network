@@ -4,6 +4,7 @@ import beauty.shafran.network.customers.data.*
 
 interface CustomersRepository {
 
+    suspend fun searchCustomerByPhone(data: SearchCustomerByPhoneRequest): SearchCustomerByPhoneResponse
     suspend fun restoreCustomer(request: RestoreCustomerRequest)
     suspend fun createCustomer(request: CreateCustomersRequest) : CreateCustomersResponse
     suspend fun getCustomerById(request: GetCustomerByIdRequest) : GetCustomerByIdResponse

@@ -2,16 +2,19 @@ package beauty.shafran.network.customers
 
 import beauty.shafran.network.customers.data.*
 import beauty.shafran.network.customers.repository.CustomersRepository
-import io.ktor.application.*
 import io.ktor.http.*
-import io.ktor.request.*
-import io.ktor.response.*
+import io.ktor.server.application.*
+import io.ktor.server.request.*
+import io.ktor.server.response.*
 import io.ktor.util.pipeline.*
 
 class CustomersReducerImpl(
     private val customersRepository: CustomersRepository,
 ) : CustomersReducer {
-
+    override val searchCustomerByPhone: suspend PipelineContext<Unit, ApplicationCall>.(Unit) -> Unit = {
+        val request = call.receive<SearchCustomerByPhoneRequest>()
+        call.respond(customersRepository.searchCustomerByPhone(request))
+    }
 
     override val createCustomer: suspend PipelineContext<Unit, ApplicationCall>.(Unit) -> Unit = {
         val request = call.receive<CreateCustomersRequest>()

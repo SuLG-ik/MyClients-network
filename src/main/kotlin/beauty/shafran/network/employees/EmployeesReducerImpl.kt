@@ -5,9 +5,9 @@ import beauty.shafran.network.employees.data.GetAllEmployeesRequest
 import beauty.shafran.network.employees.data.GetEmployeeByIdRequest
 import beauty.shafran.network.employees.data.LayoffEmployeeRequest
 import beauty.shafran.network.employees.repository.EmployeesRepository
-import io.ktor.application.*
-import io.ktor.request.*
-import io.ktor.response.*
+import io.ktor.server.application.*
+import io.ktor.server.request.*
+import io.ktor.server.response.*
 import io.ktor.util.pipeline.*
 
 class EmployeesReducerImpl(private val employeesRepository: EmployeesRepository) : EmployeesReducer {

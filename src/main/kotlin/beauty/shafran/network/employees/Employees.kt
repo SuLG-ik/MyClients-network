@@ -1,14 +1,17 @@
 package beauty.shafran.network.employees
 
-import io.ktor.routing.*
-import org.koin.ktor.ext.inject
+import beauty.shafran.network.api.withApi
+import inject
+import io.ktor.server.routing.*
 
-fun Routing.configureEmployees() {
+fun Route.configureEmployees() {
     val reducer by inject<EmployeesReducer>()
     route("/employees") {
-        get("/getAllEmployees", reducer.getAllEmployees)
-        post("/createEmployee", reducer.createEmployee)
-        delete("/layoffEmployee", reducer.layoffEmployee)
-        get("/getEmployeeById", reducer.getEmployeeById)
+        withApi {
+            get("/getAllEmployees", reducer.getAllEmployees)
+            post("/createEmployee", reducer.createEmployee)
+            delete("/layoffEmployee", reducer.layoffEmployee)
+            get("/getEmployeeById", reducer.getEmployeeById)
+        }
     }
 }

@@ -17,6 +17,7 @@ import beauty.shafran.network.employees.converters.EmployeesConverter
 import beauty.shafran.network.employees.converters.EmployeesConverterImpl
 import beauty.shafran.network.employees.repository.EmployeesRepository
 import beauty.shafran.network.employees.repository.MongoEmployeesRepository
+import beauty.shafran.network.koin.KoinPlugin
 import beauty.shafran.network.phone.converters.PhoneNumberConverter
 import beauty.shafran.network.phone.converters.PhoneNumberConverterImpl
 import beauty.shafran.network.services.ServicesReducer
@@ -31,18 +32,19 @@ import beauty.shafran.network.session.converters.ServiceSessionsConverter
 import beauty.shafran.network.session.converters.ServiceSessionsConverterImpl
 import beauty.shafran.network.session.repository.MongoServiceSessionsRepository
 import beauty.shafran.network.session.repository.ServiceSessionsRepository
-import io.ktor.application.*
+import io.ktor.server.application.*
 import org.koin.core.module.dsl.factoryOf
 import org.koin.dsl.bind
 import org.koin.dsl.module
-import org.koin.ktor.ext.Koin
+import org.koin.logger.slf4jLogger
 import org.litote.kmongo.coroutine.coroutine
 import org.litote.kmongo.reactivestreams.KMongo
 import java.util.logging.Level
 import java.util.logging.Logger
 
 fun Application.configureKoin() {
-    install(Koin) {
+    install(KoinPlugin) {
+        slf4jLogger()
         modules(
             tokenDecoderModule,
             converterModule,
@@ -56,6 +58,7 @@ fun Application.configureKoin() {
 val mongoModule = module {
     factory { get<Configuration>().buildMongoClientConfig() }
     factory { get<Configuration>().buildAssetsConfig() }
+    factory { get<Configuration>().buildSecureConfig() }
     single {
         KMongo.createClient(get<MongoClientConfig>().toSettings())
             .getDatabase(get<MongoClientConfig>().database)

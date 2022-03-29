@@ -1,16 +1,19 @@
 package beauty.shafran.network.services
 
-import io.ktor.routing.*
-import org.koin.ktor.ext.inject
+import beauty.shafran.network.api.withApi
+import inject
+import io.ktor.server.routing.*
 
-fun Routing.configureServices() {
+fun Route.configureServices() {
     val reducer by inject<ServicesReducer>()
 
     route("/services") {
-        get("/getAllServices", reducer.getAllServices)
-        get("/getServiceById", reducer.getServiceById)
-        post("/createService", reducer.createService)
-        put("/addConfiguration", reducer.addConfiguration)
-        delete("/deactivateConfiguration", reducer.deactivateConfiguration)
+        withApi {
+            get("/getAllServices", reducer.getAllServices)
+            get("/getServiceById", reducer.getServiceById)
+            post("/createService", reducer.createService)
+            put("/addConfiguration", reducer.addConfiguration)
+            delete("/deactivateConfiguration", reducer.deactivateConfiguration)
+        }
     }
 }
