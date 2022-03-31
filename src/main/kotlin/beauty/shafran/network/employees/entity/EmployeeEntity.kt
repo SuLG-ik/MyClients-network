@@ -18,6 +18,8 @@ data class EmployeeEntity(
     val id: Id<EmployeeEntity> = newId(),
 )
 
+val EmployeeEntity.Companion.collectionName get() = "employees"
+
 @Serializable
 data class EmployeeDataEntity(
     val name: String,

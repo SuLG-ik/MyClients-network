@@ -1,65 +1,51 @@
 package beauty.shafran.network.services.repository
 
-import beauty.shafran.network.services.converter.ServicesConverter
-import beauty.shafran.network.services.data.*
+import beauty.shafran.network.services.ConfigurationNotExists
+import beauty.shafran.network.services.ServiceNotExists
 import beauty.shafran.network.services.enity.ServiceConfigurationEntity
 import beauty.shafran.network.services.enity.ServiceEntity
 import beauty.shafran.network.services.enity.ServiceInfoEntity
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.toList
-import org.bson.types.ObjectId
+import beauty.shafran.network.services.enity.collectionName
+import beauty.shafran.network.utils.paged
+import beauty.shafran.network.utils.toIdSecure
 import org.litote.kmongo.coroutine.CoroutineDatabase
+import org.litote.kmongo.coroutine.updateOne
+import org.litote.kmongo.div
 
-class MongoServicesRepository(
-    client: CoroutineDatabase,
-    private val converter: ServicesConverter,
-) : ServicesRepository {
+class MongoServicesRepository(coroutineDatabase: CoroutineDatabase) : ServicesRepository {
 
-    private val collection = client.getCollection<ServiceEntity>("services")
+    private val servicesCollection = coroutineDatabase.getCollection<ServiceEntity>(ServiceEntity.collectionName)
 
-    override suspend fun getServices(data: GetAllServicesRequest): GetAllServicesResponse {
-        val services = collection.find().toFlow().map { with(converter) { it.toData() } }
-        return GetAllServicesResponse(services = services.toList())
+    override suspend fun findServiceById(serviceId: String): ServiceEntity {
+        return servicesCollection.findOneById(serviceId.toIdSecure<ServiceEntity>("serviceId"))
+            ?: throw ServiceNotExists(serviceId)
     }
 
-    override suspend fun createService(data: CreateServiceRequest): CreateServiceResponse {
-        val service = ServiceEntity(
-            info = ServiceInfoEntity(
-                title = data.title,
-                description = data.description
-            )
-        )
-        collection.insertOne(service)
-        return CreateServiceResponse(
-            service = with(converter) { service.toData() }
-        )
+    override suspend fun findConfigurationForService(
+        configurationId: String,
+        serviceId: String,
+    ): ServiceConfigurationEntity {
+        val service = findServiceById(serviceId)
+        return service.configurations.firstOrNull { configurationId == it.id.toString() }
+            ?: throw ConfigurationNotExists(configurationId)
     }
 
-    override suspend fun getServiceById(data: GetServiceByIdRequest): GetServiceByIdResponse {
-        val service = collection.findOneById(ObjectId(data.serviceId))
-        return GetServiceByIdResponse(
-            service = with(converter) { service?.toData() }
-        )
+    override suspend fun findAllServices(offset: Int, page: Int): List<ServiceEntity> {
+        return servicesCollection.find().descendingSort(ServiceEntity::info / ServiceInfoEntity::priority)
+            .paged(offset, page)
+            .toList()
     }
 
-    override suspend fun addConfiguration(data: CreateConfigurationRequest): CreateConfigurationResponse {
-        val service = collection.findOneById(ObjectId(data.serviceId))!!
-        val configurations = service.configurations.configurations
-        val configuration = ServiceConfigurationEntity(
-            title = data.data.title,
-            description = data.data.description,
-            cost = data.data.cost,
-            amount = data.data.amount,
-        )
-        val newService =
-            service.copy(configurations = service.configurations.copy(configurations = configurations + configuration))
-        collection.save(newService)
-        return CreateConfigurationResponse(
-            service = with(converter) { newService.toData() }
-        )
+
+    override suspend fun createService(info: ServiceInfoEntity): ServiceEntity {
+        val service = ServiceEntity(info = info)
+        servicesCollection.insertOne(service)
+        return service
     }
 
-    override suspend fun deactivateConfiguration(data: DeactivateServiceConfigurationRequest): DeactivateServiceConfigurationResponse {
-        TODO("Not yet implemented")
+    override suspend fun addConfiguration(serviceId: String, configuration: ServiceConfigurationEntity): ServiceEntity {
+        val service = findServiceById(serviceId).let { it.copy(configurations = it.configurations + configuration) }
+        servicesCollection.updateOne(service)
+        return service
     }
 }

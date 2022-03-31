@@ -11,9 +11,8 @@ import beauty.shafran.network.employees.entity.EmployeeLayoffEntity
 interface EmployeesConverter {
 
     suspend fun EmployeeEntity.toData(): Employee
-
     suspend fun LayoffEmployeeRequest.toNewEntity(): EmployeeLayoffEntity
-
     suspend fun EmployeeDataEntity.toData(): EmployeeData
     suspend fun EmployeeLayoffEntity.toData(): EmployeeLayoff
+
 }

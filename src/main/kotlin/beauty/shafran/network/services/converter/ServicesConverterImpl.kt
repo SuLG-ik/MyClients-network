@@ -19,7 +19,6 @@ class ServicesConverterImpl(
         )
     }
 
-
     override fun CreateConfigurationRequest.toNewEntity(): ServiceConfigurationEntity {
         return ServiceConfigurationEntity(
             title = data.title,
@@ -29,7 +28,7 @@ class ServicesConverterImpl(
         )
     }
 
-    fun ServiceConfigurationEntity.toData(): ServiceConfiguration {
+    override fun ServiceConfigurationEntity.toData(): ServiceConfiguration {
         return ServiceConfiguration(
             title = title,
             description = description,
@@ -45,7 +44,7 @@ class ServicesConverterImpl(
             data = ServiceData(
                 info = info.toData(),
                 image = with(converter) { image?.toData() },
-                configurations = configurations.configurations.map { it.toData() }
+                configurations = configurations.map { it.toData() }
             )
         )
     }

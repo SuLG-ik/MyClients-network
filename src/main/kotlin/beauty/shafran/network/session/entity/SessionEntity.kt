@@ -17,6 +17,8 @@ data class SessionEntity(
     val id: Id<SessionEntity> = newId(),
 )
 
+val SessionEntity.Companion.collectionName get() = "sessions"
+
 @Serializable
 data class SessionConfigurationEntity(
     val serviceId: String,
@@ -39,6 +41,8 @@ data class SessionUsageEntity(
     @Contextual
     val id: Id<SessionUsageEntity> = newId(),
 )
+
+val SessionUsageEntity.Companion.collectionName get() = "usages"
 
 @Serializable
 data class SessionUsageDataEntity(

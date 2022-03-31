@@ -1,55 +1,57 @@
 package beauty.shafran.network.customers
 
 import beauty.shafran.network.customers.data.*
-import beauty.shafran.network.customers.repository.CustomersRepository
+import beauty.shafran.network.customers.executor.CustomersExecutor
+import beauty.shafran.network.customers.validators.CustomersValidator
+import beauty.shafran.network.receiveOrThrow
 import io.ktor.http.*
 import io.ktor.server.application.*
-import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.util.pipeline.*
 
 class CustomersReducerImpl(
-    private val customersRepository: CustomersRepository,
+    private val executor: CustomersExecutor,
+    private val validator: CustomersValidator,
 ) : CustomersReducer {
     override val searchCustomerByPhone: suspend PipelineContext<Unit, ApplicationCall>.(Unit) -> Unit = {
-        val request = call.receive<SearchCustomerByPhoneRequest>()
-        call.respond(customersRepository.searchCustomerByPhone(request))
+        val request = call.receiveOrThrow<SearchCustomerByPhoneRequest>()
+        call.respond(executor.searchCustomerByPhone(validator.searchCustomerByPhone(request)))
     }
 
     override val createCustomer: suspend PipelineContext<Unit, ApplicationCall>.(Unit) -> Unit = {
-        val request = call.receive<CreateCustomersRequest>()
-        call.respond(customersRepository.createCustomer(request))
+        val request = call.receiveOrThrow<CreateCustomersRequest>()
+        call.respond(executor.createCustomer(validator.createCustomer(request)))
     }
 
     override val restoreCustomer: suspend PipelineContext<Unit, ApplicationCall>.(Unit) -> Unit = {
-        val request = call.receive<RestoreCustomerRequest>()
-        customersRepository.restoreCustomer(request)
+        val request = call.receiveOrThrow<RestoreCustomerRequest>()
+        executor.restoreCustomer(validator.restoreCustomer(request))
         call.respond(HttpStatusCode.OK)
     }
 
     override val getCustomerById: suspend PipelineContext<Unit, ApplicationCall>.(Unit) -> Unit = {
-        val request = call.receive<GetCustomerByIdRequest>()
-        call.respond(customersRepository.getCustomerById(request))
+        val request = call.receiveOrThrow<GetCustomerByIdRequest>()
+        call.respond(executor.getCustomerById(validator.getCustomerById(request)))
     }
 
     override val getCustomerByToken: suspend PipelineContext<Unit, ApplicationCall>.(Unit) -> Unit = {
-        val request = call.receive<GetCustomerByTokenRequest>()
-        call.respond(customersRepository.getCustomerByToken(request))
+        val request = call.receiveOrThrow<GetCustomerByTokenRequest>()
+        call.respond(executor.getCustomerByToken(validator.getCustomerByToken(request)))
     }
 
     override val getAllCustomers: suspend PipelineContext<Unit, ApplicationCall>.(Unit) -> Unit = {
-        val request = call.receive<GetAllCustomersRequest>()
-        call.respond(customersRepository.getAllCustomers(request))
+        val request = call.receiveOrThrow<GetAllCustomersRequest>()
+        call.respond(executor.getAllCustomers(validator.getAllCustomers(request)))
     }
 
     override val createEmptyCustomers: suspend PipelineContext<Unit, ApplicationCall>.(Unit) -> Unit = {
-        val request = call.receive<CreateEmptyCustomersRequest>()
-        call.respond(customersRepository.createEmptyCustomers(request))
+        val request = call.receiveOrThrow<CreateEmptyCustomersRequest>()
+        call.respond(executor.createEmptyCustomers(validator.createEmptyCustomers(request)))
     }
 
     override val editCustomerData: suspend PipelineContext<Unit, ApplicationCall>.(Unit) -> Unit = {
-        val request = call.receive<EditCustomerRequest>()
-        call.respond(customersRepository.editCustomerData(request))
+        val request = call.receiveOrThrow<EditCustomerRequest>()
+        call.respond(executor.editCustomerData(validator.editCustomerData(request)))
     }
 
 }

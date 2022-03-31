@@ -1,18 +1,17 @@
 package beauty.shafran.network.services.repository
 
-import beauty.shafran.network.services.data.*
-
+import beauty.shafran.network.services.enity.ServiceConfigurationEntity
+import beauty.shafran.network.services.enity.ServiceEntity
+import beauty.shafran.network.services.enity.ServiceInfoEntity
 
 interface ServicesRepository {
 
-    suspend fun getServices(data: GetAllServicesRequest): GetAllServicesResponse
+    suspend fun findServiceById(serviceId: String): ServiceEntity
 
-    suspend fun createService(data: CreateServiceRequest): CreateServiceResponse
+    suspend fun findConfigurationForService(configurationId: String, serviceId: String): ServiceConfigurationEntity
 
-    suspend fun getServiceById(data: GetServiceByIdRequest): GetServiceByIdResponse
+    suspend fun findAllServices(offset: Int, page: Int): List<ServiceEntity>
+    suspend fun createService(info: ServiceInfoEntity): ServiceEntity
 
-    suspend fun addConfiguration(data: CreateConfigurationRequest): CreateConfigurationResponse
-
-    suspend fun deactivateConfiguration(data: DeactivateServiceConfigurationRequest): DeactivateServiceConfigurationResponse
-
+    suspend fun addConfiguration(serviceId: String, configuration: ServiceConfigurationEntity): ServiceEntity
 }

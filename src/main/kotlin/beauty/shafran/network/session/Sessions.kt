@@ -8,6 +8,7 @@ fun Route.configureSessions() {
     val reducer by inject<SessionsReducer>()
     route("/sessions") {
         withApi {
+            get("/getSessionUsagesHistory", reducer.getSessionUsagesHistory)
             get("/getServiceSessionsForCustomer", reducer.getServiceSessionsForCustomer)
             put("/useServiceSession", reducer.useServiceSession)
             post("/createServiceSessionsForCustomer", reducer.createServiceSessionsForCustomer)

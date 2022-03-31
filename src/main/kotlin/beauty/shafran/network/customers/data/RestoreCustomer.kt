@@ -6,5 +6,5 @@ import kotlinx.serialization.Serializable
 @Parcelize
 @Serializable
 class RestoreCustomerRequest(
-    val cardId: String,
+    val token: String,
 )

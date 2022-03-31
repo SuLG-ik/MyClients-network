@@ -1,70 +1,59 @@
 package beauty.shafran.network.employees.repository
 
-import beauty.shafran.network.assets.entity.AssetEntity
-import beauty.shafran.network.employees.converters.EmployeesConverter
-import beauty.shafran.network.employees.data.*
+import beauty.shafran.network.employees.EmployeeNotExistsWithId
 import beauty.shafran.network.employees.entity.EmployeeDataEntity
 import beauty.shafran.network.employees.entity.EmployeeEntity
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.toList
-import org.bson.types.ObjectId
+import beauty.shafran.network.employees.entity.EmployeeLayoffEntity
+import beauty.shafran.network.employees.entity.collectionName
+import beauty.shafran.network.utils.paged
+import beauty.shafran.network.utils.toIdSecure
 import org.litote.kmongo.coroutine.CoroutineDatabase
+import org.litote.kmongo.coroutine.updateOne
+import org.litote.kmongo.div
+import org.litote.kmongo.eq
 
 class MongoEmployeesRepository(
-    client: CoroutineDatabase,
-    private val employeesConverter: EmployeesConverter,
+    coroutineDatabase: CoroutineDatabase,
 ) : EmployeesRepository {
 
-
-    private val collection = client.getCollection<EmployeeEntity>("employees")
-
-    override suspend fun addEmployee(data: CreateEmployeeRequest): CreateEmployeeResponse {
-        val employee = EmployeeEntity(
-            data = EmployeeDataEntity(
-                name = data.name,
-                description = data.description,
-                gender = data.gender
-            )
-        )
-        collection.save(employee)
-        return with(employeesConverter) {
-            CreateEmployeeResponse(employee.toData())
-        }
+    private val employeesCollection = coroutineDatabase.getCollection<EmployeeEntity>(EmployeeEntity.collectionName)
+    override suspend fun throwIfEmployeeNotExists(employeeId: String) {
+        if (!isEmployeeExists(employeeId))
+            throw EmployeeNotExistsWithId(employeeId)
     }
 
-    override suspend fun getAllEmployees(data: GetAllEmployeesRequest): GetAllEmployeesResponse {
-        val services = collection.find().toFlow()
-        return GetAllEmployeesResponse(
-            employees = services.map { with(employeesConverter) { it.toData() } }.toList()
-        )
+    override suspend fun isEmployeeExists(employeeId: String): Boolean {
+        return employeesCollection.countDocuments(EmployeeEntity::id eq employeeId.toIdSecure("employeeId")) >= 1
     }
 
-    override suspend fun layoffEmployee(data: LayoffEmployeeRequest): LayoffEmployeeResponse {
-        val employee = collection.findOneById(ObjectId(data.employeeId))
-            ?: TODO("EmployeeDoesNotExistsException(data.employeeId)")
-        val newEmployee = with(employeesConverter) { employee.copy(layoff = data.toNewEntity()) }
-        collection.save(newEmployee)
-        return LayoffEmployeeResponse(
-            employee = with(employeesConverter) { newEmployee.toData() }
-        )
+    override suspend fun findEmployeeById(employeeId: String): EmployeeEntity {
+        return employeesCollection.findOneById(employeeId.toIdSecure<EmployeeEntity>("employeeId"))
+            ?: throw EmployeeNotExistsWithId(employeeId)
     }
 
-    override suspend fun getEmployeeById(data: GetEmployeeByIdRequest): GetEmployeeByIdResponse {
-        val employee = collection.findOneById(ObjectId(data.employeeId))
-            ?: TODO("EmployeeDoesNotExistsException(data.employeeId)")
-        return GetEmployeeByIdResponse(
-            employee = with(employeesConverter) { employee.toData() }
-        )
+    override suspend fun updateEmployeeData(employeeId: String, data: EmployeeDataEntity): EmployeeEntity {
+        val employee = findEmployeeById(employeeId).copy(data = data)
+        employeesCollection.updateOne(employee)
+        return employee
     }
 
-    override suspend fun addEmployeeImage(data: AddEmployeeImageRequest): AddEmployeeImageResponse {
-        val employee =
-            collection.findOneById(ObjectId(data.data.employeeId))
-                ?: TODO("EmployeeDoesNotExistsException(data.data.employeeId)")
-
-        val newEmployee = employee.copy(image = AssetEntity(type = data.data.type, hash = data.asset.hash))
-        return AddEmployeeImageResponse(
-            employee = with(employeesConverter) { newEmployee.toData() }
-        )
+    override suspend fun updateEmployeeLayoff(employeeId: String, data: EmployeeLayoffEntity): EmployeeEntity {
+        val employee = findEmployeeById(employeeId).copy(layoff = data)
+        employeesCollection.updateOne(employee)
+        return employee
     }
+
+    override suspend fun insertEmployee(data: EmployeeDataEntity): EmployeeEntity {
+        val employee = EmployeeEntity(data = data)
+        employeesCollection.insertOne(employee)
+        return employee
+    }
+
+    override suspend fun findAllEmployees(offset: Int, page: Int): List<EmployeeEntity> {
+        return employeesCollection.find()
+            .ascendingSort(EmployeeEntity::data / EmployeeDataEntity::name)
+            .paged(offset, page)
+            .toList()
+    }
+
 }

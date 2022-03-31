@@ -1,144 +1,91 @@
 package beauty.shafran.network.customers.repository
 
-import beauty.shafran.network.customers.converters.CardTokenDecoder
-import beauty.shafran.network.customers.converters.CardTokenEncoder
-import beauty.shafran.network.customers.converters.CustomersConverter
-import beauty.shafran.network.customers.data.*
 import beauty.shafran.network.customers.entity.CardEntity
 import beauty.shafran.network.customers.entity.CustomerDataEntity
 import beauty.shafran.network.customers.entity.CustomerEntity
-import beauty.shafran.network.customers.exceptions.CustomersException
+import beauty.shafran.network.customers.entity.collectionName
+import beauty.shafran.network.customers.exceptions.CardNotExistsForCustomer
+import beauty.shafran.network.customers.exceptions.CardNotExistsWithId
+import beauty.shafran.network.customers.exceptions.CustomerNotExists
 import beauty.shafran.network.phone.entity.PhoneNumberEntity
-import beauty.shafran.network.session.repository.ServiceSessionsRepository
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.toList
-import org.bson.types.ObjectId
+import beauty.shafran.network.utils.paged
+import beauty.shafran.network.utils.toIdSecure
 import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 import org.litote.kmongo.coroutine.CoroutineDatabase
+import org.litote.kmongo.coroutine.updateOne
 import org.litote.kmongo.div
 import org.litote.kmongo.eq
-import org.litote.kmongo.id.WrappedObjectId
+import org.litote.kmongo.ne
 
 class MongoCustomersRepository(
-    client: CoroutineDatabase,
-    private val tokenEncoder: CardTokenEncoder,
-    private val tokenDecoder: CardTokenDecoder,
-    private val converter: CustomersConverter,
+    coroutineDatabase: CoroutineDatabase,
 ) : CustomersRepository, KoinComponent {
 
-    private val customers = client.getCollection<CustomerEntity>("customers")
-    private val cards = client.getCollection<CardEntity>("cards")
-    private val sessionsRepository by inject<ServiceSessionsRepository>()
+    private val customersCollection = coroutineDatabase.getCollection<CustomerEntity>(CustomerEntity.collectionName)
+    private val cardsCollection = coroutineDatabase.getCollection<CardEntity>(CardEntity.collectionName)
 
-
-    override suspend fun searchCustomerByPhone(data: SearchCustomerByPhoneRequest): SearchCustomerByPhoneResponse {
-        val customer = findCustomerByPhoneNumber(data.phoneNumber.number)
-        return coroutineScope {
-            SearchCustomerByPhoneResponse(
-                searchResult = customer.mapNotNull { with(converter) { it.toData() as? Customer.ActivatedCustomer } }
-                    .map {
-                        async {
-                            FoundCustomerItem(
-                                customer = it,
-                                lastUsedSession = sessionsRepository.getLastSessionForCustomer(it.id)
-                            )
-                        }
-                    }.awaitAll()
-            )
-        }
+    override suspend fun throwIfCustomerNotExists(customerId: String) {
+        if (!isCustomerExists(customerId)) throw CustomerNotExists(customerId)
     }
 
-    override suspend fun restoreCustomer(request: RestoreCustomerRequest) {
-        val customer = CustomerEntity()
-        customers.insertOne(customer)
-        val token = tokenDecoder.decodeTokenToId(request.cardId)
-        cards.save(CardEntity(customer.id.toString(), WrappedObjectId(token)))
+    override suspend fun isCustomerExists(customerId: String): Boolean {
+        return customersCollection.countDocuments(CustomerEntity::id eq customerId.toIdSecure("customerId")) >= 1
     }
 
-    override suspend fun createCustomer(request: CreateCustomersRequest): CreateCustomersResponse {
-        val customerData = with(converter) { request.data.toNewEntity() }
-        val customer = CustomerEntity(customerData)
-        customers.insertOne(customer)
-        val card = CardEntity(customer.id.toString())
-        cards.insertOne(card)
-        return CreateCustomersResponse(
-            token = tokenEncoder.encodeTokenByCard(card),
-            customer = with(converter) { customer.toData() as Customer.ActivatedCustomer }
-        )
+    override suspend fun findCustomerById(customerId: String): CustomerEntity {
+        return customersCollection.findOneById(customerId.toIdSecure<CustomerEntity>("customerId"))
+            ?: throw CustomerNotExists(customerId)
     }
 
-    override suspend fun getCustomerById(request: GetCustomerByIdRequest): GetCustomerByIdResponse {
-        val customer = findCustomerById(request.id)
-        val card = findCardByCustomerId(customer.id.toString())
-        return GetCustomerByIdResponse(
-            cardToken = tokenEncoder.encodeTokenByCard(card),
-            customer = with(converter) { customer.toData() }
-        )
+    override suspend fun updateCustomerData(customerId: String, data: CustomerDataEntity): CustomerEntity {
+        return findCustomerById(customerId).copy(data = data).also { customersCollection.updateOne(it) }
     }
 
-    override suspend fun getCustomerByToken(request: GetCustomerByTokenRequest): GetCustomerByTokenResponse {
-        val id = tokenDecoder.decodeTokenToId(request.token)
-        val card = findCardById(id)
-        val customer = findCustomerById(card.customerId)
-        return GetCustomerByTokenResponse(
-            cardToken = tokenEncoder.encodeTokenByCard(card),
-            customer = with(converter) { customer.toData() }
-        )
+    override suspend fun insertCustomer(data: CustomerDataEntity?): CustomerEntity {
+        return CustomerEntity(data = data).also { customersCollection.insertOne(it) }
     }
 
-
-    override suspend fun getAllCustomers(request: GetAllCustomersRequest): GetAllCustomersResponse {
-        val customers = customers.find().toFlow().map {
-            with(converter) { it.toData() }
-        }
-        return GetAllCustomersResponse(
-            customers = customers.toList()
-        )
+    override suspend fun insertCustomers(count: Int): List<CustomerEntity> {
+        return List(count) { CustomerEntity() }.also { customersCollection.insertMany(it) }
     }
 
-    override suspend fun createEmptyCustomers(request: CreateEmptyCustomersRequest): CreateEmptyCustomersResponse {
-        val customers = List(request.count) { CustomerEntity() }
-        this.customers.insertMany(customers)
-        val cards = customers.associateBy { CardEntity(it.id.toString()) }
-        this.cards.insertMany(cards.keys.toList())
-        return CreateEmptyCustomersResponse(
-            cards = cards.map { tokenEncoder.encodeTokenByCard(it.key) to with(converter) { it.value.toData() as Customer.InactivatedCustomer } }
-                .toMap()
-        )
+    override suspend fun insertCard(customerId: String): CardEntity {
+        if (!isCustomerExists(customerId))
+            throw CustomerNotExists(customerId)
+        return CardEntity(customerId = customerId).also { cardsCollection.insertOne(it) }
     }
 
-    override suspend fun editCustomerData(request: EditCustomerRequest): EditCustomerResponse {
-        val oldEntity = findCustomerById(request.customerId)
-        val newEntity = oldEntity.copy(
-            data = with(converter) { request.data.toNewEntity() }
-        )
-        customers.save(newEntity)
-        return EditCustomerResponse(
-            customer = with(converter) { newEntity.toData() as Customer.ActivatedCustomer }
-        )
+    override suspend fun insertCard(customerId: String, cardId: String): CardEntity {
+        if (!isCustomerExists(customerId))
+            throw CustomerNotExists(customerId)
+        return CardEntity(customerId = customerId,
+            id = cardId.toIdSecure("cardId")).also { cardsCollection.insertOne(it) }
     }
 
-    private suspend fun findCardById(token: String): CardEntity {
-        return cards.findOneById(ObjectId(token)) ?: throw CustomersException.CardNotFoundWithIdException(token)
+    override suspend fun insertCards(customers: List<CustomerEntity>): Map<CardEntity, CustomerEntity> {
+        val cards = customers.associateBy { CardEntity(customerId = it.id.toString()) }
+        cardsCollection.insertMany(cards.keys.toList())
+        return cards
     }
 
-    private suspend fun findCardByCustomerId(customerId: String): CardEntity {
-        return cards.findOne(CardEntity::customerId eq customerId)
-            ?: throw CustomersException.CardNotFoundWithCustomerException(customerId)
+    override suspend fun findCardById(cardId: String): CardEntity {
+        return cardsCollection.findOneById(cardId.toIdSecure<CardEntity>("cardId")) ?: throw CardNotExistsWithId(cardId)
     }
 
-    private suspend fun findCustomerById(customerId: String): CustomerEntity {
-        return customers.findOneById(ObjectId(customerId))
-            ?: throw CustomersException.CustomerNotFoundException(customerId)
+    override suspend fun findCardByCustomerId(customerId: String): CardEntity {
+        return cardsCollection.findOne(CardEntity::customerId eq customerId) ?: throw CardNotExistsForCustomer(
+            customerId)
     }
 
+    override suspend fun findCustomerByPhoneNumber(number: String): List<CustomerEntity> {
+        return customersCollection.find(CustomerEntity::data / CustomerDataEntity::phone / PhoneNumberEntity::number eq number)
+            .toList()
+    }
 
-    private suspend fun findCustomerByPhoneNumber(number: String): List<CustomerEntity> {
-        return customers.find(CustomerEntity::data / CustomerDataEntity::phone / PhoneNumberEntity::number eq number)
+    override suspend fun findAllCustomers(offset: Int, page: Int): List<CustomerEntity> {
+        return customersCollection.find(CustomerEntity::data ne null)
+            .ascendingSort(CustomerEntity::data / CustomerDataEntity::name)
+            .paged(offset, page)
             .toList()
     }
 

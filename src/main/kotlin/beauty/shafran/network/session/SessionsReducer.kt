@@ -5,6 +5,7 @@ import io.ktor.util.pipeline.*
 
 interface SessionsReducer {
 
+    val getSessionUsagesHistory: suspend PipelineContext<Unit, ApplicationCall>.(Unit) -> Unit
     val getServiceSessionsForCustomer: suspend PipelineContext<Unit, ApplicationCall>.(Unit) -> Unit
     val createServiceSessionsForCustomer: suspend PipelineContext<Unit, ApplicationCall>.(Unit) -> Unit
     val useServiceSession: suspend PipelineContext<Unit, ApplicationCall>.(Unit) -> Unit

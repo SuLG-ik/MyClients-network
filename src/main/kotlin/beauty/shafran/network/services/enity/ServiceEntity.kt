@@ -14,8 +14,10 @@ data class ServiceEntity(
     @Contextual
     @SerialName("_id")
     val id: Id<ServiceEntity> = newId(),
-    val configurations: ServiceConfigurationsEntity = ServiceConfigurationsEntity(serviceId = id),
+    val configurations: List<ServiceConfigurationEntity> = emptyList(),
 )
+
+val ServiceEntity.Companion.collectionName get() = "services"
 
 @Serializable
 data class ServiceInfoEntity(
@@ -23,16 +25,6 @@ data class ServiceInfoEntity(
     val description: String,
     val priority: Int = 1,
     val isPublic: Boolean = false,
-)
-
-@Serializable
-data class ServiceConfigurationsEntity(
-    @Contextual
-    val serviceId: Id<ServiceEntity>,
-    @Contextual
-    @SerialName("_id")
-    val id: Id<ServiceConfigurationsEntity> = newId(),
-    val configurations: List<ServiceConfigurationEntity> = emptyList(),
 )
 
 @Serializable

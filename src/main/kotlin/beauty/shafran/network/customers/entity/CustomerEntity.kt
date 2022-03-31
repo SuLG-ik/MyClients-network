@@ -16,6 +16,8 @@ data class CustomerEntity(
     val id: Id<CustomerEntity> = newId(),
 )
 
+val CustomerEntity.Companion.collectionName get() = "customers"
+
 @Serializable
 data class CustomerDataEntity(
     val name: String,

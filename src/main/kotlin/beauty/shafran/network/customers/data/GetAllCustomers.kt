@@ -1,11 +1,15 @@
 package beauty.shafran.network.customers.data
 
+import beauty.shafran.network.validation.ObjectIdParameter
+import jakarta.validation.constraints.Min
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class GetAllCustomersRequest(
-    val page: Int? = null,
-    val sort: String? = null,
+    @field:Min(1)
+    val offset: Int = 30,
+    @field:Min(0)
+    val page: Int = 0,
 )
 
 @Serializable
@@ -20,6 +24,7 @@ data class GetCustomerByTokenRequest(
 
 @Serializable
 data class GetCustomerByIdRequest(
+    @field:ObjectIdParameter
     val id: String,
 )
 

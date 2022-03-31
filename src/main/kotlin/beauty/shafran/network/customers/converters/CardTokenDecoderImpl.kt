@@ -1,6 +1,6 @@
 package beauty.shafran.network.customers.converters
 
-import beauty.shafran.network.customers.exceptions.CustomersException
+import beauty.shafran.network.customers.exceptions.IllegalCardToken
 import io.ktor.util.*
 
 
@@ -16,7 +16,7 @@ class CardTokenDecoderImpl : CardTokenDecoder {
             val decoder = decoders[parts[0]] ?: throw IllegalArgumentException("Unknown decoder version")
             return decoder.decodeTokenToId(decodedToken)
         } catch (e: Exception) {
-            throw CustomersException.IllegalCardTokenException(token)
+            throw IllegalCardToken(token)
         }
     }
 

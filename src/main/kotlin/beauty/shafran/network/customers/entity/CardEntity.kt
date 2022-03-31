@@ -14,3 +14,5 @@ data class CardEntity(
     @SerialName("_id")
     val id: Id<CardEntity> = newId(),
 )
+
+val CardEntity.Companion.collectionName get() = "cards"
