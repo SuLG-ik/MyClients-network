@@ -1,6 +1,7 @@
 package beauty.shafran.network.utils
 
 import beauty.shafran.network.IllegalId
+import org.bson.types.ObjectId
 import org.litote.kmongo.Id
 import org.litote.kmongo.id.WrappedObjectId
 

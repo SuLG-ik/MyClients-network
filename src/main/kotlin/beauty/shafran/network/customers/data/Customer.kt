@@ -1,12 +1,14 @@
 package beauty.shafran.network.customers.data
 
 import beauty.shafran.network.Gender
+import beauty.shafran.network.ZonedDateTimeSerializer
 import beauty.shafran.network.phone.data.PhoneNumber
 import com.arkivanov.essenty.parcelable.Parcelable
 import com.arkivanov.essenty.parcelable.Parcelize
-import jakarta.validation.constraints.Size
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import java.time.ZonedDateTime
+import javax.validation.constraints.Size
 
 @Serializable
 sealed class Customer {
@@ -40,6 +42,8 @@ data class CustomerData(
     val phone: PhoneNumber?,
     val remark: String,
     val gender: Gender,
+    @Serializable(ZonedDateTimeSerializer::class)
+    val activationDate: ZonedDateTime,
 ) : Parcelable
 
 fun CustomerData.trim(): CustomerData {

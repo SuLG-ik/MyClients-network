@@ -5,14 +5,16 @@ import beauty.shafran.network.services.data.*
 
 interface ServicesExecutor {
 
-    suspend fun getServices(data: GetAllServicesRequest): GetAllServicesResponse
+    suspend fun getServices(request: GetAllServicesRequest): GetAllServicesResponse
 
-    suspend fun createService(data: CreateServiceRequest): CreateServiceResponse
+    suspend fun createService(request: CreateServiceRequest): CreateServiceResponse
 
-    suspend fun getServiceById(data: GetServiceByIdRequest): GetServiceByIdResponse
+    suspend fun editService(request: EditServiceRequest): EditServiceResponse
 
-    suspend fun addConfiguration(data: CreateConfigurationRequest): CreateConfigurationResponse
+    suspend fun getServiceById(request: GetServiceByIdRequest): GetServiceByIdResponse
 
-    suspend fun deactivateConfiguration(data: DeactivateServiceConfigurationRequest): DeactivateServiceConfigurationResponse
+    suspend fun addConfiguration(request: CreateConfigurationRequest): CreateConfigurationResponse
+
+    suspend fun deactivateConfiguration(request: DeactivateServiceConfigurationRequest): DeactivateServiceConfigurationResponse
 
 }

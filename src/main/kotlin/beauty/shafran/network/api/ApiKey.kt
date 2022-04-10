@@ -1,116 +1,45 @@
 package beauty.shafran.network.api
 
-import beauty.shafran.network.config.SecureConfiguration
-import get
-import io.ktor.http.*
-import io.ktor.server.application.*
-import io.ktor.server.auth.*
-import io.ktor.server.request.*
-import io.ktor.server.response.*
-import io.ktor.server.routing.*
-import io.ktor.util.pipeline.*
+import org.springframework.context.annotation.Configuration
+import org.springframework.core.annotation.Order
+import org.springframework.security.config.annotation.web.builders.HttpSecurity
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
+import org.springframework.security.config.http.SessionCreationPolicy
+import org.springframework.security.web.authentication.preauth.AbstractPreAuthenticatedProcessingFilter
+import javax.servlet.http.HttpServletRequest
 
 
-private const val ApiKeyCode = "apiKey"
+class APIKeyAuthFilter(
+    private val config: ApiKeyConfig,
+) : AbstractPreAuthenticatedProcessingFilter() {
 
-class ApiPrincipal : Principal
-
-class ApiKeyAuthenticationProvider internal constructor(
-    configuration: Configuration,
-) : AuthenticationProvider(configuration) {
-    internal val headerName: String = configuration.headerName
-
-    internal val authenticationFunction = configuration.authenticationFunction
-
-    internal val challengeFunction = configuration.challengeFunction
-
-    internal val authScheme = configuration.authScheme
-
-    /**
-     * Api key auth configuration.
-     */
-    class Configuration internal constructor(name: String?) : AuthenticationProvider.Configuration(name) {
-
-        internal lateinit var authenticationFunction: ApiKeyAuthenticationFunction
-
-        internal var challengeFunction: ApiKeyAuthChallengeFunction = {
-            call.respond(HttpStatusCode.Unauthorized)
-        }
-
-        /**
-         * Name of the scheme used when challenge fails, see [AuthenticationContext.challenge].
-         */
-        var authScheme: String = "apiKey"
-
-        /**
-         * Name of the header that will be used as a source for the api key.
-         */
-        var headerName: String = "X-Api-Key"
-
-        /**
-         * Sets a validation function that will check given API key retrieved from [headerName] instance and return [Principal],
-         * or null if credential does not correspond to an authenticated principal.
-         */
-        fun validate(body: suspend ApplicationCall.(String) -> Principal?) {
-            authenticationFunction = body
-        }
-
-        /**
-         * A response to send back if authentication failed.
-         */
-        fun challenge(body: ApiKeyAuthChallengeFunction) {
-            challengeFunction = body
-        }
-    }
-}
-
-fun Route.withApi(build: Route.() -> Unit) {
-    val config = get<SecureConfiguration>()
-    authenticate(config.keyName, build = build)
-}
-
-/**
- * Installs API Key authentication mechanism.
- */
-fun Authentication.Configuration.apiKey(
-    name: String? = null,
-    configure: ApiKeyAuthenticationProvider.Configuration.() -> Unit,
-) {
-    val provider = ApiKeyAuthenticationProvider(ApiKeyAuthenticationProvider.Configuration(name).apply(configure))
-    val headerName = provider.headerName
-    val authenticate = provider.authenticationFunction
-    val authScheme = provider.authScheme
-    val challenge = provider.challengeFunction
-
-    provider.pipeline.intercept(AuthenticationPipeline.RequestAuthentication) { context ->
-        val apiKey = call.request.header(headerName)
-        val principal = apiKey?.let { authenticate(call, it) }
-
-        val cause = when {
-            apiKey == null -> AuthenticationFailedCause.NoCredentials
-            principal == null -> AuthenticationFailedCause.InvalidCredentials
-            else -> null
-        }
-        if (cause != null) {
-            context.challenge(authScheme, cause) {
-                challenge.invoke(this, it)
-                it.complete()
-            }
-        }
-        if (principal != null) {
-            context.principal(principal)
-        }
+    override fun getPreAuthenticatedCredentials(request: HttpServletRequest?): String {
+        return ""
     }
 
-    register(provider)
+    override fun getPreAuthenticatedPrincipal(request: HttpServletRequest?): String {
+        return request?.getHeader(config.header) ?: ""
+    }
+
 }
 
-/**
- * Alias for function signature that is invoked when verifying header.
- */
-typealias ApiKeyAuthenticationFunction = suspend ApplicationCall.(String) -> Principal?
+@Configuration
+@EnableWebSecurity
+@Order(1)
+class APISecurityConfig(
+    private val config: ApiKeyConfig,
+) : WebSecurityConfigurerAdapter() {
 
-/**
- * Alias for function signature that is called when authentication fails.
- */
-typealias ApiKeyAuthChallengeFunction = PipelineInterceptor<AuthenticationProcedureChallenge, ApplicationCall>
+    override fun configure(httpSecurity: HttpSecurity) {
+        val filter = APIKeyAuthFilter(config)
+        filter.setAuthenticationManager { authentication ->
+            val principal = authentication.principal
+            authentication.apply { isAuthenticated = config.key == principal }
+        }
+        httpSecurity.antMatcher("/v1/**").csrf().disable().sessionManagement()
+            .sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().addFilter(filter).authorizeRequests()
+            .anyRequest().authenticated()
+    }
+
+}

@@ -5,23 +5,35 @@ import beauty.shafran.network.services.data.*
 import beauty.shafran.network.services.enity.ServiceConfigurationEntity
 import beauty.shafran.network.services.enity.ServiceInfoEntity
 import beauty.shafran.network.services.repository.ServicesRepository
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
-import org.litote.kmongo.coroutine.CoroutineDatabase
+import org.springframework.stereotype.Service
 
-class ServicesExecutorImpl : ServicesExecutor, KoinComponent {
-
-
-    private val converter: ServicesConverter by inject()
-    private val servicesRepository: ServicesRepository by inject()
+@Service
+class ServicesExecutorImpl(
+    private val converter: ServicesConverter,
+    private val servicesRepository: ServicesRepository,
+) : ServicesExecutor {
 
 
-    override suspend fun getServices(data: GetAllServicesRequest): GetAllServicesResponse {
-        val services = servicesRepository.findAllServices(data.offset, data.page)
-        return GetAllServicesResponse(services = with(converter) { services.map { it.toData() } })
+    override suspend fun getServices(request: GetAllServicesRequest): GetAllServicesResponse {
+        val services = servicesRepository.findAllServices(request.offset, request.page)
+        return GetAllServicesResponse(
+            services = with(converter) { services.map { it.toData() } },
+            offset = request.offset,
+            page = request.page,
+        )
     }
 
-    override suspend fun createService(data: CreateServiceRequest): CreateServiceResponse {
+    override suspend fun editService(request: EditServiceRequest): EditServiceResponse {
+        val info = with(converter) { request.data.trim().toNewEntity() }
+        val service = servicesRepository.updateServiceInfo(request.serviceId, info)
+        return EditServiceResponse(
+            service = with(converter) { service.toData() }
+        )
+    }
+
+
+    override suspend fun createService(request: CreateServiceRequest): CreateServiceResponse {
+        val data = request.data.trim()
         val service = servicesRepository.createService(ServiceInfoEntity(
             title = data.title,
             description = data.description,
@@ -31,14 +43,15 @@ class ServicesExecutorImpl : ServicesExecutor, KoinComponent {
         )
     }
 
-    override suspend fun getServiceById(data: GetServiceByIdRequest): GetServiceByIdResponse {
-        val service = servicesRepository.findServiceById(data.serviceId)
+    override suspend fun getServiceById(request: GetServiceByIdRequest): GetServiceByIdResponse {
+        val service = servicesRepository.findServiceById(request.serviceId)
         return GetServiceByIdResponse(
             service = with(converter) { service.toData() }
         )
     }
 
-    override suspend fun addConfiguration(data: CreateConfigurationRequest): CreateConfigurationResponse {
+    override suspend fun addConfiguration(request: CreateConfigurationRequest): CreateConfigurationResponse {
+        val data = request.trim()
         val service = servicesRepository.addConfiguration(data.serviceId, ServiceConfigurationEntity(
             title = data.data.title,
             description = data.data.description,
@@ -50,7 +63,7 @@ class ServicesExecutorImpl : ServicesExecutor, KoinComponent {
         )
     }
 
-    override suspend fun deactivateConfiguration(data: DeactivateServiceConfigurationRequest): DeactivateServiceConfigurationResponse {
+    override suspend fun deactivateConfiguration(request: DeactivateServiceConfigurationRequest): DeactivateServiceConfigurationResponse {
         TODO("Not yet implemented")
     }
 }

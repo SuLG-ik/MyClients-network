@@ -1,8 +1,8 @@
 package beauty.shafran.network.phone.data
 
 import com.arkivanov.essenty.parcelable.Parcelize
-import jakarta.validation.constraints.Size
 import kotlinx.serialization.Serializable
+import javax.validation.constraints.Size
 
 @Serializable
 @Parcelize

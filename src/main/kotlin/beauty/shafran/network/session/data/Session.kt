@@ -2,13 +2,13 @@
 
 package beauty.shafran.network.session.data
 
+import beauty.shafran.network.ZonedDateTimeSerializer
+import beauty.shafran.network.employees.data.Employee
+import beauty.shafran.network.services.data.ConfiguredService
 import com.arkivanov.essenty.parcelable.Parcelable
 import com.arkivanov.essenty.parcelable.Parcelize
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
-import beauty.shafran.network.employees.data.Employee
-import beauty.shafran.network.services.data.ConfiguredService
-import beauty.shafran.network.ZonedDateTimeSerializer
 import java.time.ZonedDateTime
 
 @Serializable
@@ -62,5 +62,5 @@ data class SessionManualDeactivationData(
 
 
 enum class SessionManualDeactivationReason {
-    UNKNOWN
+    UNKNOWN, MISS_CLICK, CANCEL_BY_CUSTOMER, CANCEL_BY_BUSINESS,
 }

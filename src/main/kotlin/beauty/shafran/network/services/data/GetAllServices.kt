@@ -2,8 +2,8 @@ package beauty.shafran.network.services.data
 
 import com.arkivanov.essenty.parcelable.Parcelable
 import com.arkivanov.essenty.parcelable.Parcelize
-import jakarta.validation.constraints.Min
 import kotlinx.serialization.Serializable
+import javax.validation.constraints.Min
 
 @Parcelize
 @Serializable
@@ -18,6 +18,6 @@ data class GetAllServicesRequest(
 @Serializable
 data class GetAllServicesResponse(
     val services: List<Service>,
-    val offset: Int = 30,
-    val page: Int = 0,
+    val offset: Int,
+    val page: Int,
 ) : Parcelable

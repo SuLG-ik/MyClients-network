@@ -3,10 +3,10 @@ package beauty.shafran.network.services.data
 import beauty.shafran.network.validation.ObjectIdParameter
 import com.arkivanov.essenty.parcelable.Parcelable
 import com.arkivanov.essenty.parcelable.Parcelize
-import jakarta.validation.Valid
-import jakarta.validation.constraints.Min
-import jakarta.validation.constraints.Size
 import kotlinx.serialization.Serializable
+import javax.validation.Valid
+import javax.validation.constraints.Min
+import javax.validation.constraints.Size
 
 @Parcelize
 @Serializable

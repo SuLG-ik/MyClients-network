@@ -8,9 +8,17 @@ import beauty.shafran.network.services.enity.ServiceEntity
 import beauty.shafran.network.services.enity.ServiceInfoEntity
 import org.litote.kmongo.newId
 
+@org.springframework.stereotype.Service
 class ServicesConverterImpl(
     private val converter: AssetsConverter,
 ) : ServicesConverter {
+
+    override fun EditableServiceData.toNewEntity(): ServiceInfoEntity {
+        return ServiceInfoEntity(
+            title = title,
+            description = description,
+        )
+    }
 
     override fun DeactivateServiceConfigurationRequest.toNewEntity(): ServiceDeactivationEntity {
         return ServiceDeactivationEntity(

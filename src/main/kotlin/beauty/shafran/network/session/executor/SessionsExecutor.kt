@@ -4,9 +4,11 @@ import beauty.shafran.network.session.data.*
 
 interface SessionsExecutor {
 
-    suspend fun getSessionUsagesHistory(data: GetSessionUsagesHistoryRequest): GetSessionUsagesHistoryResponse
-    suspend fun getSessionsForCustomer(data: GetSessionsForCustomerRequest): GetSessionsForCustomerResponse
-    suspend fun createSessionsForCustomer(data: CreateSessionForCustomerRequest): CreateSessionForCustomerResponse
-    suspend fun useSession(data: UseSessionRequest): UseSessionResponse
+    suspend fun getSessionUsagesHistory(request: GetSessionUsagesHistoryRequest): GetSessionUsagesHistoryResponse
+    suspend fun getSessionsIgnoreDeactivatedForCustomer(request: GetSessionsForCustomerRequest): GetSessionsForCustomerResponse
+    suspend fun createSessionsForCustomer(request: CreateSessionForCustomerRequest): CreateSessionForCustomerResponse
+    suspend fun useSession(request: UseSessionRequest): UseSessionResponse
 
+    suspend fun deactivateSession(request: DeactivateSessionRequest): DeactivateSessionResponse
+    suspend fun getAllSessionsForCustomer(request: GetSessionsForCustomerRequest): GetSessionsForCustomerResponse
 }

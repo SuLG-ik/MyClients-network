@@ -3,8 +3,12 @@ package beauty.shafran.network.config
 import com.mongodb.ConnectionString
 import com.mongodb.MongoClientSettings
 import com.mongodb.MongoCredential
+import org.springframework.boot.context.properties.ConfigurationProperties
+import org.springframework.boot.context.properties.ConstructorBinding
 
-data class MongoClientConfig(
+@ConfigurationProperties("kmongo")
+@ConstructorBinding
+class MongoClientConfig(
     val url: String,
     val database: String,
     val username: String,

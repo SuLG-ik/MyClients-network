@@ -3,8 +3,8 @@ package beauty.shafran.network.employees.data
 import beauty.shafran.network.Gender
 import com.arkivanov.essenty.parcelable.Parcelable
 import com.arkivanov.essenty.parcelable.Parcelize
-import jakarta.validation.constraints.Size
 import kotlinx.serialization.Serializable
+import javax.validation.constraints.Size
 
 @Parcelize
 @Serializable

@@ -1,8 +1,8 @@
 package beauty.shafran.network.customers.data
 
 import beauty.shafran.network.validation.ObjectIdParameter
-import jakarta.validation.Valid
 import kotlinx.serialization.Serializable
+import javax.validation.Valid
 
 @Serializable
 data class EditCustomerRequest(

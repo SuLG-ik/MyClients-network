@@ -1,6 +1,6 @@
 package beauty.shafran.network.employees.repository
 
-import beauty.shafran.network.employees.EmployeeNotExistsWithId
+import beauty.shafran.network.EmployeeNotExistsWithId
 import beauty.shafran.network.employees.entity.EmployeeDataEntity
 import beauty.shafran.network.employees.entity.EmployeeEntity
 import beauty.shafran.network.employees.entity.EmployeeLayoffEntity
@@ -11,7 +11,9 @@ import org.litote.kmongo.coroutine.CoroutineDatabase
 import org.litote.kmongo.coroutine.updateOne
 import org.litote.kmongo.div
 import org.litote.kmongo.eq
+import org.springframework.stereotype.Repository
 
+@Repository
 class MongoEmployeesRepository(
     coroutineDatabase: CoroutineDatabase,
 ) : EmployeesRepository {

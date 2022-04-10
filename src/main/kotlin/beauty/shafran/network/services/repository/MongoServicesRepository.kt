@@ -1,7 +1,7 @@
 package beauty.shafran.network.services.repository
 
-import beauty.shafran.network.services.ConfigurationNotExists
-import beauty.shafran.network.services.ServiceNotExists
+import beauty.shafran.network.ConfigurationNotExists
+import beauty.shafran.network.ServiceNotExists
 import beauty.shafran.network.services.enity.ServiceConfigurationEntity
 import beauty.shafran.network.services.enity.ServiceEntity
 import beauty.shafran.network.services.enity.ServiceInfoEntity
@@ -11,10 +11,19 @@ import beauty.shafran.network.utils.toIdSecure
 import org.litote.kmongo.coroutine.CoroutineDatabase
 import org.litote.kmongo.coroutine.updateOne
 import org.litote.kmongo.div
+import org.litote.kmongo.eq
+import org.springframework.stereotype.Repository
 
+@Repository
 class MongoServicesRepository(coroutineDatabase: CoroutineDatabase) : ServicesRepository {
 
     private val servicesCollection = coroutineDatabase.getCollection<ServiceEntity>(ServiceEntity.collectionName)
+
+    override suspend fun updateServiceInfo(serviceId: String, info: ServiceInfoEntity): ServiceEntity {
+        val service = findServiceById(serviceId).copy(info = info)
+        servicesCollection.updateOneById(serviceId.toIdSecure<ServiceEntity>("serviceId"), service)
+        return service
+    }
 
     override suspend fun findServiceById(serviceId: String): ServiceEntity {
         return servicesCollection.findOneById(serviceId.toIdSecure<ServiceEntity>("serviceId"))
@@ -48,4 +57,11 @@ class MongoServicesRepository(coroutineDatabase: CoroutineDatabase) : ServicesRe
         servicesCollection.updateOne(service)
         return service
     }
+
+
+    override suspend fun throwIfServiceNotExists(serviceId: String) {
+        if (servicesCollection.countDocuments(ServiceEntity::id eq serviceId.toIdSecure("serviceId")) < 1)
+            throw ServiceNotExists(serviceId)
+    }
+
 }

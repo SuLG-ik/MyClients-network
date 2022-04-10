@@ -9,7 +9,9 @@ import beauty.shafran.network.employees.entity.EmployeeDataEntity
 import beauty.shafran.network.employees.entity.EmployeeEntity
 import beauty.shafran.network.employees.entity.EmployeeLayoffEntity
 import beauty.shafran.network.utils.getZonedDateTime
+import org.springframework.stereotype.Service
 
+@Service
 class EmployeesConverterImpl(
     private val assetsConverter: AssetsConverter,
 ) : EmployeesConverter {

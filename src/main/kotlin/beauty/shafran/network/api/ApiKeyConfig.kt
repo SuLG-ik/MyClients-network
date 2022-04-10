@@ -1,11 +1,11 @@
-package beauty.shafran.network.assets.converter
+package beauty.shafran.network.api
 
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.boot.context.properties.ConstructorBinding
 
-
-@ConfigurationProperties("features.assets")
+@ConfigurationProperties("security.api")
 @ConstructorBinding
-data class AssetsConfig(
-    val url: String,
+class ApiKeyConfig(
+    val header: String,
+    val key: String,
 )

@@ -5,7 +5,11 @@ import beauty.shafran.network.customers.data.CustomerData
 import beauty.shafran.network.customers.entity.CustomerDataEntity
 import beauty.shafran.network.customers.entity.CustomerEntity
 import beauty.shafran.network.phone.converters.PhoneNumberConverter
+import org.springframework.stereotype.Service
+import java.time.ZoneId
+import java.time.ZonedDateTime
 
+@Service
 class MongoCustomersConverter(private val phoneNumberConverter: PhoneNumberConverter) : CustomersConverter {
 
 
@@ -26,6 +30,7 @@ class MongoCustomersConverter(private val phoneNumberConverter: PhoneNumberConve
             phone = with(phoneNumberConverter) { phone?.toData() },
             remark = remark,
             gender = gender,
+            activationDate = ZonedDateTime.ofInstant(activationDate.toInstant(), ZoneId.systemDefault())
         )
     }
 

@@ -1,9 +1,9 @@
 package beauty.shafran.network.services.data
 
+import beauty.shafran.network.assets.data.AssetData
 import com.arkivanov.essenty.parcelable.Parcelable
 import com.arkivanov.essenty.parcelable.Parcelize
 import kotlinx.serialization.Serializable
-import beauty.shafran.network.assets.data.AssetData
 
 @Serializable
 @Parcelize

@@ -10,18 +10,18 @@ import beauty.shafran.network.session.repository.SessionsRepository
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
+import org.springframework.stereotype.Service
 
+@Service
 class CustomersExecutorImpl(
     private val tokenEncoder: CardTokenEncoder,
     private val tokenDecoder: CardTokenDecoder,
-) : CustomersExecutor, KoinComponent {
+    private val customersConverter: CustomersConverter,
+    private val sessionsConverter: SessionsConverter,
+    private val sessionsRepository: SessionsRepository,
+    private val customersRepository: CustomersRepository,
+) : CustomersExecutor {
 
-    private val customersConverter: CustomersConverter by inject()
-    private val sessionsConverter: SessionsConverter by inject()
-    private val sessionsRepository: SessionsRepository by inject()
-    private val customersRepository: CustomersRepository by inject()
 
     override suspend fun searchCustomerByPhone(request: SearchCustomerByPhoneRequest): SearchCustomerByPhoneResponse {
         val customer = customersRepository.findCustomerByPhoneNumber(request.phoneNumber.number)
@@ -71,7 +71,7 @@ class CustomersExecutorImpl(
     override suspend fun getAllCustomers(request: GetAllCustomersRequest): GetAllCustomersResponse {
         val customers = customersRepository.findAllCustomers(request.offset, request.page)
             .map { with(customersConverter) { it.toData() } }
-        return GetAllCustomersResponse(customers = customers.toList())
+        return GetAllCustomersResponse(customers = customers.toList(), page = request.page, offset = request.offset)
     }
 
     override suspend fun createEmptyCustomers(request: CreateEmptyCustomersRequest): CreateEmptyCustomersResponse {

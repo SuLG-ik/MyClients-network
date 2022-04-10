@@ -1,29 +1,28 @@
 package beauty.shafran.network.session.converters
 
+import beauty.shafran.network.employees.converters.EmployeesConverter
 import beauty.shafran.network.employees.data.Employee
-import beauty.shafran.network.employees.data.GetEmployeeByIdRequest
-import beauty.shafran.network.employees.executor.EmployeesExecutor
+import beauty.shafran.network.employees.repository.EmployeesRepository
+import beauty.shafran.network.services.converter.ServicesConverter
 import beauty.shafran.network.services.data.ConfiguredService
-import beauty.shafran.network.services.data.GetServiceByIdRequest
-import beauty.shafran.network.services.executor.ServicesExecutor
+import beauty.shafran.network.services.repository.ServicesRepository
 import beauty.shafran.network.session.data.*
 import beauty.shafran.network.session.entity.*
-import beauty.shafran.network.session.executor.SessionsExecutor
 import beauty.shafran.network.utils.getZonedDateTime
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
+import org.springframework.stereotype.Service
 import java.time.ZoneId
 import java.time.ZonedDateTime
 
-class SessionsConverterImpl : SessionsConverter, KoinComponent {
-
-
-    private val employeesExecutor: EmployeesExecutor by inject()
-    private val servicesExecutor: ServicesExecutor by inject()
-    private val sessionsRepository: SessionsExecutor by inject()
+@Service
+class SessionsConverterImpl(
+    private val servicesRepository: ServicesRepository,
+    private val servicesConverter: ServicesConverter,
+    private val employeesRepository: EmployeesRepository,
+    private val employeesConverter: EmployeesConverter,
+) : SessionsConverter {
 
     override suspend fun SessionUsageEntity.toData(): SessionUsage {
         return SessionUsage(
@@ -87,18 +86,15 @@ class SessionsConverterImpl : SessionsConverter, KoinComponent {
     }
 
     private suspend fun findEmployee(employeeId: String): Employee {
-        return employeesExecutor.getEmployeeById(GetEmployeeByIdRequest(employeeId)).employee
+        return with(employeesConverter) { employeesRepository.findEmployeeById(employeeId).toData() }
     }
 
     private suspend fun findConfiguredService(configurationEntity: SessionConfigurationEntity): ConfiguredService {
-        val serviceRequest =
-            servicesExecutor.getServiceById(GetServiceByIdRequest(configurationEntity.serviceId.toString()))
-        val service =
-            serviceRequest.service
-                ?: TODO("throw ServiceDoesNotExistsException(configurationEntity.serviceId.toHexString())")
-
+        val service = with(servicesConverter) {
+            servicesRepository.findServiceById(configurationEntity.serviceId).toData()
+        }
         val configuration =
-            service.data.configurations.firstOrNull { it.id == configurationEntity.configurationId.toString() }
+            service.data.configurations.firstOrNull { it.id == configurationEntity.configurationId }
                 ?: TODO("""throw ConfigurationDoesNotExistsException(
                     serviceId = configurationEntity.serviceId.toHexString(),
                     configurationId = configurationEntity.configurationId.toHexString(),
@@ -115,11 +111,11 @@ class SessionsConverterImpl : SessionsConverter, KoinComponent {
     private suspend fun findUsages(usages: List<SessionUsageEntity>): List<SessionUsage> {
         return coroutineScope {
             usages.associateWith {
-                async(Dispatchers.IO) { employeesExecutor.getEmployeeById(GetEmployeeByIdRequest(it.data.employeeId.toString())) }
+                async(Dispatchers.IO) { employeesRepository.findEmployeeById(it.data.employeeId) }
             }.map {
-                val employee = it.value.await().employee
+                val employee = it.value.await()
                 SessionUsage(id = it.key.id.toString(),
-                    data = SessionUsageData(employee = employee,
+                    data = SessionUsageData(employee = with(employeesConverter) { employee.toData() },
                         note = it.key.data.note,
                         date = it.key.id.getZonedDateTime()))
             }

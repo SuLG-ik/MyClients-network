@@ -11,6 +11,7 @@ interface ServicesConverter {
 
     fun CreateConfigurationRequest.toNewEntity(): ServiceConfigurationEntity
     fun DeactivateServiceConfigurationRequest.toNewEntity(): ServiceDeactivationEntity
+    fun EditableServiceData.toNewEntity(): ServiceInfoEntity
 
     fun ServiceInfoEntity.toData(): ServiceInfo
     fun ServiceEntity.toData(): Service

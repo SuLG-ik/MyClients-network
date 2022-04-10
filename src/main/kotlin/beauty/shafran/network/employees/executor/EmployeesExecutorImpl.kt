@@ -4,20 +4,20 @@ import beauty.shafran.network.employees.converters.EmployeesConverter
 import beauty.shafran.network.employees.data.*
 import beauty.shafran.network.employees.entity.EmployeeDataEntity
 import beauty.shafran.network.employees.repository.EmployeesRepository
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
+import org.springframework.stereotype.Service
 
-class EmployeesExecutorImpl() : EmployeesExecutor, KoinComponent {
+@Service
+class EmployeesExecutorImpl(
+    private val employeesConverter: EmployeesConverter,
+    private val employeesRepository: EmployeesRepository,
+) : EmployeesExecutor {
 
 
-    private val employeesConverter: EmployeesConverter by inject()
-    private val employeesRepository: EmployeesRepository by inject()
-
-    override suspend fun createEmployee(data: CreateEmployeeRequest): CreateEmployeeResponse {
+    override suspend fun createEmployee(request: CreateEmployeeRequest): CreateEmployeeResponse {
         val employeeData = EmployeeDataEntity(
-            name = data.name,
-            description = data.description,
-            gender = data.gender
+            name = request.name,
+            description = request.description,
+            gender = request.gender
         )
         val employee = employeesRepository.insertEmployee(employeeData)
         return with(employeesConverter) {
@@ -25,29 +25,31 @@ class EmployeesExecutorImpl() : EmployeesExecutor, KoinComponent {
         }
     }
 
-    override suspend fun getAllEmployees(data: GetAllEmployeesRequest): GetAllEmployeesResponse {
-        val services = employeesRepository.findAllEmployees(data.offset, data.page)
+    override suspend fun getAllEmployees(request: GetAllEmployeesRequest): GetAllEmployeesResponse {
+        val services = employeesRepository.findAllEmployees(request.offset, request.page)
         return GetAllEmployeesResponse(
-            employees = services.map { with(employeesConverter) { it.toData() } }.toList()
+            employees = services.map { with(employeesConverter) { it.toData() } }.toList(),
+            offset = request.offset,
+            page = request.page,
         )
     }
 
-    override suspend fun layoffEmployee(data: LayoffEmployeeRequest): LayoffEmployeeResponse {
+    override suspend fun layoffEmployee(request: LayoffEmployeeRequest): LayoffEmployeeResponse {
         val employee =
-            employeesRepository.updateEmployeeLayoff(data.employeeId, with(employeesConverter) { data.toNewEntity() })
+            employeesRepository.updateEmployeeLayoff(request.employeeId, with(employeesConverter) { request.toNewEntity() })
         return LayoffEmployeeResponse(
             employee = with(employeesConverter) { employee.toData() }
         )
     }
 
-    override suspend fun getEmployeeById(data: GetEmployeeByIdRequest): GetEmployeeByIdResponse {
-        val employee = employeesRepository.findEmployeeById(data.employeeId)
+    override suspend fun getEmployeeById(request: GetEmployeeByIdRequest): GetEmployeeByIdResponse {
+        val employee = employeesRepository.findEmployeeById(request.employeeId)
         return GetEmployeeByIdResponse(
             employee = with(employeesConverter) { employee.toData() }
         )
     }
 
-    override suspend fun addEmployeeImage(data: AddEmployeeImageRequest): AddEmployeeImageResponse {
+    override suspend fun addEmployeeImage(request: AddEmployeeImageRequest): AddEmployeeImageResponse {
         TODO()
     }
 }

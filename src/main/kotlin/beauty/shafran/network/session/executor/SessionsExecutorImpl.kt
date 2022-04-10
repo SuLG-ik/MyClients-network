@@ -1,5 +1,7 @@
 package beauty.shafran.network.session.executor
 
+import beauty.shafran.network.SessionIsDeactivated
+import beauty.shafran.network.SessionOveruseException
 import beauty.shafran.network.assets.converter.AssetsConverter
 import beauty.shafran.network.customers.converters.CustomersConverter
 import beauty.shafran.network.customers.data.Customer
@@ -7,7 +9,6 @@ import beauty.shafran.network.customers.repository.CustomersRepository
 import beauty.shafran.network.services.converter.ServicesConverter
 import beauty.shafran.network.services.data.ConfiguredService
 import beauty.shafran.network.services.repository.ServicesRepository
-import beauty.shafran.network.session.SessionOveruseException
 import beauty.shafran.network.session.converters.SessionsConverter
 import beauty.shafran.network.session.data.*
 import beauty.shafran.network.session.entity.SessionUsageDataEntity
@@ -16,35 +17,35 @@ import beauty.shafran.network.session.repository.SessionsRepository
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
+import org.springframework.stereotype.Service
 
+@Service
 class SessionsExecutorImpl(
-) : SessionsExecutor, KoinComponent {
-
-    private val sessionsConverter: SessionsConverter by inject()
-    private val customersConverter: CustomersConverter by inject()
-    private val assetsConverter: AssetsConverter by inject()
-
-    private val servicesConverter: ServicesConverter by inject()
-    private val sessionsRepository: SessionsRepository by inject()
-    private val servicesRepository: ServicesRepository by inject()
-    private val customersRepository: CustomersRepository by inject()
+    private val sessionsConverter: SessionsConverter,
+    private val customersConverter: CustomersConverter,
+    private val assetsConverter: AssetsConverter,
+    private val servicesConverter: ServicesConverter,
+    private val sessionsRepository: SessionsRepository,
+    private val servicesRepository: ServicesRepository,
+    private val customersRepository: CustomersRepository,
+) : SessionsExecutor {
 
 
-    override suspend fun getSessionUsagesHistory(data: GetSessionUsagesHistoryRequest): GetSessionUsagesHistoryResponse {
+    override suspend fun getSessionUsagesHistory(request: GetSessionUsagesHistoryRequest): GetSessionUsagesHistoryResponse {
         val lastUsages = sessionsRepository.findUsagesHistory(
-            offset = data.offset,
-            page = data.page
+            offset = request.offset,
+            page = request.page
         )
         return coroutineScope {
             GetSessionUsagesHistoryResponse(
-                usages = lastUsages.map { loadSessionUsageHistoryItem(it) }
+                usages = lastUsages.mapNotNull { loadSessionUsageHistoryItem(it) },
+                offset = request.offset,
+                page = request.page,
             )
         }
     }
 
-    private suspend fun loadSessionUsageHistoryItem(entity: SessionUsageEntity): SessionUsageHistoryItem {
+    private suspend fun loadSessionUsageHistoryItem(entity: SessionUsageEntity): SessionUsageHistoryItem? {
         return coroutineScope {
             val usage = async { with(sessionsConverter) { entity.toData() } }
             val session = async { sessionsRepository.findSessionById(entity.sessionId) }
@@ -56,7 +57,7 @@ class SessionsExecutorImpl(
             }
             val service =
                 async { servicesRepository.findServiceById(session.await().activation.configuration.serviceId) }
-            val customer = async { customersRepository.findCustomerById(session.await().activation.customerId) }
+            val customer = async { customersRepository.findCustomerByIdOrNull(session.await().activation.customerId) }
             SessionUsageHistoryItem(
                 service = ConfiguredService(
                     serviceId = service.await().id.toString(),
@@ -65,15 +66,16 @@ class SessionsExecutorImpl(
                     configuration = with(servicesConverter) { configuration.await().toData() }
                 ),
                 usage = usage.await(),
-                customer = with(customersConverter) { customer.await().toData() as Customer.ActivatedCustomer }
+                customer = with(customersConverter) { customer.await()?.toData() as? Customer.ActivatedCustomer }
+                    ?: return@coroutineScope null
             )
         }
 
     }
 
-    override suspend fun getSessionsForCustomer(data: GetSessionsForCustomerRequest): GetSessionsForCustomerResponse {
+    override suspend fun getAllSessionsForCustomer(request: GetSessionsForCustomerRequest): GetSessionsForCustomerResponse {
         return coroutineScope {
-            val sessionEntities = sessionsRepository.findSessionsForCustomer(data.customerId)
+            val sessionEntities = sessionsRepository.findSessionsForCustomer(request.customerId)
             GetSessionsForCustomerResponse(
                 sessions = sessionEntities.map {
                     with(sessionsConverter) { async { it.toData(sessionsRepository.findUsagesForSession(it.id.toString())) } }
@@ -82,19 +84,32 @@ class SessionsExecutorImpl(
         }
     }
 
-    override suspend fun createSessionsForCustomer(data: CreateSessionForCustomerRequest): CreateSessionForCustomerResponse {
+    override suspend fun getSessionsIgnoreDeactivatedForCustomer(request: GetSessionsForCustomerRequest): GetSessionsForCustomerResponse {
         return coroutineScope {
-            val session = sessionsRepository.insertSession(with(sessionsConverter) { data.toNewEntity() })
+            val sessionEntities = sessionsRepository.findSessionsIgnoreDeactivatedForCustomer(request.customerId)
+            GetSessionsForCustomerResponse(
+                sessions = sessionEntities.map {
+                    with(sessionsConverter) { async { it.toData(sessionsRepository.findUsagesForSession(it.id.toString())) } }
+                }.toList().awaitAll()
+            )
+        }
+    }
+
+    override suspend fun createSessionsForCustomer(request: CreateSessionForCustomerRequest): CreateSessionForCustomerResponse {
+        return coroutineScope {
+            val session = sessionsRepository.insertSession(with(sessionsConverter) { request.toNewEntity() })
             CreateSessionForCustomerResponse(
                 session = with(sessionsConverter) { session.toData(sessionsRepository.findUsagesForSession(session.id.toString())) }
             )
         }
     }
 
-    override suspend fun useSession(data: UseSessionRequest): UseSessionResponse {
+    override suspend fun useSession(request: UseSessionRequest): UseSessionResponse {
         return coroutineScope {
             val session =
-                sessionsRepository.findSessionById(data.sessionId)
+                sessionsRepository.findSessionById(request.sessionId)
+            if (session.deactivation != null)
+                throw SessionIsDeactivated(request.sessionId)
             val configuration = async {
                 servicesRepository.findConfigurationForService(
                     session.activation.configuration.configurationId,
@@ -102,16 +117,16 @@ class SessionsExecutorImpl(
                 )
             }
             val usagesCount =
-                async { sessionsRepository.countUsagesForSession(sessionId = session.id.toString()) }
+                async { sessionsRepository.countUsagesForSession(sessionId = request.sessionId.toString()) }
 
             if (usagesCount.await() >= configuration.await().amount) {
-                throw SessionOveruseException(data.sessionId)
+                throw SessionOveruseException(request.sessionId)
             }
             sessionsRepository.useSession(
                 SessionUsageEntity(
                     data = SessionUsageDataEntity(
-                        employeeId = data.employeeId,
-                        note = data.note,
+                        employeeId = request.employeeId,
+                        note = request.note,
                     ),
                     sessionId = session.id.toString(),
                 )
@@ -120,6 +135,14 @@ class SessionsExecutorImpl(
                 session = with(sessionsConverter) { session.toData(sessionsRepository.findUsagesForSession(session.id.toString())) }
             )
         }
+    }
+
+    override suspend fun deactivateSession(request: DeactivateSessionRequest): DeactivateSessionResponse {
+        val session = sessionsRepository.deactivateSessionForCustomer(request.sessionId, request.data)
+        val usages = sessionsRepository.findUsagesForSession(request.sessionId)
+        return DeactivateSessionResponse(
+            with(sessionsConverter) { session.toData(usages) }
+        )
     }
 
 

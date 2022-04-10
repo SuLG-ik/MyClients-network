@@ -1,4 +1,4 @@
-package beauty.shafran.network.services
+package beauty.shafran.network.customers
 
 import beauty.shafran.network.ShafranNetworkException
 import kotlinx.serialization.SerialName

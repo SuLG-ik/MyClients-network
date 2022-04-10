@@ -1,25 +1,26 @@
 package beauty.shafran.network.customers.repository
 
+import beauty.shafran.network.CardNotExistsForCustomer
+import beauty.shafran.network.CardNotExistsWithId
+import beauty.shafran.network.CustomerNotExists
 import beauty.shafran.network.customers.entity.CardEntity
 import beauty.shafran.network.customers.entity.CustomerDataEntity
 import beauty.shafran.network.customers.entity.CustomerEntity
 import beauty.shafran.network.customers.entity.collectionName
-import beauty.shafran.network.customers.exceptions.CardNotExistsForCustomer
-import beauty.shafran.network.customers.exceptions.CardNotExistsWithId
-import beauty.shafran.network.customers.exceptions.CustomerNotExists
 import beauty.shafran.network.phone.entity.PhoneNumberEntity
 import beauty.shafran.network.utils.paged
 import beauty.shafran.network.utils.toIdSecure
-import org.koin.core.component.KoinComponent
 import org.litote.kmongo.coroutine.CoroutineDatabase
 import org.litote.kmongo.coroutine.updateOne
 import org.litote.kmongo.div
 import org.litote.kmongo.eq
 import org.litote.kmongo.ne
+import org.springframework.stereotype.Repository
 
+@Repository
 class MongoCustomersRepository(
     coroutineDatabase: CoroutineDatabase,
-) : CustomersRepository, KoinComponent {
+) : CustomersRepository {
 
     private val customersCollection = coroutineDatabase.getCollection<CustomerEntity>(CustomerEntity.collectionName)
     private val cardsCollection = coroutineDatabase.getCollection<CardEntity>(CardEntity.collectionName)
@@ -35,6 +36,10 @@ class MongoCustomersRepository(
     override suspend fun findCustomerById(customerId: String): CustomerEntity {
         return customersCollection.findOneById(customerId.toIdSecure<CustomerEntity>("customerId"))
             ?: throw CustomerNotExists(customerId)
+    }
+
+    override suspend fun findCustomerByIdOrNull(customerId: String): CustomerEntity? {
+        return customersCollection.findOneById(customerId.toIdSecure<CustomerEntity>("customerId"))
     }
 
     override suspend fun updateCustomerData(customerId: String, data: CustomerDataEntity): CustomerEntity {

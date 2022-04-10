@@ -1,17 +1,22 @@
 package beauty.shafran.network.customers.converters
 
-import beauty.shafran.network.customers.exceptions.IllegalCardToken
-import io.ktor.util.*
+import beauty.shafran.network.IllegalCardToken
+import org.springframework.stereotype.Service
+import java.util.*
 
 
+@Service
 class CardTokenDecoderImpl : CardTokenDecoder {
 
     private val decoders = mapOf<String, CardTokenDecoder>("0" to CardTokenDecoder0())
 
-    @OptIn(InternalAPI::class)
+    private val decoder = Base64.getDecoder()
+
+
     override fun decodeTokenToId(token: String): String {
         try {
-            val decodedToken = token.decodeBase64String()
+
+            val decodedToken = decoder.decode(token).decodeToString()
             val parts = decodedToken.split("$")
             val decoder = decoders[parts[0]] ?: throw IllegalArgumentException("Unknown decoder version")
             return decoder.decodeTokenToId(decodedToken)

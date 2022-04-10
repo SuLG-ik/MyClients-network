@@ -2,9 +2,9 @@ package beauty.shafran.network.customers.data
 
 import com.arkivanov.essenty.parcelable.Parcelable
 import com.arkivanov.essenty.parcelable.Parcelize
-import jakarta.validation.Valid
-import jakarta.validation.constraints.Min
 import kotlinx.serialization.Serializable
+import javax.validation.Valid
+import javax.validation.constraints.Min
 
 @Parcelize
 @Serializable

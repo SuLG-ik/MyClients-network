@@ -9,6 +9,7 @@ interface CustomersRepository {
     suspend fun throwIfCustomerNotExists(customerId: String)
     suspend fun isCustomerExists(customerId: String): Boolean
     suspend fun findCustomerById(customerId: String): CustomerEntity
+    suspend fun findCustomerByIdOrNull(customerId: String): CustomerEntity?
     suspend fun updateCustomerData(customerId: String, data: CustomerDataEntity): CustomerEntity
     suspend fun insertCustomer(data: CustomerDataEntity?): CustomerEntity
     suspend fun insertCustomers(count: Int): List<CustomerEntity>

@@ -1,12 +1,12 @@
 package beauty.shafran.network.validation
 
-import jakarta.validation.Constraint
-import jakarta.validation.ConstraintValidator
-import jakarta.validation.ConstraintValidatorContext
-import jakarta.validation.Payload
-import jakarta.validation.constraintvalidation.SupportedValidationTarget
-import jakarta.validation.constraintvalidation.ValidationTarget
 import org.bson.types.ObjectId
+import javax.validation.Constraint
+import javax.validation.ConstraintValidator
+import javax.validation.ConstraintValidatorContext
+import javax.validation.Payload
+import javax.validation.constraintvalidation.SupportedValidationTarget
+import javax.validation.constraintvalidation.ValidationTarget
 import kotlin.reflect.KClass
 
 
@@ -19,7 +19,7 @@ annotation class ObjectIdParameter(
     val payload: Array<KClass<out Payload>> = [],
 )
 
-@SupportedValidationTarget(ValidationTarget.PARAMETERS)
+@SupportedValidationTarget(ValidationTarget.ANNOTATED_ELEMENT)
 class ObjectIdParametersValidator :
     ConstraintValidator<ObjectIdParameter?, String> {
 

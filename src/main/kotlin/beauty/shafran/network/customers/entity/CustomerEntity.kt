@@ -7,6 +7,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.litote.kmongo.Id
 import org.litote.kmongo.newId
+import java.util.*
 
 @Serializable
 data class CustomerEntity(
@@ -24,5 +25,7 @@ data class CustomerDataEntity(
     val phone: PhoneNumberEntity?,
     val gender: Gender,
     val remark: String,
+    @Contextual
+    val activationDate: Date = Date(),
 )
 

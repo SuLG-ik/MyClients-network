@@ -31,6 +31,8 @@ data class SessionActivationEntity(
     val employeeId: String,
     val customerId: String,
     val note: String? = null,
+    @Contextual
+    val date: Date = Date(),
 )
 
 @Serializable

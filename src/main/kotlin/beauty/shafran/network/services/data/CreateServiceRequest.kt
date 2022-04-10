@@ -1,21 +1,34 @@
 package beauty.shafran.network.services.data
 
+import beauty.shafran.network.validation.ObjectIdParameter
 import com.arkivanov.essenty.parcelable.Parcelable
 import com.arkivanov.essenty.parcelable.Parcelize
-import jakarta.validation.constraints.Size
 import kotlinx.serialization.Serializable
-
+import javax.validation.Valid
+import javax.validation.constraints.Size
 
 @Parcelize
 @Serializable
-data class CreateServiceRequest(
+data class EditableServiceData(
     @field:Size(min = 2)
     val title: String,
     val description: String,
 ) : Parcelable
 
-fun CreateServiceRequest.trim(): CreateServiceRequest {
+fun EditableServiceData.trim(): EditableServiceData {
     return copy(description = description.trim(), title = title.trim())
+}
+
+@Parcelize
+@Serializable
+data class CreateServiceRequest(
+    @Valid
+    val data: EditableServiceData,
+) : Parcelable
+
+
+fun CreateServiceRequest.trim(): CreateServiceRequest {
+    return copy(data = data.trim())
 }
 
 @Parcelize
@@ -24,3 +37,18 @@ data class CreateServiceResponse(
     val service: Service,
 ) : Parcelable
 
+
+@Parcelize
+@Serializable
+data class EditServiceRequest(
+    @ObjectIdParameter
+    val serviceId: String,
+    @Valid
+    val data: EditableServiceData,
+) : Parcelable
+
+@Parcelize
+@Serializable
+data class EditServiceResponse(
+    val service: Service,
+) : Parcelable

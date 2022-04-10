@@ -4,6 +4,7 @@ import beauty.shafran.network.validation.ObjectIdParameter
 import com.arkivanov.essenty.parcelable.Parcelable
 import com.arkivanov.essenty.parcelable.Parcelize
 import kotlinx.serialization.Serializable
+import javax.validation.Valid
 
 @Serializable
 @Parcelize
@@ -18,5 +19,29 @@ data class UseSessionRequest(
 @Serializable
 @Parcelize
 data class UseSessionResponse(
+    val session: Session,
+) : Parcelable
+
+@Parcelize
+@Serializable
+data class DeactivateSessionRequest(
+    @ObjectIdParameter
+    val sessionId: String,
+    @Valid
+    val data: DeactivateSessionRequestData,
+) : Parcelable
+
+@Serializable
+@Parcelize
+data class DeactivateSessionRequestData(
+    @ObjectIdParameter
+    val employeeId: String,
+    val note: String?,
+    val reason: SessionManualDeactivationReason,
+) : Parcelable
+
+@Parcelize
+@Serializable
+data class DeactivateSessionResponse(
     val session: Session,
 ) : Parcelable
