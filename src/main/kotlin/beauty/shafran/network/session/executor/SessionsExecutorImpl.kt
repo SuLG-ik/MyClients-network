@@ -14,6 +14,7 @@ import beauty.shafran.network.session.data.*
 import beauty.shafran.network.session.entity.SessionUsageDataEntity
 import beauty.shafran.network.session.entity.SessionUsageEntity
 import beauty.shafran.network.session.repository.SessionsRepository
+import beauty.shafran.network.utils.toLocalDate
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
@@ -135,6 +136,56 @@ class SessionsExecutorImpl(
                 session = with(sessionsConverter) { session.toData(sessionsRepository.findUsagesForSession(session.id.toString())) }
             )
         }
+    }
+
+    private suspend fun getConfiguredServiceById(serviceId: String, configurationId: String): ConfiguredService {
+        val service = servicesRepository.findServiceById(serviceId)
+        val configuration = servicesRepository.findConfigurationForService(configurationId, serviceId)
+        return ConfiguredService(
+            serviceId = serviceId,
+            info = with(servicesConverter) { service.info.toData() },
+            image = with(assetsConverter) { service.image?.toData() },
+            configuration = with(servicesConverter) { configuration.toData() },
+        )
+    }
+
+
+    override suspend fun getSessionsStats(request: GetSessionsStatsRequest): GetSessionsStatsResponse {
+        return coroutineScope {
+            val activatedSessionsCount = async { sessionsRepository.countActivationsForPeriod(request.period) }
+            val usedSessionsCount = async { sessionsRepository.countUsagesForPeriod(request.period) }
+            val usagesForPeriod = async { sessionsRepository.findUsagesForPeriod(request.period) }
+            val popularService = async {
+                val mostPopularService = usagesForPeriod.await().map {
+                    async {
+                        sessionsRepository.findSessionById(it.sessionId).activation.configuration
+                    }
+                }.awaitAll().groupBy { it.serviceId }.values.maxByOrNull {
+                    it.size
+                } ?: return@async null
+                val service = mostPopularService.first()
+                MostPopularService(
+                    count = mostPopularService.size,
+                    configuredService = with(servicesConverter) {
+                        servicesRepository.findServiceById(service.serviceId).toData()
+                    }
+                )
+            }
+            val usages = async {
+                usagesForPeriod.await().groupBy { it.data.date.toLocalDate() }
+                    .map { DayToCountUsageStat(it.key, it.value.size) }
+            }
+            return@coroutineScope GetSessionsStatsResponse(
+                stats = SessionStats(
+                    activatedSessionsCount = activatedSessionsCount.await(),
+                    usedSessionsCount = usedSessionsCount.await(),
+                    popularService = popularService.await() ?: TODO(),
+                    usages = usages.await(),
+                ),
+                period = request.period
+            )
+        }
+
     }
 
     override suspend fun deactivateSession(request: DeactivateSessionRequest): DeactivateSessionResponse {

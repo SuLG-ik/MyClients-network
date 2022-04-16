@@ -15,9 +15,9 @@ class EmployeesExecutorImpl(
 
     override suspend fun createEmployee(request: CreateEmployeeRequest): CreateEmployeeResponse {
         val employeeData = EmployeeDataEntity(
-            name = request.name,
-            description = request.description,
-            gender = request.gender
+            name = request.data.name,
+            description = request.data.description,
+            gender = request.data.gender
         )
         val employee = employeesRepository.insertEmployee(employeeData)
         return with(employeesConverter) {
@@ -36,7 +36,8 @@ class EmployeesExecutorImpl(
 
     override suspend fun layoffEmployee(request: LayoffEmployeeRequest): LayoffEmployeeResponse {
         val employee =
-            employeesRepository.updateEmployeeLayoff(request.employeeId, with(employeesConverter) { request.toNewEntity() })
+            employeesRepository.updateEmployeeLayoff(request.employeeId,
+                with(employeesConverter) { request.toNewEntity() })
         return LayoffEmployeeResponse(
             employee = with(employeesConverter) { employee.toData() }
         )

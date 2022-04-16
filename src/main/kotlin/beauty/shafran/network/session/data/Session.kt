@@ -26,6 +26,7 @@ data class SessionActivation(
     val employee: Employee,
     val service: ConfiguredService,
     val customerId: String,
+    val date: ZonedDateTime,
     val note: String?,
 ) : Parcelable
 
@@ -61,6 +62,7 @@ data class SessionManualDeactivationData(
 ) : Parcelable
 
 
+
 enum class SessionManualDeactivationReason {
-    UNKNOWN, MISS_CLICK, CANCEL_BY_CUSTOMER, CANCEL_BY_BUSINESS,
+    UNKNOWN, MISS_CLICK, MONEY_BACK;
 }

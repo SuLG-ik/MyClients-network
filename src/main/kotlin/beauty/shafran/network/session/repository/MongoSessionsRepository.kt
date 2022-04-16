@@ -6,13 +6,12 @@ import beauty.shafran.network.SessionNotExists
 import beauty.shafran.network.customers.repository.CustomersRepository
 import beauty.shafran.network.session.data.DeactivateSessionRequestData
 import beauty.shafran.network.session.entity.*
+import beauty.shafran.network.utils.DatePeriod
 import beauty.shafran.network.utils.paged
 import beauty.shafran.network.utils.toIdSecure
-import org.litote.kmongo.`in`
-import org.litote.kmongo.and
+import beauty.shafran.network.utils.toStartOfDate
+import org.litote.kmongo.*
 import org.litote.kmongo.coroutine.CoroutineDatabase
-import org.litote.kmongo.div
-import org.litote.kmongo.eq
 import org.springframework.stereotype.Repository
 
 @Repository
@@ -24,6 +23,35 @@ class MongoSessionsRepository(
     private val sessionsCollection = coroutineDatabase.getCollection<SessionEntity>(SessionEntity.collectionName)
     private val usagesCollection =
         coroutineDatabase.getCollection<SessionUsageEntity>(SessionUsageEntity.collectionName)
+
+
+    override suspend fun countUsagesForPeriod(period: DatePeriod, sessionId: String?, employeeId: String?): Int {
+        return usagesCollection.countDocuments(
+            and(
+                SessionUsageEntity::data / SessionUsageDataEntity::date gte period.from.toStartOfDate(),
+                SessionUsageEntity::data / SessionUsageDataEntity::date lt period.to.plusDays(1).toStartOfDate(),
+            )
+        ).toInt()
+    }
+
+    override suspend fun countActivationsForPeriod(period: DatePeriod, sessionId: String?, employeeId: String?): Int {
+        return sessionsCollection.countDocuments(
+            and(
+                SessionEntity::activation / SessionActivationEntity::date gte period.from.toStartOfDate(),
+                SessionEntity::activation / SessionActivationEntity::date lt period.to.plusDays(1).toStartOfDate(),
+                SessionEntity::deactivation eq null
+            )
+        ).toInt()
+    }
+
+    override suspend fun findUsagesForPeriod(period: DatePeriod): List<SessionUsageEntity> {
+        return usagesCollection.find(
+            and(
+                SessionUsageEntity::data / SessionUsageDataEntity::date gte period.from.toStartOfDate(),
+                SessionUsageEntity::data / SessionUsageDataEntity::date lt period.to.plusDays(1).toStartOfDate(),
+            )
+        ).toList()
+    }
 
     override suspend fun isSessionExists(sessionId: String): Boolean {
         return sessionsCollection.countDocuments(SessionEntity::id eq sessionId.toIdSecure("sessionId")) >= 1

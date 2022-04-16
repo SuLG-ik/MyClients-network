@@ -4,19 +4,33 @@ import beauty.shafran.network.Gender
 import com.arkivanov.essenty.parcelable.Parcelable
 import com.arkivanov.essenty.parcelable.Parcelize
 import kotlinx.serialization.Serializable
+import javax.validation.Valid
 import javax.validation.constraints.Size
+
 
 @Parcelize
 @Serializable
 data class CreateEmployeeRequest(
-    @field:Size(min = 2, max = 64, message = "Name length must be betwern 2 and 64")
+    @field:Valid
+    val data: CreateEmployeeRequestData,
+) : Parcelable
+
+@Parcelize
+@Serializable
+data class CreateEmployeeRequestData(
+    @field:Size(min = 2, max = 64, message = "Name length must be between 2 and 64")
     val name: String,
     val gender: Gender,
     val description: String,
 ) : Parcelable
 
-fun CreateEmployeeRequest.trim(): CreateEmployeeRequest {
+
+fun CreateEmployeeRequestData.trim(): CreateEmployeeRequestData {
     return copy(name = name.trim(), description = description.trim())
+}
+
+fun CreateEmployeeRequest.trim(): CreateEmployeeRequest {
+    return copy(data = data.trim())
 }
 
 @Parcelize

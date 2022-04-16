@@ -27,6 +27,16 @@ class Sessions(
     }
 
     @RequestMapping(
+        value = ["/getSessionsStats"],
+        method = [RequestMethod.GET],
+        produces = [MediaType.APPLICATION_JSON_VALUE],
+        consumes = [MediaType.APPLICATION_JSON_VALUE],
+    )
+    suspend fun getSessionsStats(@Valid @RequestBody request: GetSessionsStatsRequest): GetSessionsStatsResponse {
+        return executor.getSessionsStats(request)
+    }
+
+    @RequestMapping(
         value = ["/getAllServiceSessionsForCustomer"],
         method = [RequestMethod.GET],
         produces = [MediaType.APPLICATION_JSON_VALUE],
@@ -46,18 +56,6 @@ class Sessions(
         return executor.getSessionsIgnoreDeactivatedForCustomer(request)
     }
 
-
-    @RequestMapping(
-        value = ["/getServiceSessionsForCustomer"],
-        method = [RequestMethod.GET],
-        produces = [MediaType.APPLICATION_JSON_VALUE],
-        consumes = [MediaType.APPLICATION_JSON_VALUE],
-    )
-    @Deprecated(message = "Must be replaced in next release",
-        replaceWith = ReplaceWith("getServiceSessionsIgnoreDeactivatedForCustomer(request)"))
-    suspend fun getServiceSessionsForCustomer(@Valid @RequestBody request: GetSessionsForCustomerRequest): GetSessionsForCustomerResponse {
-        return getServiceSessionsIgnoreDeactivatedForCustomer(request)
-    }
 
     @RequestMapping(
         value = ["/useServiceSession"],

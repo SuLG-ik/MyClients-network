@@ -19,6 +19,7 @@ class MongoServicesRepository(coroutineDatabase: CoroutineDatabase) : ServicesRe
 
     private val servicesCollection = coroutineDatabase.getCollection<ServiceEntity>(ServiceEntity.collectionName)
 
+
     override suspend fun updateServiceInfo(serviceId: String, info: ServiceInfoEntity): ServiceEntity {
         val service = findServiceById(serviceId).copy(info = info)
         servicesCollection.updateOneById(serviceId.toIdSecure<ServiceEntity>("serviceId"), service)

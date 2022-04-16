@@ -4,10 +4,27 @@ import beauty.shafran.network.session.data.DeactivateSessionRequestData
 import beauty.shafran.network.session.entity.SessionActivationEntity
 import beauty.shafran.network.session.entity.SessionEntity
 import beauty.shafran.network.session.entity.SessionUsageEntity
+import beauty.shafran.network.utils.DatePeriod
 
 interface SessionsRepository {
 
     suspend fun throwIfSessionNotExists(sessionId: String)
+
+    suspend fun countUsagesForPeriod(
+        period: DatePeriod,
+        sessionId: String? = null,
+        employeeId: String? = null,
+    ): Int
+
+    suspend fun countActivationsForPeriod(
+        period: DatePeriod,
+        sessionId: String? = null,
+        employeeId: String? = null,
+    ): Int
+
+    suspend fun findUsagesForPeriod(period: DatePeriod): List<SessionUsageEntity>
+
+
     suspend fun countUsagesForSession(sessionId: String): Long
     suspend fun findSessionById(sessionId: String): SessionEntity
     suspend fun findUsagesForSession(sessionId: String): List<SessionUsageEntity>
@@ -17,7 +34,6 @@ interface SessionsRepository {
     suspend fun useSession(data: SessionUsageEntity): SessionUsageEntity
     suspend fun findUsagesHistory(offset: Int, page: Int): List<SessionUsageEntity>
     suspend fun insertSession(activation: SessionActivationEntity): SessionEntity
-
     suspend fun deactivateSessionForCustomer(sessionId: String, data: DeactivateSessionRequestData): SessionEntity
     suspend fun findSessionsForCustomer(customerId: String): List<SessionEntity>
 }

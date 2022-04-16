@@ -25,16 +25,16 @@ data class UseSessionResponse(
 @Parcelize
 @Serializable
 data class DeactivateSessionRequest(
-    @ObjectIdParameter
+    @field:ObjectIdParameter
     val sessionId: String,
-    @Valid
+    @field:Valid
     val data: DeactivateSessionRequestData,
 ) : Parcelable
 
 @Serializable
 @Parcelize
 data class DeactivateSessionRequestData(
-    @ObjectIdParameter
+    @field:ObjectIdParameter
     val employeeId: String,
     val note: String?,
     val reason: SessionManualDeactivationReason,

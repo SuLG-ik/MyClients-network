@@ -24,7 +24,7 @@ data class CreateEmptyCustomersResponse(
 @Serializable
 data class CreateCustomersRequest(
     @field:Valid
-    val data: CustomerData,
+    val data: EditableCustomerData,
 ) : Parcelable
 
 fun CreateCustomersRequest.trim(): CreateCustomersRequest {

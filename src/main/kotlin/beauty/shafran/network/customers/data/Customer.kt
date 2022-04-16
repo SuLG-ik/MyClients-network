@@ -43,7 +43,7 @@ data class CustomerData(
     val remark: String,
     val gender: Gender,
     @Serializable(ZonedDateTimeSerializer::class)
-    val activationDate: ZonedDateTime,
+    val activationDate: ZonedDateTime = ZonedDateTime.now(),
 ) : Parcelable
 
 fun CustomerData.trim(): CustomerData {

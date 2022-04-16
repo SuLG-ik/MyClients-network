@@ -86,13 +86,6 @@ class IllegalPhoneNumber(val number: String) : ShafranNetworkException() {
 }
 
 @Serializable
-@SerialName("illegal_request")
-class IllegalRequest(val fieldName: String, override val message: String) : ShafranNetworkException() {
-    override val httpStatusCode: HttpStatus
-        get() = HttpStatus.BAD_REQUEST
-}
-
-@Serializable
 @SerialName("employee_not_exists")
 class EmployeeNotExistsWithId(
     val employeeId: String,

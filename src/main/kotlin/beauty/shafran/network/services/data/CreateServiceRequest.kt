@@ -22,7 +22,7 @@ fun EditableServiceData.trim(): EditableServiceData {
 @Parcelize
 @Serializable
 data class CreateServiceRequest(
-    @Valid
+    @field:Valid
     val data: EditableServiceData,
 ) : Parcelable
 
@@ -41,9 +41,10 @@ data class CreateServiceResponse(
 @Parcelize
 @Serializable
 data class EditServiceRequest(
-    @ObjectIdParameter
+    @field:ObjectIdParameter
     val serviceId: String,
-    @Valid
+    @field:Valid
+
     val data: EditableServiceData,
 ) : Parcelable
 

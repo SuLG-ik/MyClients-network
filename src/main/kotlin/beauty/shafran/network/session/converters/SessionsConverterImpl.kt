@@ -1,5 +1,6 @@
 package beauty.shafran.network.session.converters
 
+import beauty.shafran.network.ConfigurationNotExists
 import beauty.shafran.network.employees.converters.EmployeesConverter
 import beauty.shafran.network.employees.data.Employee
 import beauty.shafran.network.employees.repository.EmployeesRepository
@@ -70,6 +71,7 @@ class SessionsConverterImpl(
                 service = configuredService.await(),
                 customerId = activationEntity.customerId.toString(),
                 note = activationEntity.note,
+                date = ZonedDateTime.ofInstant(activationEntity.date.toInstant(), ZoneId.systemDefault())
             )
         }
     }
@@ -95,10 +97,7 @@ class SessionsConverterImpl(
         }
         val configuration =
             service.data.configurations.firstOrNull { it.id == configurationEntity.configurationId }
-                ?: TODO("""throw ConfigurationDoesNotExistsException(
-                    serviceId = configurationEntity.serviceId.toHexString(),
-                    configurationId = configurationEntity.configurationId.toHexString(),
-                )""")
+                ?: throw ConfigurationNotExists(configurationEntity.configurationId)
 
         return ConfiguredService(
             serviceId = service.id,
