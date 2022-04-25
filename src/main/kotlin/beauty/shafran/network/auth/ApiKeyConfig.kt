@@ -1,4 +1,4 @@
-package beauty.shafran.network.api
+package beauty.shafran.network.auth
 
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.boot.context.properties.ConstructorBinding
@@ -8,4 +8,5 @@ import org.springframework.boot.context.properties.ConstructorBinding
 class ApiKeyConfig(
     val header: String,
     val key: String,
+    val authHeader: String,
 )

@@ -1,6 +1,5 @@
-package beauty.shafran.network.auth.entity
+package beauty.shafran.network.companies.entity
 
-import beauty.shafran.network.assets.entity.AssetEntity
 import beauty.shafran.network.utils.MetaEntity
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.SerialName
@@ -8,20 +7,17 @@ import kotlinx.serialization.Serializable
 import org.litote.kmongo.Id
 import org.litote.kmongo.newId
 
-
 @Serializable
-class BusinessEntity(
-    val data: BusinessDataEntity,
+data class CompanyEntity(
+    val data: CompanyEntityData,
     val meta: MetaEntity = MetaEntity(),
-    @Contextual
     @SerialName("_id")
-    val id: Id<BusinessEntity> = newId(),
+    @Contextual
+    val id: Id<CompanyEntity> = newId(),
 )
 
 @Serializable
-class BusinessDataEntity(
+data class CompanyEntityData(
     val title: String,
-    val description: String,
-    val icon: AssetEntity? = null,
+    val codeName: String,
 )
-

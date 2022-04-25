@@ -5,20 +5,17 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.ResponseBody
-import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler
-import javax.servlet.http.HttpServletRequest
+import org.springframework.web.bind.annotation.RestControllerAdvice
 
 
-@ControllerAdvice
-class ExceptionHandler : ResponseEntityExceptionHandler() {
+@RestControllerAdvice
+class ExceptionHandler {
 
     @ResponseBody
     @ExceptionHandler(ShafranNetworkException::class)
     fun handleShafranNetwork(
-        req: HttpServletRequest,
         exception: ShafranNetworkException,
     ): ResponseEntity<ShafranNetworkException> {
         return ResponseEntity(exception, exception.httpStatusCode)
@@ -126,8 +123,6 @@ class SessionOveruseException(
 }
 
 
-
-
 @Serializable
 @SerialName("session_not_exists")
 class SessionNotExists(
@@ -156,6 +151,7 @@ class SessionIsAlreadyUsed(
 }
 
 @Serializable
+@SerialName("validation")
 class ValidationException(
     val error: List<ValidationSubject>,
 ) : ShafranNetworkException() {
@@ -163,3 +159,54 @@ class ValidationException(
         get() = HttpStatus.BAD_REQUEST
 }
 
+@Serializable
+@SerialName("business_not_exists")
+class BusinessNotExists(
+    val businessId: String,
+) : ShafranNetworkException() {
+    override val httpStatusCode: HttpStatus
+        get() = HttpStatus.NOT_FOUND
+}
+
+@Serializable
+@SerialName("account_not_exists")
+class AccountNotExists(val accountId: String) : ShafranNetworkException() {
+    override val httpStatusCode: HttpStatus
+        get() = HttpStatus.NOT_FOUND
+}
+
+
+@Serializable
+@SerialName("account_already_deactivated")
+class AccountAlreadyDeactivated(val accountId: String) : ShafranNetworkException() {
+    override val httpStatusCode: HttpStatus
+        get() = HttpStatus.NOT_FOUND
+}
+
+@Serializable
+@SerialName("account_already_exists")
+class AccountAlreadyExists(val login: String) : ShafranNetworkException() {
+    override val httpStatusCode: HttpStatus
+        get() = HttpStatus.NOT_FOUND
+}
+
+@Serializable
+@SerialName("account_illegal_credentials")
+class AccountIllegalCredentials(val login: String) : ShafranNetworkException() {
+    override val httpStatusCode: HttpStatus
+        get() = HttpStatus.NOT_FOUND
+}
+
+@Serializable
+@SerialName("token_timeout")
+class TokenTimeout() : ShafranNetworkException() {
+    override val httpStatusCode: HttpStatus
+        get() = HttpStatus.FORBIDDEN
+}
+
+@Serializable
+@SerialName("account_session_not_exists")
+class AccountSessionNotExists(val sessionId: String) : ShafranNetworkException() {
+    override val httpStatusCode: HttpStatus
+        get() = HttpStatus.NOT_FOUND
+}
