@@ -6,9 +6,9 @@ import beauty.shafran.network.auth.data.*
 import beauty.shafran.network.auth.repository.AccountSessionsRepository
 import beauty.shafran.network.auth.token.TokenAuthService
 import beauty.shafran.network.companies.repository.CompaniesRepository
-import org.springframework.stereotype.Component
+import org.koin.core.annotation.Single
 
-@Component
+@Single
 class AuthenticationExecutorImpl(
     private val accountsRepository: AccountsRepository,
     private val companiesRepository: CompaniesRepository,
@@ -47,7 +47,8 @@ class AuthenticationExecutorImpl(
 
 
     private suspend fun RefreshTokenRequest.JwtRefreshTokenRequest.refreshAccount(): RefreshTokenResponse {
-        val session = auth.findSessionWithRefreshToken(data)
+        val sessionId = auth.extractSessionId(data)
+        val session = accountSessionsRepository.findSessionWithId(sessionId)
         val jwt = auth.generateTokenForSession(session)
         return RefreshTokenResponse(
             accountId = session.accountId,

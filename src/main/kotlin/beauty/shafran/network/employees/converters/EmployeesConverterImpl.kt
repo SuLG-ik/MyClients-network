@@ -9,9 +9,9 @@ import beauty.shafran.network.employees.entity.EmployeeDataEntity
 import beauty.shafran.network.employees.entity.EmployeeEntity
 import beauty.shafran.network.employees.entity.EmployeeLayoffEntity
 import beauty.shafran.network.utils.getZonedDateTime
-import org.springframework.stereotype.Service
+import org.koin.core.annotation.Single
 
-@Service
+@Single
 class EmployeesConverterImpl(
     private val assetsConverter: AssetsConverter,
 ) : EmployeesConverter {
@@ -24,11 +24,6 @@ class EmployeesConverterImpl(
         )
     }
 
-    override suspend fun LayoffEmployeeRequest.toNewEntity(): EmployeeLayoffEntity {
-        return EmployeeLayoffEntity(
-            reason = data.reason
-        )
-    }
 
     override suspend fun EmployeeDataEntity.toData(): EmployeeData {
         return EmployeeData(

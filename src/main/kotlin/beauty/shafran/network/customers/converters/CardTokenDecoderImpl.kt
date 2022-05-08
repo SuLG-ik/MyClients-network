@@ -1,11 +1,11 @@
 package beauty.shafran.network.customers.converters
 
-import beauty.shafran.network.IllegalCardToken
-import org.springframework.stereotype.Service
+import beauty.shafran.IllegalCardToken
+import org.koin.core.annotation.Single
 import java.util.*
 
 
-@Service
+@Single
 class CardTokenDecoderImpl : CardTokenDecoder {
 
     private val decoders = mapOf<String, CardTokenDecoder>("0" to CardTokenDecoder0())

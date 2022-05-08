@@ -1,15 +1,16 @@
 package beauty.shafran.network.session.executor
 
+import beauty.shafran.network.auth.data.AuthorizedAccount
 import beauty.shafran.network.session.data.*
 
 interface SessionsExecutor {
 
-    suspend fun getSessionUsagesHistory(request: GetSessionUsagesHistoryRequest): GetSessionUsagesHistoryResponse
-    suspend fun createSessionsForCustomer(request: CreateSessionForCustomerRequest): CreateSessionForCustomerResponse
-    suspend fun useSession(request: UseSessionRequest): UseSessionResponse
-    suspend fun deactivateSession(request: DeactivateSessionRequest): DeactivateSessionResponse
-    suspend fun getAllSessionsForCustomer(request: GetSessionsForCustomerRequest): GetSessionsForCustomerResponse
-    suspend fun getSessionsIgnoreDeactivatedForCustomer(request: GetSessionsForCustomerRequest): GetSessionsForCustomerResponse
-    suspend fun getSessionsStats(request: GetSessionsStatsRequest): GetSessionsStatsResponse
+    suspend fun getSessionUsagesHistory(request: GetSessionUsagesHistoryRequest, account: AuthorizedAccount): GetSessionUsagesHistoryResponse
+    suspend fun createSessionsForCustomer(request: CreateSessionForCustomerRequest, account: AuthorizedAccount): CreateSessionForCustomerResponse
+    suspend fun useSession(request: UseSessionRequest, account: AuthorizedAccount): UseSessionResponse
+    suspend fun deactivateSession(request: DeactivateSessionRequest, account: AuthorizedAccount): DeactivateSessionResponse
+    suspend fun getAllSessionsForCustomer(request: GetSessionsForCustomerRequest, account: AuthorizedAccount): GetSessionsForCustomerResponse
+    suspend fun getSessionsIgnoreDeactivatedForCustomer(request: GetSessionsForCustomerRequest, account: AuthorizedAccount): GetSessionsForCustomerResponse
+    suspend fun getSessionsStats(request: GetSessionsStatsRequest, account: AuthorizedAccount): GetSessionsStatsResponse
 
 }

@@ -12,7 +12,7 @@ interface EmployeesRepository {
     suspend fun findEmployeeById(employeeId: String): EmployeeEntity
     suspend fun updateEmployeeData(employeeId: String, data: EmployeeDataEntity): EmployeeEntity
     suspend fun updateEmployeeLayoff(employeeId: String, data: EmployeeLayoffEntity): EmployeeEntity
-    suspend fun insertEmployee(data: EmployeeDataEntity): EmployeeEntity
-    suspend fun findAllEmployees(offset: Int, page: Int): List<EmployeeEntity>
+    suspend fun insertEmployee(data: EmployeeDataEntity, companyId: String): EmployeeEntity
+    suspend fun findAllEmployees(offset: Int, page: Int, companyId: String): List<EmployeeEntity>
 
 }

@@ -6,11 +6,11 @@ import beauty.shafran.network.customers.data.EditableCustomerData
 import beauty.shafran.network.customers.entity.CustomerDataEntity
 import beauty.shafran.network.customers.entity.CustomerEntity
 import beauty.shafran.network.phone.converters.PhoneNumberConverter
-import org.springframework.stereotype.Service
+import org.koin.core.annotation.Single
 import java.time.ZoneId
 import java.time.ZonedDateTime
 
-@Service
+@Single
 class MongoCustomersConverter(private val phoneNumberConverter: PhoneNumberConverter) : CustomersConverter {
 
 

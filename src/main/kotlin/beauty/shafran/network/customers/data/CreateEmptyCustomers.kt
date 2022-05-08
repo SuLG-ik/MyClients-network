@@ -1,16 +1,15 @@
 package beauty.shafran.network.customers.data
 
+import beauty.shafran.network.companies.data.CompanyId
 import com.arkivanov.essenty.parcelable.Parcelable
 import com.arkivanov.essenty.parcelable.Parcelize
 import kotlinx.serialization.Serializable
-import javax.validation.Valid
-import javax.validation.constraints.Min
 
 @Parcelize
 @Serializable
 data class CreateEmptyCustomersRequest(
-    @field:Min(1)
     val count: Int,
+    val companyId: String,
 ) : Parcelable
 
 @Parcelize
@@ -23,17 +22,14 @@ data class CreateEmptyCustomersResponse(
 @Parcelize
 @Serializable
 data class CreateCustomersRequest(
-    @field:Valid
     val data: EditableCustomerData,
+    val companyId: CompanyId,
 ) : Parcelable
 
-fun CreateCustomersRequest.trim(): CreateCustomersRequest {
-    return copy(data = data.trim())
-}
 
 @Parcelize
 @Serializable
-data class CreateCustomersResponse(
+data class CreateCustomerResponse(
     val token: String,
     val customer: Customer.ActivatedCustomer,
 ) : Parcelable

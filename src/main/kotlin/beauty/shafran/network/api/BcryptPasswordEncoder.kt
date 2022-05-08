@@ -1,12 +1,21 @@
 package beauty.shafran.network.api
 
-import org.springframework.beans.factory.annotation.Qualifier
-import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.Configuration
-import org.springframework.context.annotation.Primary
-import org.springframework.security.crypto.password.DelegatingPasswordEncoder
-import org.springframework.security.crypto.password.PasswordEncoder
-import org.springframework.stereotype.Service
+import org.koin.core.annotation.Module
+import org.koin.core.annotation.Single
+
+
+@Module
+class PasswordModule {
+
+    @Single
+    fun generalPasswordEncoder(bCryptPasswordEncoder: BCryptPasswordEncoder): AuthPasswordEncoder {
+        return GeneralPasswordEncoder(
+            mapOf("bcrypt" to bCryptPasswordEncoder),
+            "bcrypt"
+        )
+    }
+
+}
 
 interface AuthPasswordEncoder {
 
@@ -16,35 +25,20 @@ interface AuthPasswordEncoder {
 
 }
 
-
-@Configuration
-class EncodersConfiguration {
-
-    @Bean
-    @Primary
-    fun getEncoders(
-        @Qualifier("bcrypt_encoder")
-        bcryptPasswordEncoder: PasswordEncoder,
-    ): PasswordEncoder {
-        return DelegatingPasswordEncoder("bcrypt", mapOf(
-            "bcrypt" to bcryptPasswordEncoder
-        ))
-    }
-
-}
-
-@Service
-@Primary
 class GeneralPasswordEncoder(
-    private val encoder: PasswordEncoder,
+    private val encoders: Map<String, AuthPasswordEncoder>,
+    private val primaryEncoder: String,
 ) : AuthPasswordEncoder {
 
     override fun encode(rawPassword: String): String {
-        return encoder.encode(rawPassword)
+        val hash = encoders[primaryEncoder]!!.encode(rawPassword)
+        return "{${primaryEncoder}}${hash}"
     }
 
     override fun match(rawPassword: String, encodedPassword: String): Boolean {
-        return encoder.matches(rawPassword, encodedPassword)
+        val encoder =
+            encoders.firstNotNullOf { if (encodedPassword.startsWith("{${it.key}}")) it else null }
+        return encoder.value.match(rawPassword, encodedPassword.removePrefix("{${encoder.key}}"))
     }
 
 }

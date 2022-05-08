@@ -9,7 +9,7 @@ interface CompaniesRepository {
 
     suspend fun findCompanyById(companyId: String): CompanyEntity
 
-    suspend fun findAccountMembersOfAccount(accountId: String): List<CompanyMemberEntity>
+    suspend fun findAccountMembersForAccount(accountId: String): List<CompanyMemberEntity>
 
     suspend fun isAccessedForCompany(
         accessScope: AccessScope,
@@ -19,7 +19,8 @@ interface CompaniesRepository {
 
     suspend fun findCompanyForAccount(accountId: String): List<CompanyEntity>
 
-    suspend fun createBusiness(data: CompanyEntityData): CompanyEntity
+    suspend fun createCompany(data: CompanyEntityData, ownerAccountId: String): CompanyEntity
 
     suspend fun throwIfBusinessNotExists(businessId: String)
+
 }

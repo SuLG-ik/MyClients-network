@@ -1,9 +1,9 @@
 package beauty.shafran.network.account.repository
 
-import beauty.shafran.network.AccountAlreadyDeactivated
-import beauty.shafran.network.AccountAlreadyExists
-import beauty.shafran.network.AccountIllegalCredentials
-import beauty.shafran.network.AccountNotExists
+import beauty.shafran.AccountAlreadyDeactivated
+import beauty.shafran.AccountAlreadyExists
+import beauty.shafran.AccountIllegalCredentials
+import beauty.shafran.AccountNotExists
 import beauty.shafran.network.account.entity.AccountDeactivationEntity
 import beauty.shafran.network.account.entity.AccountEntity
 import beauty.shafran.network.account.entity.AccountEntityData
@@ -13,18 +13,22 @@ import beauty.shafran.network.utils.MetaEntity
 import beauty.shafran.network.utils.MongoTransactional
 import beauty.shafran.network.utils.isDocumentExists
 import beauty.shafran.network.utils.toIdSecure
+import org.koin.core.annotation.Named
+import org.koin.core.annotation.Single
 import org.litote.kmongo.and
 import org.litote.kmongo.coroutine.CoroutineCollection
 import org.litote.kmongo.div
 import org.litote.kmongo.eq
 import org.litote.kmongo.ne
-import org.springframework.stereotype.Repository
 
-@Repository
+@Single
 class MongoAccountsRepository(
     private val mongoTransactional: MongoTransactional,
+    @Named(AccountEntity.collectionName)
     private val accountsCollection: CoroutineCollection<AccountEntity>,
+    @Named(AccountPasswordAuthEntity.collectionName)
     private val accountsPasswordAuthCollection: CoroutineCollection<AccountPasswordAuthEntity>,
+    @Named(AccountDeactivationEntity.collectionName)
     private val accountDeactivationEntity: CoroutineCollection<AccountDeactivationEntity>,
     private val authPasswordEncoder: AuthPasswordEncoder,
 ) : AccountsRepository {
@@ -90,7 +94,7 @@ class MongoAccountsRepository(
     }
 
     override suspend fun findAccountById(accountId: String): AccountEntity {
-        return accountsCollection.findOneById(AccountEntity::id eq accountId.toIdSecure("accountId"))
+        return accountsCollection.findOneById(accountId.toIdSecure("accountId"))
             ?: throw AccountNotExists(accountId)
     }
 

@@ -6,9 +6,10 @@ import beauty.shafran.network.services.enity.ServiceConfigurationEntity
 import beauty.shafran.network.services.enity.ServiceDeactivationEntity
 import beauty.shafran.network.services.enity.ServiceEntity
 import beauty.shafran.network.services.enity.ServiceInfoEntity
+import org.koin.core.annotation.Single
 import org.litote.kmongo.newId
 
-@org.springframework.stereotype.Service
+@Single
 class ServicesConverterImpl(
     private val converter: AssetsConverter,
 ) : ServicesConverter {

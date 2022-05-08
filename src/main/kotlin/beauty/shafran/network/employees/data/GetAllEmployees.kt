@@ -1,20 +1,17 @@
 package beauty.shafran.network.employees.data
 
+import beauty.shafran.network.companies.data.CompanyId
 import com.arkivanov.essenty.parcelable.Parcelable
 import com.arkivanov.essenty.parcelable.Parcelize
 import kotlinx.serialization.Serializable
-import javax.validation.constraints.Min
 
 @Parcelize
 @Serializable
 data class GetAllEmployeesRequest(
-    @field:Min(1)
+    val companyId: CompanyId,
     val offset: Int = 30,
-    @field:Min(0)
     val page: Int = 0,
-) : Parcelable {
-
-}
+) : Parcelable
 
 @Parcelize
 @Serializable

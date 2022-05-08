@@ -1,14 +1,12 @@
 package beauty.shafran.network.employees.data
 
-import beauty.shafran.network.validation.ObjectIdParameter
 import com.arkivanov.essenty.parcelable.Parcelable
 import com.arkivanov.essenty.parcelable.Parcelize
 import kotlinx.serialization.Serializable
 
 @Parcelize
 @Serializable
-data class GetEmployeeByIdRequest(
-    @ObjectIdParameter
+data class GetEmployeeWithIdRequest(
     val employeeId: String,
 ) : Parcelable
 

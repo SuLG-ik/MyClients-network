@@ -1,14 +1,11 @@
 package beauty.shafran.network.auth.jwt
 
-import org.springframework.boot.context.properties.ConfigurationProperties
-import org.springframework.boot.context.properties.ConstructorBinding
-
-@ConfigurationProperties("jwt.keystore")
-@ConstructorBinding
 class JwtConfig(
-    val issuer: String,
-    val path: String,
-    val alias: String,
-    val password: String,
-    val storePassword: String,
+    val issuer: String = System.getenv("JWT_ISSUER"),
+    val audience: String = System.getenv("JWT_AUDIENCE"),
+    val path: String = System.getenv("JWT_STORE"),
+    val alias: String = System.getenv("JWT_ALIAS"),
+    val password: String = System.getenv("JWT_PASSWORD"),
+    val storePassword: String = System.getenv("JWT_STORE_PASSWORD"),
+    val realm: String = System.getenv("JWT_REALM")
 )

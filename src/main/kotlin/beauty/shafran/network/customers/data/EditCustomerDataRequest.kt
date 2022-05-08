@@ -1,39 +1,28 @@
 package beauty.shafran.network.customers.data
 
-import beauty.shafran.network.Gender
+import beauty.shafran.network.gender.Gender
 import beauty.shafran.network.phone.data.PhoneNumber
-import beauty.shafran.network.validation.ObjectIdParameter
+import com.arkivanov.essenty.parcelable.Parcelable
+import com.arkivanov.essenty.parcelable.Parcelize
 import kotlinx.serialization.Serializable
-import javax.validation.Valid
-import javax.validation.constraints.Size
 
 @Serializable
+@Parcelize
 data class EditCustomerRequest(
-    @field:ObjectIdParameter
     val customerId: String,
-    @field:Valid
     val data: EditableCustomerData,
-)
+) : Parcelable
 
 @Serializable
+@Parcelize
 data class EditableCustomerData(
-    @field:Size(min = 2)
     val name: String,
     val phone: PhoneNumber?,
     val remark: String,
     val gender: Gender,
-)
-
-fun EditableCustomerData.trim(): EditableCustomerData {
-    return copy(name = name.trim(), remark = remark.trim())
-}
-
-
-fun EditCustomerRequest.trim(): EditCustomerRequest {
-    return copy(data = data.trim())
-}
+) : Parcelable
 
 @Serializable
-data class EditCustomerResponse(
+data class EditCustomerDataResponse(
     val customer: Customer.ActivatedCustomer,
 )

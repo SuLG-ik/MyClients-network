@@ -1,112 +1,18 @@
 package beauty.shafran.network.customers
 
-import beauty.shafran.network.customers.data.*
 import beauty.shafran.network.customers.executor.CustomersExecutor
-import org.springframework.http.MediaType
-import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestMethod
-import org.springframework.web.bind.annotation.RestController
-import java.io.File
-import javax.validation.Valid
-import kotlin.io.path.Path
+import beauty.shafran.network.utils.callWrapper
+import io.ktor.server.routing.*
 
-@RequestMapping("/v1/customers")
-@RestController
-class Customers(
-    private val executor: CustomersExecutor,
+fun Route.customersRoute(
+    executor: CustomersExecutor,
 ) {
-
-    @RequestMapping(
-        value = ["/searchCustomerByPhone"],
-        method = [RequestMethod.GET],
-        produces = [MediaType.APPLICATION_JSON_VALUE],
-        consumes = [MediaType.APPLICATION_JSON_VALUE],
-    )
-    suspend fun searchCustomerByPhone(@Valid @RequestBody request: SearchCustomerByPhoneRequest): SearchCustomerByPhoneResponse {
-        ResponseEntity.ok(File("fsdfds"))
-
-        Path("fajfdsf").map {  }
-        return executor.searchCustomerByPhone(request)
-    }
-
-
-    @RequestMapping(
-        value = ["/restoreCustomer"],
-        method = [RequestMethod.GET],
-        produces = [MediaType.APPLICATION_JSON_VALUE],
-        consumes = [MediaType.APPLICATION_JSON_VALUE],
-    )
-    suspend fun restoreCustomer(@Valid @RequestBody request: RestoreCustomerRequest) {
-        return executor.restoreCustomer(request)
-    }
-
-    @RequestMapping(
-        value = ["/createCustomer"],
-        method = [RequestMethod.POST],
-        produces = [MediaType.APPLICATION_JSON_VALUE],
-        consumes = [MediaType.APPLICATION_JSON_VALUE],
-    )
-    suspend fun createCustomer(@Valid @RequestBody request: CreateCustomersRequest): CreateCustomersResponse {
-        return executor.createCustomer(request)
-    }
-
-    @RequestMapping(
-        value = ["/getCustomerById"],
-        method = [RequestMethod.GET],
-        produces = [MediaType.APPLICATION_JSON_VALUE],
-        consumes = [MediaType.APPLICATION_JSON_VALUE],
-    )
-    suspend fun getCustomerById(@Valid @RequestBody request: GetCustomerByIdRequest): GetCustomerByIdResponse {
-        return executor.getCustomerById(request)
-    }
-
-
-
-    @RequestMapping(
-        value = ["/getCustomerByToken"],
-        method = [RequestMethod.GET],
-        produces = [MediaType.APPLICATION_JSON_VALUE],
-        consumes = [MediaType.APPLICATION_JSON_VALUE],
-    )
-    suspend fun getCustomerByToken(@Valid @RequestBody request: GetCustomerByTokenRequest): GetCustomerByTokenResponse {
-        return executor.getCustomerByToken(request)
-    }
-
-
-
-    @RequestMapping(
-        value = ["/getAllCustomers"],
-        method = [RequestMethod.GET],
-        produces = [MediaType.APPLICATION_JSON_VALUE],
-        consumes = [MediaType.APPLICATION_JSON_VALUE],
-    )
-    suspend fun getAllCustomers(@Valid @RequestBody request: GetAllCustomersRequest): GetAllCustomersResponse {
-        return executor.getAllCustomers(request)
-    }
-
-
-    @RequestMapping(
-        value = ["/createEmptyCustomers"],
-        method = [RequestMethod.POST],
-        produces = [MediaType.APPLICATION_JSON_VALUE],
-        consumes = [MediaType.APPLICATION_JSON_VALUE],
-    )
-    suspend fun createEmptyCustomers(@Valid @RequestBody request: CreateEmptyCustomersRequest): CreateEmptyCustomersResponse {
-        return executor.createEmptyCustomers(request)
-    }
-
-    @RequestMapping(
-        value = ["/editCustomerData"],
-        method = [RequestMethod.PATCH],
-        produces = [MediaType.APPLICATION_JSON_VALUE],
-        consumes = [MediaType.APPLICATION_JSON_VALUE],
-    )
-    suspend fun createCustomer(@Valid @RequestBody request: EditCustomerRequest): EditCustomerResponse {
-        return executor.editCustomerData(request)
-    }
-
+    get("/searchCustomerByPhone", callWrapper(executor::searchCustomerByPhone))
+    post("/createCustomer", callWrapper(executor::createCustomer))
+    get("/getCustomerById", callWrapper(executor::getCustomerById))
+    get("/getCustomerByToken", callWrapper(executor::getCustomerByToken))
+    post("/createEmptyCustomers", callWrapper(executor::createEmptyCustomers))
+    patch("/editCustomerData", callWrapper(executor::editCustomerData))
 }
 
 //fun Route.configureCustomers() {

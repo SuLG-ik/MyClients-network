@@ -2,9 +2,9 @@ package beauty.shafran.network.phone.converters
 
 import beauty.shafran.network.phone.data.PhoneNumber
 import beauty.shafran.network.phone.entity.PhoneNumberEntity
-import org.springframework.stereotype.Service
+import org.koin.core.annotation.Single
 
-@Service
+@Single
 class PhoneNumberConverterImpl : PhoneNumberConverter {
     override fun PhoneNumber.toEntity(): PhoneNumberEntity? {
         return if (isValid) PhoneNumberEntity(

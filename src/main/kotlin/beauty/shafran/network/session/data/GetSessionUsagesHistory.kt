@@ -5,16 +5,14 @@ import beauty.shafran.network.services.data.ConfiguredService
 import com.arkivanov.essenty.parcelable.Parcelable
 import com.arkivanov.essenty.parcelable.Parcelize
 import kotlinx.serialization.Serializable
-import javax.validation.constraints.Min
 
 
 @Serializable
 @Parcelize
 data class GetSessionUsagesHistoryRequest(
-    @field:Min(1)
     val offset: Int = 30,
-    @field:Min(0)
     val page: Int = 0,
+    val companyId: String,
 ) : Parcelable
 
 

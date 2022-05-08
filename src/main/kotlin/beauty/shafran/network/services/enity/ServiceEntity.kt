@@ -1,6 +1,8 @@
 package beauty.shafran.network.services.enity
 
 import beauty.shafran.network.assets.entity.AssetEntity
+import beauty.shafran.network.companies.data.CompanyId
+import beauty.shafran.network.companies.entity.CompanyReferenceEntity
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -9,6 +11,7 @@ import org.litote.kmongo.newId
 
 @Serializable
 data class ServiceEntity(
+    val companyReference: CompanyReferenceEntity,
     val info: ServiceInfoEntity,
     val image: AssetEntity? = null,
     @Contextual
@@ -16,6 +19,10 @@ data class ServiceEntity(
     val id: Id<ServiceEntity> = newId(),
     val configurations: List<ServiceConfigurationEntity> = emptyList(),
 )
+
+fun CompanyReferenceEntity.toCompanyId(): CompanyId {
+    return CompanyId(companyId)
+}
 
 val ServiceEntity.Companion.collectionName get() = "services"
 

@@ -13,6 +13,7 @@ import kotlinx.serialization.encoding.Encoder
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.ZoneOffset
+import java.time.ZonedDateTime
 import java.util.*
 
 @Serializable
@@ -28,6 +29,10 @@ fun Date.toLocalDate(): LocalDate {
 
 fun LocalDate.toStartOfDate(): Date {
     return Date.from(atStartOfDay().toInstant(ZoneOffset.UTC))
+}
+
+fun Date.toZonedDateTime(zoneId: ZoneId = ZoneId.systemDefault()): ZonedDateTime {
+    return ZonedDateTime.ofInstant(toInstant(), zoneId)
 }
 
 object LocalDateSerializer : KSerializer<LocalDate> {

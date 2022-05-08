@@ -1,12 +1,11 @@
 package beauty.shafran.network.account
 
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import beauty.shafran.network.account.executors.AccountsExecutor
+import beauty.shafran.network.utils.callWrapper
+import io.ktor.server.routing.*
 
-@RestController
-@RequestMapping("/v1/accounts")
-class Accounts(
-
+fun Route.accountsRoute(
+    executor: AccountsExecutor,
 ) {
-
+    get("/getAccount", callWrapper(executor::getAccount))
 }

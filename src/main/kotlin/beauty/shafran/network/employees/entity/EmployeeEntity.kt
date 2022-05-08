@@ -1,7 +1,9 @@
 package beauty.shafran.network.employees.entity
 
-import beauty.shafran.network.Gender
+import beauty.shafran.network.gender.Gender
 import beauty.shafran.network.assets.entity.AssetEntity
+import beauty.shafran.network.companies.entity.CompanyReferenceEntity
+import beauty.shafran.network.utils.MetaEntity
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -10,6 +12,7 @@ import org.litote.kmongo.newId
 
 @Serializable
 data class EmployeeEntity(
+    val companyReference: CompanyReferenceEntity,
     val data: EmployeeDataEntity,
     val image: AssetEntity? = null,
     val layoff: EmployeeLayoffEntity? = null,
@@ -31,7 +34,8 @@ data class EmployeeDataEntity(
 @Serializable
 data class EmployeeLayoffEntity(
     val reason: String,
+    val meta: MetaEntity = MetaEntity(),
     @Contextual
-    @SerialName("_id")
-    val id: Id<EmployeeLayoffEntity> = newId(),
+@SerialName("_id")
+val id: Id<EmployeeLayoffEntity> = newId(),
 )

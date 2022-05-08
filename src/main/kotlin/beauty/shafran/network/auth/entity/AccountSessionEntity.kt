@@ -14,9 +14,12 @@ class AccountSessionEntity(
     @SerialName("_id")
     @Contextual
     val id: Id<AccountSessionEntity> = newId(),
-)
+) {
+    companion object {
+        const val collectionName = "account_sessions"
+    }
+}
 
-val AccountSessionEntity.Companion.collectionName get() = "account_sessions"
 
 @Serializable
 class AccountSessionDeactivation(

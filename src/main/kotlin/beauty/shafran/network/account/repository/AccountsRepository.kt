@@ -7,7 +7,6 @@ interface AccountsRepository {
 
     suspend fun throwIfAccountNotExists(accountId: String)
 
-
     suspend fun throwIfAccountNotExistsOrDeactivated(accountId: String)
 
     suspend fun findAccountByUsernameCredential(
@@ -20,4 +19,5 @@ interface AccountsRepository {
     suspend fun changePassword(accountId: String, oldPassword: String, newPassword: String): AccountEntity
 
     suspend fun findAccountById(accountId: String): AccountEntity
+
 }

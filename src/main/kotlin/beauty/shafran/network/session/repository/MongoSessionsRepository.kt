@@ -1,8 +1,9 @@
 package beauty.shafran.network.session.repository
 
-import beauty.shafran.network.CustomerNotExists
-import beauty.shafran.network.SessionIsAlreadyUsed
-import beauty.shafran.network.SessionNotExists
+import beauty.shafran.CustomerNotExists
+import beauty.shafran.SessionIsAlreadyUsed
+import beauty.shafran.SessionNotExists
+import beauty.shafran.network.companies.entity.CompanyReferenceEntity
 import beauty.shafran.network.customers.repository.CustomersRepository
 import beauty.shafran.network.session.data.DeactivateSessionRequestData
 import beauty.shafran.network.session.entity.*
@@ -10,11 +11,11 @@ import beauty.shafran.network.utils.DatePeriod
 import beauty.shafran.network.utils.paged
 import beauty.shafran.network.utils.toIdSecure
 import beauty.shafran.network.utils.toStartOfDate
+import org.koin.core.annotation.Single
 import org.litote.kmongo.*
 import org.litote.kmongo.coroutine.CoroutineDatabase
-import org.springframework.stereotype.Repository
 
-@Repository
+@Single
 class MongoSessionsRepository(
     coroutineDatabase: CoroutineDatabase,
     private val customerRepository: CustomersRepository,
@@ -25,30 +26,46 @@ class MongoSessionsRepository(
         coroutineDatabase.getCollection<SessionUsageEntity>(SessionUsageEntity.collectionName)
 
 
-    override suspend fun countUsagesForPeriod(period: DatePeriod, sessionId: String?, employeeId: String?): Int {
+    override suspend fun countUsagesForPeriod(
+        period: DatePeriod,
+        companyId: String,
+        sessionId: String?,
+        employeeId: String?,
+    ): Int {
         return usagesCollection.countDocuments(
             and(
                 SessionUsageEntity::data / SessionUsageDataEntity::date gte period.from.toStartOfDate(),
                 SessionUsageEntity::data / SessionUsageDataEntity::date lt period.to.plusDays(1).toStartOfDate(),
+                SessionUsageEntity::companyReference eq CompanyReferenceEntity(companyId)
             )
         ).toInt()
     }
 
-    override suspend fun countActivationsForPeriod(period: DatePeriod, sessionId: String?, employeeId: String?): Int {
+    override suspend fun countActivationsForPeriod(
+        period: DatePeriod,
+        companyId: String,
+        sessionId: String?,
+        employeeId: String?,
+    ): Int {
         return sessionsCollection.countDocuments(
             and(
                 SessionEntity::activation / SessionActivationEntity::date gte period.from.toStartOfDate(),
                 SessionEntity::activation / SessionActivationEntity::date lt period.to.plusDays(1).toStartOfDate(),
-                SessionEntity::deactivation eq null
+                SessionEntity::deactivation eq null,
+                SessionEntity::companyReference eq CompanyReferenceEntity(companyId)
             )
         ).toInt()
     }
 
-    override suspend fun findUsagesForPeriod(period: DatePeriod): List<SessionUsageEntity> {
+    override suspend fun findUsagesForPeriod(
+        period: DatePeriod,
+        companyId: String,
+    ): List<SessionUsageEntity> {
         return usagesCollection.find(
             and(
                 SessionUsageEntity::data / SessionUsageDataEntity::date gte period.from.toStartOfDate(),
                 SessionUsageEntity::data / SessionUsageDataEntity::date lt period.to.plusDays(1).toStartOfDate(),
+                SessionEntity::companyReference eq CompanyReferenceEntity(companyId)
             )
         ).toList()
     }
@@ -62,8 +79,8 @@ class MongoSessionsRepository(
         return data
     }
 
-    override suspend fun findUsagesHistory(offset: Int, page: Int): List<SessionUsageEntity> {
-        return usagesCollection.find()
+    override suspend fun findUsagesHistory(offset: Int, page: Int, companyId: String): List<SessionUsageEntity> {
+        return usagesCollection.find(SessionUsageEntity::companyReference eq CompanyReferenceEntity(companyId))
             .descendingSort(SessionUsageEntity::data / SessionUsageDataEntity::date)
             .paged(offset, page)
             .toList()
@@ -81,7 +98,7 @@ class MongoSessionsRepository(
     }
 
     override suspend fun findSessionById(sessionId: String): SessionEntity {
-        return sessionsCollection.findOneById(sessionId.toIdSecure<SessionEntity>("sessionId"))
+        return sessionsCollection.findOneById(sessionId.toIdSecure("sessionId"))
             ?: throw SessionNotExists(sessionId)
     }
 
@@ -119,7 +136,6 @@ class MongoSessionsRepository(
         val usagesCount = countUsagesForSession(sessionId)
         if (usagesCount > 0)
             throw SessionIsAlreadyUsed(sessionId)
-        val actualSession = findSessionById(sessionId)
         val deactivation = SessionManualDeactivationEntity(
             data = SessionManualDeactivationDataEntity(
                 employeeId = data.employeeId,
@@ -127,17 +143,20 @@ class MongoSessionsRepository(
                 reason = data.reason
             )
         )
-        val deactivatedSession = actualSession.copy(deactivation = deactivation)
-        return updateSession(deactivatedSession)
+        val newSession = findSessionById(sessionId).copy(deactivation = deactivation)
+        return updateSession(newSession)
     }
 
     private suspend fun updateSession(session: SessionEntity): SessionEntity {
-        sessionsCollection.updateOneById(session.id, session)
+        sessionsCollection.save(session)
         return session
     }
 
-    override suspend fun insertSession(activation: SessionActivationEntity): SessionEntity {
-        return SessionEntity(activation = activation).also { sessionsCollection.insertOne(it) }
+    override suspend fun insertSession(activation: SessionActivationEntity, companyId: String): SessionEntity {
+        return SessionEntity(
+            activation = activation,
+            companyReference = CompanyReferenceEntity(companyId),
+        ).also { sessionsCollection.insertOne(it) }
     }
 
     override suspend fun findLastUsageForCustomer(sessions: List<SessionEntity>): SessionUsageEntity? {

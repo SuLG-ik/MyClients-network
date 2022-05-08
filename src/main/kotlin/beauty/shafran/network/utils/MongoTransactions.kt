@@ -1,8 +1,8 @@
 package beauty.shafran.network.utils
 
 import com.mongodb.reactivestreams.client.ClientSession
+import org.koin.core.annotation.Single
 import org.litote.kmongo.coroutine.CoroutineClient
-import org.springframework.stereotype.Service
 
 interface MongoTransactional {
 
@@ -11,7 +11,7 @@ interface MongoTransactional {
 }
 
 
-@Service
+@Single
 class MongoTransactionalImpl(
     val mongoClient: CoroutineClient,
 ) : MongoTransactional {

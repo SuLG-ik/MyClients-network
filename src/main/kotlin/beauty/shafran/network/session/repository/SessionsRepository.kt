@@ -12,17 +12,22 @@ interface SessionsRepository {
 
     suspend fun countUsagesForPeriod(
         period: DatePeriod,
+        companyId: String,
         sessionId: String? = null,
         employeeId: String? = null,
     ): Int
 
     suspend fun countActivationsForPeriod(
         period: DatePeriod,
+        companyId: String,
         sessionId: String? = null,
         employeeId: String? = null,
     ): Int
 
-    suspend fun findUsagesForPeriod(period: DatePeriod): List<SessionUsageEntity>
+    suspend fun findUsagesForPeriod(
+        period: DatePeriod,
+        companyId: String,
+    ): List<SessionUsageEntity>
 
 
     suspend fun countUsagesForSession(sessionId: String): Long
@@ -30,10 +35,13 @@ interface SessionsRepository {
     suspend fun findUsagesForSession(sessionId: String): List<SessionUsageEntity>
     suspend fun findSessionsIgnoreDeactivatedForCustomer(customerId: String): List<SessionEntity>
     suspend fun findLastUsageForCustomer(sessions: List<SessionEntity>): SessionUsageEntity?
-    suspend fun isSessionExists(sessionId: String): Boolean
+    suspend fun isSessionExists(
+        sessionId: String,
+    ): Boolean
+
     suspend fun useSession(data: SessionUsageEntity): SessionUsageEntity
-    suspend fun findUsagesHistory(offset: Int, page: Int): List<SessionUsageEntity>
-    suspend fun insertSession(activation: SessionActivationEntity): SessionEntity
+    suspend fun findUsagesHistory(offset: Int, page: Int, companyId: String): List<SessionUsageEntity>
+    suspend fun insertSession(activation: SessionActivationEntity, companyId: String): SessionEntity
     suspend fun deactivateSessionForCustomer(sessionId: String, data: DeactivateSessionRequestData): SessionEntity
     suspend fun findSessionsForCustomer(customerId: String): List<SessionEntity>
 }

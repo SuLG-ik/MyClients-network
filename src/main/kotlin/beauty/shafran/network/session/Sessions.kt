@@ -1,91 +1,18 @@
 package beauty.shafran.network.session
 
-import beauty.shafran.network.session.data.*
 import beauty.shafran.network.session.executor.SessionsExecutor
-import org.springframework.http.MediaType
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestMethod
-import org.springframework.web.bind.annotation.RestController
-import javax.validation.Valid
+import beauty.shafran.network.utils.callWrapper
+import io.ktor.server.routing.*
 
 
-@RequestMapping("/v1/sessions")
-@RestController()
-class Sessions(
-    private val executor: SessionsExecutor,
+fun Route.sessionsRoute(
+    executor: SessionsExecutor,
 ) {
-
-    @RequestMapping(
-        value = ["/getSessionUsagesHistory"],
-        method = [RequestMethod.GET],
-        produces = [MediaType.APPLICATION_JSON_VALUE],
-        consumes = [MediaType.APPLICATION_JSON_VALUE],
-    )
-    suspend fun getSessionUsagesHistory(@Valid @RequestBody request: GetSessionUsagesHistoryRequest): GetSessionUsagesHistoryResponse {
-        return executor.getSessionUsagesHistory(request)
-    }
-
-    @RequestMapping(
-        value = ["/getSessionsStats"],
-        method = [RequestMethod.GET],
-        produces = [MediaType.APPLICATION_JSON_VALUE],
-        consumes = [MediaType.APPLICATION_JSON_VALUE],
-    )
-    suspend fun getSessionsStats(@Valid @RequestBody request: GetSessionsStatsRequest): GetSessionsStatsResponse {
-        return executor.getSessionsStats(request)
-    }
-
-    @RequestMapping(
-        value = ["/getAllServiceSessionsForCustomer"],
-        method = [RequestMethod.GET],
-        produces = [MediaType.APPLICATION_JSON_VALUE],
-        consumes = [MediaType.APPLICATION_JSON_VALUE],
-    )
-    suspend fun getAllServiceSessionsForCustomer(@Valid @RequestBody request: GetSessionsForCustomerRequest): GetSessionsForCustomerResponse {
-        return executor.getAllSessionsForCustomer(request)
-    }
-
-    @RequestMapping(
-        value = ["/getServiceSessionsIgnoreDeactivatedForCustomer"],
-        method = [RequestMethod.GET],
-        produces = [MediaType.APPLICATION_JSON_VALUE],
-        consumes = [MediaType.APPLICATION_JSON_VALUE],
-    )
-    suspend fun getServiceSessionsIgnoreDeactivatedForCustomer(@Valid @RequestBody request: GetSessionsForCustomerRequest): GetSessionsForCustomerResponse {
-        return executor.getSessionsIgnoreDeactivatedForCustomer(request)
-    }
-
-
-    @RequestMapping(
-        value = ["/useServiceSession"],
-        method = [RequestMethod.PUT],
-        produces = [MediaType.APPLICATION_JSON_VALUE],
-        consumes = [MediaType.APPLICATION_JSON_VALUE],
-    )
-    suspend fun useServiceSession(@Valid @RequestBody request: UseSessionRequest): UseSessionResponse {
-        return executor.useSession(request)
-    }
-
-
-    @RequestMapping(
-        value = ["/createServiceSessionsForCustomer"],
-        method = [RequestMethod.POST],
-        produces = [MediaType.APPLICATION_JSON_VALUE],
-        consumes = [MediaType.APPLICATION_JSON_VALUE],
-    )
-    suspend fun getSessionUsagesHistory(@Valid @RequestBody request: CreateSessionForCustomerRequest): CreateSessionForCustomerResponse {
-        return executor.createSessionsForCustomer(request)
-    }
-
-    @RequestMapping(
-        value = ["/deactivateServiceSession"],
-        method = [RequestMethod.DELETE],
-        produces = [MediaType.APPLICATION_JSON_VALUE],
-        consumes = [MediaType.APPLICATION_JSON_VALUE],
-    )
-    suspend fun deactivateServiceSession(@Valid @RequestBody request: DeactivateSessionRequest): DeactivateSessionResponse {
-        return executor.deactivateSession(request)
-    }
-
+    get("/getSessionUsagesHistory", callWrapper(executor::getSessionUsagesHistory))
+    get("/getSessionsStats", callWrapper(executor::getSessionsStats))
+    get("/getAllServiceSessionsForCustomer", callWrapper(executor::getAllSessionsForCustomer))
+    get("/getServiceSessionsIgnoreDeactivatedForCustomer", callWrapper(executor::getSessionsIgnoreDeactivatedForCustomer))
+    put("/useServiceSession", callWrapper(executor::useSession))
+    post("/createServiceSessionsForCustomer", callWrapper(executor::createSessionsForCustomer))
+    delete("/deactivateServiceSession", callWrapper(executor::deactivateSession))
 }

@@ -1,10 +1,10 @@
 package beauty.shafran.network.customers.converters
 
 import beauty.shafran.network.customers.entity.CardEntity
-import org.springframework.stereotype.Service
+import org.koin.core.annotation.Single
 import java.util.*
 
-@Service
+@Single
 class CardTokenEncoderImpl : CardTokenEncoder {
 
     override fun encodeTokenByCard(cardEntity: CardEntity): String {

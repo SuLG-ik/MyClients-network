@@ -2,14 +2,15 @@
 
 package beauty.shafran.network.employees.data
 
+import beauty.shafran.network.gender.Gender
+import beauty.shafran.network.ZonedDateTimeSerializer
+import beauty.shafran.network.assets.data.AssetData
 import com.arkivanov.essenty.parcelable.Parcelable
 import com.arkivanov.essenty.parcelable.Parcelize
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
-import beauty.shafran.network.Gender
-import beauty.shafran.network.assets.data.AssetData
-import beauty.shafran.network.ZonedDateTimeSerializer
 import java.time.ZonedDateTime
+
 
 
 @Parcelize

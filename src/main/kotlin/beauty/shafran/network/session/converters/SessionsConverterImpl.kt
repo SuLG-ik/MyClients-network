@@ -1,6 +1,6 @@
 package beauty.shafran.network.session.converters
 
-import beauty.shafran.network.ConfigurationNotExists
+import beauty.shafran.ConfigurationNotExists
 import beauty.shafran.network.employees.converters.EmployeesConverter
 import beauty.shafran.network.employees.data.Employee
 import beauty.shafran.network.employees.repository.EmployeesRepository
@@ -13,11 +13,11 @@ import beauty.shafran.network.utils.getZonedDateTime
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
-import org.springframework.stereotype.Service
+import org.koin.core.annotation.Single
 import java.time.ZoneId
 import java.time.ZonedDateTime
 
-@Service
+@Single
 class SessionsConverterImpl(
     private val servicesRepository: ServicesRepository,
     private val servicesConverter: ServicesConverter,
@@ -58,7 +58,7 @@ class SessionsConverterImpl(
             ),
             customerId = customerId,
             employeeId = employeeId,
-            note = data.note
+            note = data.remark
         )
     }
 

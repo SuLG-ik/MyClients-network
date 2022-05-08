@@ -1,5 +1,6 @@
 package beauty.shafran.network.session.entity
 
+import beauty.shafran.network.companies.entity.CompanyReferenceEntity
 import beauty.shafran.network.session.data.SessionManualDeactivationReason
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.SerialName
@@ -10,6 +11,7 @@ import java.util.*
 
 @Serializable
 data class SessionEntity(
+    val companyReference: CompanyReferenceEntity,
     val activation: SessionActivationEntity,
     val deactivation: SessionManualDeactivationEntity? = null,
     @Contextual
@@ -37,6 +39,7 @@ data class SessionActivationEntity(
 
 @Serializable
 data class SessionUsageEntity(
+    val companyReference: CompanyReferenceEntity,
     val sessionId: String,
     val data: SessionUsageDataEntity,
     @SerialName("_id")

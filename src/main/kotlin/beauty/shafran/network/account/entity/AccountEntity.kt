@@ -16,9 +16,11 @@ class AccountEntity(
     @SerialName("_id")
     @Contextual
     val id: Id<AccountEntity> = newId(),
-)
-
-val AccountEntity.Companion.collectionName get() = "accounts"
+) {
+    companion object {
+        const val collectionName = "accounts"
+    }
+}
 
 enum class AccountDeactivation {
     UNKNOWN,
@@ -32,7 +34,11 @@ data class AccountDeactivationEntity(
     @SerialName("_id")
     @Contextual
     val id: Id<AccountDeactivationEntity> = newId(),
-)
+) {
+    companion object {
+        const val collectionName = "accounts_deactivations"
+    }
+}
 
 @Serializable
 data class AccountDeactivationDisablingData(
@@ -48,8 +54,6 @@ data class AccountDeactivationData(
     val meta: MetaEntity,
 )
 
-val AccountDeactivationEntity.Companion.collectionName get() = "accounts_deactivations"
-
 @Serializable
 data class AccountEntityData(
     val name: String,
@@ -64,6 +68,8 @@ data class AccountPasswordAuthEntity(
     @SerialName("_id")
     @Contextual
     val id: Id<AccountPasswordAuthEntity> = newId(),
-)
-
-val AccountPasswordAuthEntity.Companion.collectionName get() = "accounts_auth_password"
+) {
+    companion object {
+        const val collectionName = "accounts_auth_password"
+    }
+}

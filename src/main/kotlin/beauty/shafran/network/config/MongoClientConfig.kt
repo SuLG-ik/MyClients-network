@@ -3,17 +3,13 @@ package beauty.shafran.network.config
 import com.mongodb.ConnectionString
 import com.mongodb.MongoClientSettings
 import com.mongodb.MongoCredential
-import org.springframework.boot.context.properties.ConfigurationProperties
-import org.springframework.boot.context.properties.ConstructorBinding
 
-@ConfigurationProperties("kmongo")
-@ConstructorBinding
 class MongoClientConfig(
-    val url: String,
-    val database: String,
-    val username: String,
-    val password: String,
-    val authDatabase: String,
+    val url: String = System.getenv("DATABASE_URL"),
+    val database: String = System.getenv("DATABASE_NAME"),
+    val username: String = System.getenv("DATABASE_USERNAME"),
+    val password: String = System.getenv("DATABASE_PASSWORD"),
+    val authDatabase: String = System.getenv("DATABASE_AUTH_NAME"),
 )
 
 fun MongoClientConfig.toSettings(): MongoClientSettings {

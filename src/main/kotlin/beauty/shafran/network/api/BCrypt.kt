@@ -1,16 +1,20 @@
 package beauty.shafran.network.api
 
-import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.Configuration
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
-import org.springframework.security.crypto.password.PasswordEncoder
+import at.favre.lib.crypto.bcrypt.BCrypt
+import org.koin.core.annotation.Single
 
-@Configuration
-class BCrypt {
+@Single([BCryptPasswordEncoder::class])
+class BCryptPasswordEncoder(
+    private val hasher: BCrypt.Hasher,
+    private val verifier: BCrypt.Verifyer,
+) : AuthPasswordEncoder {
+    override fun encode(rawPassword: String): String {
+        return hasher.hashToString(4, rawPassword.toCharArray())
+    }
 
-    @Bean("bcrypt_encoder")
-    fun bCryptEncoderBean(): PasswordEncoder {
-        return BCryptPasswordEncoder()
+    override fun match(rawPassword: String, encodedPassword: String): Boolean {
+        return verifier.verify(rawPassword.toCharArray(), encodedPassword).verified
     }
 
 }
+

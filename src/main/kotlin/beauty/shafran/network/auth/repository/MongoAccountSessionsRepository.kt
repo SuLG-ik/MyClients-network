@@ -1,13 +1,15 @@
 package beauty.shafran.network.auth.repository
 
-import beauty.shafran.network.AccountSessionNotExists
+import beauty.shafran.AccountSessionNotExists
 import beauty.shafran.network.auth.entity.AccountSessionEntity
 import beauty.shafran.network.utils.toIdSecure
+import org.koin.core.annotation.Named
+import org.koin.core.annotation.Single
 import org.litote.kmongo.coroutine.CoroutineCollection
-import org.springframework.stereotype.Repository
 
-@Repository
+@Single
 class MongoAccountSessionsRepository(
+    @Named(AccountSessionEntity.collectionName)
     private val accountSessionsCollection: CoroutineCollection<AccountSessionEntity>,
 ) : AccountSessionsRepository {
 
@@ -18,7 +20,7 @@ class MongoAccountSessionsRepository(
     }
 
     override suspend fun findSessionWithId(sessionId: String): AccountSessionEntity {
-        return accountSessionsCollection.findOneById(sessionId.toIdSecure<AccountSessionEntity>("sessionId"))
+        return accountSessionsCollection.findOneById(sessionId.toIdSecure("sessionId"))
             ?: throw AccountSessionNotExists(sessionId)
     }
 
