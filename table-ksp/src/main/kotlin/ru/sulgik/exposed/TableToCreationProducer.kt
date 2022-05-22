@@ -49,7 +49,10 @@ private class SingleTableToEntityProducer(
         val typeSpec =
             generateEntity(entityName = fileName, annotation = annotation, properties = properties)
         val fileSpec = FileSpec.builder(packageName, fileName)
+            .addImport("org.jetbrains.exposed.sql.SqlExpressionBuilder", "eq")
             .addImport("org.jetbrains.exposed.sql", "insert")
+            .addImport("org.jetbrains.exposed.sql", "select")
+            .addImport("org.jetbrains.exposed.sql", "insertAndGetId")
             .addType(typeSpec)
             .addFunction(
                 generateRowToEntity(
@@ -61,12 +64,12 @@ private class SingleTableToEntityProducer(
             )
             .addFunction(
                 generateInsert(
-                    fileName,
-                    ClassName(packageName, fileName),
                     properties.filterIgnoreOnInsert(),
-                    table.toClassName()
+                    table
                 )
             )
+            .addFunction(generateInsertAndGetId(properties.filterIgnoreOnInsert(), table))
+            .addFunction(generateSelectById(fileName, ClassName(packageName, fileName), table))
             .build()
         fileSpec.writeTo(codeGenerator, Dependencies(false))
         codeGenerator.associateWithClasses(listOf(table), table.packageName.asString(), fileName)
@@ -74,6 +77,25 @@ private class SingleTableToEntityProducer(
         return table
     }
 
+    @OptIn(KotlinPoetKspPreview::class)
+    private fun generateSelectById(
+        typeName: String,
+        type: TypeName,
+        table: KSClassDeclaration,
+    ): FunSpec {
+        return FunSpec.builder("findById")
+            .receiver(table.toClassName())
+            .addParameter("id", table.getTableIdType().toClassName())
+            .returns(type.copy(nullable = true))
+            .addCode(
+                "return %T.select{ %T.${table.getTableIdProperty()}.eq(id) }",
+                table.toClassName(),
+                table.toClassName(),
+            )
+            .addCode(".firstOrNull()")
+            .addCode("?.to$typeName()")
+            .build()
+    }
 
     private fun String.toEntityName(): String {
         return removeSuffix("Table") + "Entity"
@@ -130,37 +152,68 @@ private class SingleTableToEntityProducer(
             }.toList()
     }
 
+    @OptIn(KotlinPoetKspPreview::class)
     private fun generateInsert(
-        typeName: String,
-        type: TypeName,
         properties: List<EntityProperty>,
-        table: TypeName,
+        table: KSClassDeclaration,
     ): FunSpec {
-        return FunSpec.builder("insert")
-            .receiver(table)
+        return FunSpec.builder("insertEntity")
+            .receiver(table.toClassName())
             .addInsertParameters(properties)
+            .beginControlFlow("return %T.insert", table.toClassName())
             .addPropertiesToInsertBuilder(properties, table)
+            .endControlFlow()
+            .build()
+    }
+
+    @OptIn(KspExperimental::class)
+    private fun KSClassDeclaration.getTableIdProperty(): KSPropertyDeclaration {
+        return getAllProperties().filter { it.isAnnotationPresent(TableId::class) }.toList().also {
+            if (it.size != 1)
+                throw IllegalStateException("Table can contain only one @Id")
+        }.first()
+    }
+
+    @OptIn(KspExperimental::class)
+    private fun KSClassDeclaration.getTableIdType(): KSType {
+        return getAllProperties().filter { it.isAnnotationPresent(TableId::class) }.toList().also {
+            if (it.size != 1)
+                throw IllegalStateException("Table can contain only one @Id")
+        }.first().type.resolve().getGeneric()
+    }
+
+    @OptIn(KotlinPoetKspPreview::class)
+    private fun generateInsertAndGetId(
+        properties: List<EntityProperty>,
+        table: KSClassDeclaration,
+    ): FunSpec {
+        return FunSpec.builder("insertEntityAndGetId")
+            .receiver(table.toClassName())
+            .returns(table.getTableIdType().toClassName())
+            .addInsertParameters(properties)
+            .beginControlFlow("return %T.insertAndGetId", table.toClassName())
+            .addPropertiesToInsertBuilder(properties, table)
+            .endControlFlow()
+            .addCode(".value")
             .build()
     }
 
     @OptIn(KotlinPoetKspPreview::class, KspExperimental::class)
     private fun FunSpec.Builder.addPropertiesToInsertBuilder(
         properties: List<EntityProperty>,
-        table: TypeName,
+        table: KSClassDeclaration,
     ): FunSpec.Builder {
         return this
-            .beginControlFlow("return %T.insert{ ", table)
             .apply {
                 properties.forEach {
                     val isWithDefault = it.declaration.isAnnotationPresent(DefaultOnInsert::class)
                     if (isWithDefault)
                         beginControlFlow("if (${it.propertyName} != null)")
-                    addStatement("it[%T.${it.tablePropertyName}] = ${it.propertyName}", table)
+                    addStatement("it[%T.${it.tablePropertyName}] = ${it.propertyName}", table.toClassName())
                     if (isWithDefault)
                         endControlFlow()
                 }
             }
-            .endControlFlow()
     }
 
     @OptIn(KotlinPoetKspPreview::class, KspExperimental::class)

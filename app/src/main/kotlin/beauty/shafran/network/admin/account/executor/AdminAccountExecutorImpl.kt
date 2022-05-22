@@ -1,6 +1,6 @@
 package beauty.shafran.network.admin.account.executor
 
-import beauty.shafran.network.account.entity.AccountEntityData
+import beauty.shafran.network.account.data.AccountId
 import beauty.shafran.network.account.repository.AccountsRepository
 import beauty.shafran.network.auth.data.RegisterAccountRequest
 import beauty.shafran.network.auth.data.RegisterAccountResponse
@@ -27,16 +27,13 @@ class AdminAccountExecutorImpl(
             val account =
                 accountsRepository.run {
                     createAccount(
-                        AccountEntityData(
-                            username = username,
-                            name = "name"
-                        ),
+                        username = username,
                         password = password)
                 }
-            val session = accountSessionsRepository.run { createSessionForAccount(account.id) }
+            val session = accountSessionsRepository.run { createSessionForAccount(AccountId(account.id)) }
             val jwt = authService.generateTokenForSession(session)
             RegisterAccountResponse(
-                accountId = account.id,
+                accountId = AccountId(account.id),
                 token = jwt,
             )
         }

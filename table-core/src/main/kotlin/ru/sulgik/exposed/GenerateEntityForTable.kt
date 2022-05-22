@@ -20,3 +20,8 @@ annotation class IgnoreOnInsert
 @Target(AnnotationTarget.PROPERTY)
 @Retention(AnnotationRetention.SOURCE)
 annotation class DefaultOnInsert
+
+
+@Target(AnnotationTarget.PROPERTY)
+@Retention(AnnotationRetention.SOURCE)
+annotation class TableId
