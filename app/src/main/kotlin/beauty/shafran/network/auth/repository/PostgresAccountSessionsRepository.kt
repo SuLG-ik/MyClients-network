@@ -10,9 +10,8 @@ import beauty.shafran.network.utils.TransactionalScope
 import beauty.shafran.network.utils.selectLatest
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.insertAndGetId
-import org.koin.core.annotation.Single
 
-@Single
+
 class PostgresAccountSessionsRepository(
     private val db: Database,
 ) : AccountSessionsRepository {

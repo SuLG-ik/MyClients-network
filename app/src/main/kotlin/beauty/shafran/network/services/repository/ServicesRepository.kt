@@ -12,26 +12,26 @@ import beauty.shafran.network.utils.TransactionalScope
 
 interface ServicesRepository {
 
-            suspend fun TransactionalScope.updateServiceInfo(serviceId: ServiceId, info: ServiceInfoEntity): ServiceEntity
+    context (TransactionalScope) suspend fun updateServiceInfo(serviceId: ServiceId, info: ServiceInfoEntity): ServiceEntity
 
-            suspend fun TransactionalScope.findServiceById(serviceId: ServiceId): ServiceEntity
+    context (TransactionalScope) suspend fun findServiceById(serviceId: ServiceId): ServiceEntity
 
-            suspend fun TransactionalScope.findServiceByConfigurationId(configurationId: ServiceConfigurationId): ServiceEntity
+    context (TransactionalScope) suspend fun findServiceByConfigurationId(configurationId: ServiceConfigurationId): ServiceEntity
 
-            suspend fun TransactionalScope.findServiceConfiguration(configurationId: ServiceConfigurationId): ServiceConfigurationEntity
+    context (TransactionalScope) suspend fun findServiceConfiguration(configurationId: ServiceConfigurationId): ServiceConfigurationEntity
 
-            suspend fun TransactionalScope.findAllServices(paged: PagedData, storageId: ServicesStorageId): List<ServiceEntity>
+    context (TransactionalScope) suspend fun findAllServices(paged: PagedData, storageId: ServicesStorageId): List<ServiceEntity>
 
-            suspend fun TransactionalScope.createService(info: ServiceInfoEntity, storageId: ServicesStorageId): ServiceEntity
+    context (TransactionalScope) suspend fun createService(info: ServiceInfoEntity, storageId: ServicesStorageId): ServiceEntity
 
-            suspend fun TransactionalScope.addConfiguration(serviceId: ServiceId, data: ServiceConfigurationEntityData): ServiceEntity
+    context (TransactionalScope) suspend fun addConfiguration(serviceId: ServiceId, data: ServiceConfigurationEntityData): ServiceEntity
 
-            suspend fun TransactionalScope.throwIfServiceNotExists(serviceId: ServiceId)
+    context (TransactionalScope) suspend fun throwIfServiceNotExists(serviceId: ServiceId)
 
-            suspend fun TransactionalScope.isServiceExists(serviceId: ServiceId): Boolean
+    context (TransactionalScope) suspend fun isServiceExists(serviceId: ServiceId): Boolean
 
-            suspend fun TransactionalScope.throwIfServiceConfigurationNotExists(configurationId: ServiceConfigurationId)
+    context (TransactionalScope) suspend fun throwIfServiceConfigurationNotExists(configurationId: ServiceConfigurationId)
 
-            suspend fun TransactionalScope.isServiceConfigurationExists(configurationId: ServiceConfigurationId): Boolean
+    context (TransactionalScope) suspend fun isServiceConfigurationExists(configurationId: ServiceConfigurationId): Boolean
 
 }

@@ -2,11 +2,9 @@ package beauty.shafran.network.cards.token
 
 import beauty.shafran.IllegalCardToken
 import beauty.shafran.network.cards.data.CardToken
-import org.koin.core.annotation.Single
 import java.util.*
 
 
-@Single
 class CardTokenDecoderImpl : CardTokenDecoder {
 
     private val decoders = mapOf<String, CardTokenDecoder>("0" to CardTokenDecoder0())

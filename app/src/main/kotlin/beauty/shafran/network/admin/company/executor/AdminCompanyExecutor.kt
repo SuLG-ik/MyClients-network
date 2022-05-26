@@ -1,4 +1,4 @@
-package beauty.shafran.network.admin.company.execute
+package beauty.shafran.network.admin.company.executor
 
 import beauty.shafran.network.companies.data.CreateCompanyRequest
 import beauty.shafran.network.companies.data.CreateCompanyResponse

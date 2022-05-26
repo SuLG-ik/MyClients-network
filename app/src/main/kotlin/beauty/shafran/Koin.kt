@@ -1,6 +1,22 @@
 package beauty.shafran
 
+import beauty.shafran.network.ClockModule
 import beauty.shafran.network.ExposedBeanModule
+import beauty.shafran.network.LoggerModule
+import beauty.shafran.network.account.AccountsModule
+import beauty.shafran.network.admin.AdminModule
+import beauty.shafran.network.api.PasswordModule
+import beauty.shafran.network.assets.AssetsModule
+import beauty.shafran.network.auth.AuthModule
+import beauty.shafran.network.auth.jwt.JwtModule
+import beauty.shafran.network.cards.CardsModule
+import beauty.shafran.network.companies.CompanyModule
+import beauty.shafran.network.customers.CustomersModule
+import beauty.shafran.network.employees.EmployeesModule
+import beauty.shafran.network.phone.PhoneModule
+import beauty.shafran.network.services.ServicesModule
+import beauty.shafran.network.session.ServiceSessionsModule
+import beauty.shafran.network.utils.RandomModule
 import io.ktor.events.EventDefinition
 import io.ktor.server.application.*
 import io.ktor.server.routing.*
@@ -15,20 +31,29 @@ import org.koin.core.parameter.ParametersDefinition
 import org.koin.core.qualifier.Qualifier
 import org.koin.dsl.bind
 import org.koin.dsl.module
-import org.koin.ksp.generated.*
 
 fun Application.koin() {
     install(KoinPlugin) {
         ktorApplication(this@koin)
         modules(
-            defaultModule,
-            RandomBeanModule,
+            AccountsModule,
+            AdminModule,
+            AssetsModule,
+            CardsModule,
+            CompanyModule,
+            CustomersModule,
+            EmployeesModule,
+            ServicesModule,
+            ServiceSessionsModule,
+            AuthModule,
             ExposedBeanModule,
             SerializationModule,
-            PasswordModuleModule,
-            AuthModuleModule,
-            AssetsModule,
-            JwtConfigurationModule,
+            JwtModule,
+            PasswordModule,
+            PhoneModule,
+            RandomModule,
+            ClockModule,
+            LoggerModule,
         )
     }
 }

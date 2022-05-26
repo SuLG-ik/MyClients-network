@@ -1,5 +1,6 @@
 package beauty.shafran.network.companies.data
 
+import beauty.shafran.network.account.data.AccountId
 import com.arkivanov.essenty.parcelable.Parcelable
 import com.arkivanov.essenty.parcelable.Parcelize
 import kotlinx.serialization.Serializable
@@ -8,6 +9,7 @@ import kotlinx.serialization.Serializable
 @Parcelize
 data class CreateCompanyRequest(
     val data: CreateCompanyRequestData,
+    val ownerAccountId: AccountId,
 ): Parcelable
 
 @Serializable

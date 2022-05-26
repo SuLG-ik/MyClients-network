@@ -51,8 +51,6 @@ dependencies {
 
     implementation("at.favre.lib:bcrypt:0.9.0")
     implementation("io.insert-koin:koin-core:$koin_version")
-    implementation("io.insert-koin:koin-annotations:$koin_ksp_version")
-    ksp("io.insert-koin:koin-ksp-compiler:$koin_ksp_version")
 
     implementation("org.jetbrains.exposed:exposed-core:$exposedVersion")
     implementation("org.jetbrains.exposed:exposed-jdbc:$exposedVersion")

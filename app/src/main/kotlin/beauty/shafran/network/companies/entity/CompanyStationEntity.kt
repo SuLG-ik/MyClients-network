@@ -5,7 +5,6 @@ import beauty.shafran.network.utils.LongIdWithMetaTable
 import kotlinx.serialization.Serializable
 import ru.sulgik.exposed.TableToCreation
 
-
 @TableToCreation
 object CompanyStationTable : LongIdWithMetaTable("company_station") {
     val codename = varchar("codename", 64)

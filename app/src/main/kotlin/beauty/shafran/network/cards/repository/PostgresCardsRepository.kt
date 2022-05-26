@@ -17,9 +17,8 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.exposed.sql.batchInsert
-import org.koin.core.annotation.Single
 
-@Single
+
 class PostgresCardsRepository(
     private val tokenGenerator: CardTokenGenerator,
     private val clock: Clock,

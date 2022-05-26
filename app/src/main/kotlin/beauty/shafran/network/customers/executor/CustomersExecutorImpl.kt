@@ -11,9 +11,8 @@ import beauty.shafran.network.customers.repository.CustomersRepository
 import beauty.shafran.network.utils.Transactional
 import beauty.shafran.network.utils.TransactionalScope
 import kotlinx.coroutines.awaitAll
-import org.koin.core.annotation.Single
 
-@Single
+
 class CustomersExecutorImpl(
     private val tokenDecoder: CardTokenDecoder,
     private val customersConverter: CustomersConverter,

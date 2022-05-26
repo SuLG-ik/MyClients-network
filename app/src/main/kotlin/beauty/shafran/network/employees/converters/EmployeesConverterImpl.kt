@@ -9,9 +9,8 @@ import beauty.shafran.network.employees.data.EmployeeLayoff
 import beauty.shafran.network.employees.entity.EmployeeDataEntity
 import beauty.shafran.network.employees.entity.EmployeeEntity
 import beauty.shafran.network.employees.entity.EmployeeLayoffEntity
-import org.koin.core.annotation.Single
 
-@Single
+
 class EmployeesConverterImpl(
     private val assetsConverter: AssetsConverter,
 ) : EmployeesConverter {

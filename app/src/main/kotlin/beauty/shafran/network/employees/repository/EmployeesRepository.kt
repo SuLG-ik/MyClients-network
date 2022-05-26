@@ -13,46 +13,46 @@ import beauty.shafran.network.utils.TransactionalScope
 
 interface EmployeesRepository {
 
-    suspend fun TransactionalScope.throwIfEmployeeNotExists(employeeId: EmployeeId)
+    context (TransactionalScope) suspend fun throwIfEmployeeNotExists(employeeId: EmployeeId)
 
-    suspend fun TransactionalScope.isEmployeeExists(employeeId: EmployeeId): Boolean
+    context (TransactionalScope) suspend fun isEmployeeExists(employeeId: EmployeeId): Boolean
 
-    suspend fun TransactionalScope.findEmployeeById(
+    context (TransactionalScope) suspend fun findEmployeeById(
         employeeId: EmployeeId,
     ): EmployeeEntity
 
-    suspend fun TransactionalScope.updateEmployeeData(employeeId: EmployeeId, data: EmployeeDataEntity): EmployeeEntity
+    context (TransactionalScope) suspend fun updateEmployeeData(employeeId: EmployeeId, data: EmployeeDataEntity): EmployeeEntity
 
-    suspend fun TransactionalScope.updateEmployeeLayoff(
+    context (TransactionalScope) suspend fun updateEmployeeLayoff(
         employeeId: EmployeeId,
         data: LayoffEmployeeRequestData,
     ): EmployeeEntity
 
-    suspend fun TransactionalScope.insertEmployee(
+    context (TransactionalScope) suspend fun insertEmployee(
         request: CreateEmployeeRequestData, storageId: EmployeeStorageId,
     ): EmployeeEntity
 
-    suspend fun TransactionalScope.connectEmployeeToStorage(
+    context (TransactionalScope) suspend fun connectEmployeeToStorage(
         employeeId: EmployeeId,
         storageId: EmployeeStorageId,
     ): EmployeeEntity
 
-    suspend fun TransactionalScope.findAllEmployees(
+    context (TransactionalScope)  suspend fun findAllEmployees(
         paged: PagedData,
         storageId: EmployeeStorageId,
     ): List<EmployeeEntity>
 
-    suspend fun TransactionalScope.findEmployeeDataById(employeeId: EmployeeId): EmployeeDataEntity
+    context (TransactionalScope) suspend fun findEmployeeDataById(employeeId: EmployeeId): EmployeeDataEntity
 
-    suspend fun TransactionalScope.findEmployeeLayoffById(employeeId: EmployeeId): EmployeeLayoffEntity
+    context (TransactionalScope) suspend fun findEmployeeLayoffById(employeeId: EmployeeId): EmployeeLayoffEntity
 
-    suspend fun TransactionalScope.findEmployeeImageById(
+    context (TransactionalScope) suspend fun findEmployeeImageById(
         employeeId: EmployeeId,
     ): AssetEntity
 
-    fun findAllEmployeesData(employees: List<EmployeeEntity>): Map<Long, EmployeeDataEntity>
+    context (TransactionalScope) suspend fun findAllEmployeesData(employees: List<EmployeeEntity>): Map<Long, EmployeeDataEntity>
 
-    fun findAllEmployeesLayoff(employees: List<EmployeeEntity>): Map<Long, EmployeeLayoffEntity>
+    context (TransactionalScope) suspend fun findAllEmployeesLayoff(employees: List<EmployeeEntity>): Map<Long, EmployeeLayoffEntity>
 
-    fun findAllEmployeesImage(employees: List<EmployeeEntity>): Map<Long, AssetEntity>
+    context (TransactionalScope) suspend fun findAllEmployeesImage(employees: List<EmployeeEntity>): Map<Long, AssetEntity>
 }

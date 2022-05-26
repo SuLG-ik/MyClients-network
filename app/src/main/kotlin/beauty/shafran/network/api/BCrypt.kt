@@ -1,9 +1,7 @@
 package beauty.shafran.network.api
 
 import at.favre.lib.crypto.bcrypt.BCrypt
-import org.koin.core.annotation.Single
 
-@Single([BCryptPasswordEncoder::class])
 class BCryptPasswordEncoder(
     private val hasher: BCrypt.Hasher,
     private val verifier: BCrypt.Verifyer,

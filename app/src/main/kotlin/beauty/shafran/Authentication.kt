@@ -8,7 +8,7 @@ import io.ktor.server.auth.*
 import io.ktor.server.auth.jwt.*
 
 const val CompaniesAuthScope = "companies_scope"
-const val AdminAuthScope = "companies_scope"
+const val AdminAuthScope = "admin_scope"
 
 fun Application.jwtAuthentication() {
     val config: JwtConfig = get()

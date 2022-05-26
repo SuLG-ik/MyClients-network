@@ -13,9 +13,8 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.exposed.sql.select
-import org.koin.core.annotation.Single
 
-@Single
+
 class PostgresCustomersRepository : CustomersRepository {
 
     context (TransactionalScope) override suspend fun throwIfCustomerNotExists(customerId: CustomerId) {

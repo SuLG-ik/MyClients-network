@@ -16,6 +16,7 @@ import com.squareup.kotlinpoet.ksp.toClassName
 import com.squareup.kotlinpoet.ksp.toTypeName
 import com.squareup.kotlinpoet.ksp.writeTo
 import org.jetbrains.exposed.sql.ResultRow
+import org.jetbrains.exposed.sql.statements.InsertStatement
 
 class TablesToEntityCreationProducer(
     private val logger: KSPLogger,
@@ -70,6 +71,22 @@ private class SingleTableToEntityProducer(
             )
             .addFunction(generateInsertAndGetId(properties.filterIgnoreOnInsert(), table))
             .addFunction(generateSelectById(fileName, ClassName(packageName, fileName), table))
+            .addFunction(
+                generateInsertToEntity(
+                    fileName,
+                    ClassName(packageName, fileName),
+                    properties,
+                    table.toClassName()
+                )
+            )
+            .addFunction(
+                generateInsertAndGet(
+                    fileName,
+                    ClassName(packageName, fileName),
+                    properties.filterIgnoreOnInsert(),
+                    table
+                )
+            )
             .build()
         fileSpec.writeTo(codeGenerator, Dependencies(false))
         codeGenerator.associateWithClasses(listOf(table), table.packageName.asString(), fileName)
@@ -101,6 +118,21 @@ private class SingleTableToEntityProducer(
         return removeSuffix("Table") + "Entity"
     }
 
+    private fun generateInsertToEntity(
+        typeName: String,
+        type: TypeName,
+        properties: List<EntityProperty>,
+        table: TypeName,
+    ): FunSpec {
+        return FunSpec.builder("to$typeName")
+            .receiver(typeNameOf<InsertStatement<Number>>().copy())
+            .returns(type)
+            .addCode("return %T(", type)
+            .addPropertiesToEntityBuilder(properties, table)
+            .addCode(")")
+            .build()
+    }
+
     private fun generateRowToEntity(
         typeName: String,
         type: TypeName,
@@ -128,6 +160,7 @@ private class SingleTableToEntityProducer(
         }
     }
 
+
     private fun generateEntity(
         entityName: String,
         annotation: TableWithEntity,
@@ -151,6 +184,25 @@ private class SingleTableToEntityProducer(
                 it.toEntityProperty()
             }.toList()
     }
+
+    @OptIn(KotlinPoetKspPreview::class)
+    private fun generateInsertAndGet(
+        typeName: String,
+        type: TypeName,
+        properties: List<EntityProperty>,
+        table: KSClassDeclaration,
+    ): FunSpec {
+        return FunSpec.builder("insertAndGetEntity")
+            .returns(type)
+            .receiver(table.toClassName())
+            .addInsertParameters(properties)
+            .beginControlFlow("return %T.insert", table.toClassName())
+            .addPropertiesToInsertBuilder(properties, table)
+            .endControlFlow()
+            .addCode(".to${typeName}()")
+            .build()
+    }
+
 
     @OptIn(KotlinPoetKspPreview::class)
     private fun generateInsert(

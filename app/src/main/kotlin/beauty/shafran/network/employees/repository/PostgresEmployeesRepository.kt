@@ -16,54 +16,54 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.exposed.sql.select
-import org.koin.core.annotation.Single
 
-@Single
 class PostgresEmployeesRepository : EmployeesRepository {
 
 
-    override suspend fun TransactionalScope.throwIfEmployeeNotExists(employeeId: EmployeeId) {
+    context (TransactionalScope) override suspend fun throwIfEmployeeNotExists(employeeId: EmployeeId) {
         if (!isEmployeeExists(employeeId)) throw EmployeeNotExistsWithId(employeeId.toString())
     }
 
-    override suspend fun TransactionalScope.isEmployeeExists(employeeId: EmployeeId): Boolean {
+    context (TransactionalScope) override suspend fun isEmployeeExists(employeeId: EmployeeId): Boolean {
         return EmployeeTable.isRowExists { EmployeeTable.id eq employeeId.id }
     }
 
 
-    override suspend fun TransactionalScope.findEmployeeDataById(employeeId: EmployeeId): EmployeeDataEntity {
+    context (TransactionalScope) override suspend fun findEmployeeDataById(employeeId: EmployeeId): EmployeeDataEntity {
         return EmployeeDataTable.selectLatest { EmployeeDataTable.employeeId eq employeeId.id }?.toEmployeeDataEntity()
             ?: throw EmployeeNotExistsWithId(employeeId.toString())
     }
 
-    override suspend fun TransactionalScope.findEmployeeLayoffById(employeeId: EmployeeId): EmployeeLayoffEntity {
+    context (TransactionalScope) override suspend fun findEmployeeLayoffById(employeeId: EmployeeId): EmployeeLayoffEntity {
         return EmployeeLayoffTable.selectLatest { EmployeeDataTable.employeeId eq employeeId.id }
             ?.toEmployeeLayoffEntity() ?: throw EmployeeNotExistsWithId(employeeId.toString())
     }
 
-    override suspend fun TransactionalScope.findEmployeeImageById(employeeId: EmployeeId): AssetEntity {
+    context (TransactionalScope) override suspend fun findEmployeeImageById(employeeId: EmployeeId): AssetEntity {
         TODO("Not yet implemented")
     }
 
-    override suspend fun TransactionalScope.findEmployeeById(
+    context (TransactionalScope) override suspend fun findEmployeeById(
         employeeId: EmployeeId,
     ): EmployeeEntity {
         return EmployeeTable.findById(employeeId.id) ?: throw EmployeeNotExistsWithId(employeeId.toString())
     }
 
-    override suspend fun TransactionalScope.updateEmployeeData(
+    context (TransactionalScope) override suspend fun updateEmployeeData(
         employeeId: EmployeeId,
         data: EmployeeDataEntity,
     ): EmployeeEntity {
         throwIfEmployeeNotExists(employeeId)
-        EmployeeDataTable.insertEntity(name = data.name,
+        EmployeeDataTable.insertEntity(
+            name = data.name,
             description = data.description,
             gender = data.gender,
-            employeeId = employeeId.id)
+            employeeId = employeeId.id
+        )
         return findEmployeeById(employeeId)
     }
 
-    override suspend fun TransactionalScope.updateEmployeeLayoff(
+    context (TransactionalScope) override suspend fun updateEmployeeLayoff(
         employeeId: EmployeeId,
         data: LayoffEmployeeRequestData,
     ): EmployeeEntity {
@@ -72,7 +72,7 @@ class PostgresEmployeesRepository : EmployeesRepository {
         return findEmployeeById(employeeId)
     }
 
-    override suspend fun TransactionalScope.insertEmployee(
+    context (TransactionalScope) override suspend fun insertEmployee(
         request: CreateEmployeeRequestData,
         storageId: EmployeeStorageId,
     ): EmployeeEntity {
@@ -93,7 +93,7 @@ class PostgresEmployeesRepository : EmployeesRepository {
     }
 
 
-    override suspend fun TransactionalScope.connectEmployeeToStorage(
+    context (TransactionalScope) override suspend fun connectEmployeeToStorage(
         employeeId: EmployeeId,
         storageId: EmployeeStorageId,
     ): EmployeeEntity {
@@ -101,7 +101,7 @@ class PostgresEmployeesRepository : EmployeesRepository {
         return findEmployeeById(employeeId)
     }
 
-    override fun findAllEmployeesData(employees: List<EmployeeEntity>): Map<Long, EmployeeDataEntity> {
+    context (TransactionalScope) override suspend fun findAllEmployeesData(employees: List<EmployeeEntity>): Map<Long, EmployeeDataEntity> {
         return EmployeeDataTable.select { EmployeeDataTable.employeeId inList employees.map { it.id } }
             .associate {
                 val entity = it.toEmployeeDataEntity()
@@ -109,7 +109,7 @@ class PostgresEmployeesRepository : EmployeesRepository {
             }
     }
 
-    override fun findAllEmployeesLayoff(employees: List<EmployeeEntity>): Map<Long, EmployeeLayoffEntity> {
+    context (TransactionalScope) override suspend fun findAllEmployeesLayoff(employees: List<EmployeeEntity>): Map<Long, EmployeeLayoffEntity> {
         return EmployeeLayoffTable.select { EmployeeDataTable.employeeId inList employees.map { it.id } }
             .associate {
                 val entity = it.toEmployeeLayoffEntity()
@@ -117,11 +117,11 @@ class PostgresEmployeesRepository : EmployeesRepository {
             }
     }
 
-    override fun findAllEmployeesImage(employees: List<EmployeeEntity>): Map<Long, AssetEntity> {
+    context (TransactionalScope) override suspend fun findAllEmployeesImage(employees: List<EmployeeEntity>): Map<Long, AssetEntity> {
         TODO("Not yet implemented")
     }
 
-    override suspend fun TransactionalScope.findAllEmployees(
+    context (TransactionalScope) override suspend fun findAllEmployees(
         paged: PagedData,
         storageId: EmployeeStorageId,
     ): List<EmployeeEntity> {

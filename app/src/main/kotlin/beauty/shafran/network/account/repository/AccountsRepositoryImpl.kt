@@ -3,6 +3,7 @@ package beauty.shafran.network.account.repository
 import beauty.shafran.AccountIllegalCredentials
 import beauty.shafran.AccountNotExists
 import beauty.shafran.network.account.data.AccountId
+import beauty.shafran.network.account.data.AccountUsername
 import beauty.shafran.network.account.entity.*
 import beauty.shafran.network.api.AuthPasswordEncoder
 import beauty.shafran.network.utils.TransactionalScope
@@ -11,26 +12,28 @@ import beauty.shafran.network.utils.selectLatest
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
-import org.koin.core.annotation.Single
 
-@Single
-class PostgresAccountsRepository(
+class AccountsRepositoryImpl(
     private val authPasswordEncoder: AuthPasswordEncoder,
 ) : AccountsRepository {
 
-    override suspend fun TransactionalScope.isAccountExists(accountId: AccountId): Boolean {
+    context(TransactionalScope) override suspend fun isAccountExists(username: AccountUsername): Boolean {
+        return AccountTable.isRowExists { AccountTable.username eq username.username }
+    }
+
+    context (TransactionalScope) override suspend fun isAccountExists(accountId: AccountId): Boolean {
         return AccountTable.isRowExists { AccountTable.id eq accountId.id }
     }
 
-    override suspend fun TransactionalScope.throwIfAccountNotExists(accountId: AccountId) {
+    context (TransactionalScope) override suspend fun throwIfAccountNotExists(accountId: AccountId) {
         if (isAccountExists(accountId)) throw AccountNotExists(accountId.id.toString())
     }
 
-    override suspend fun TransactionalScope.throwIfAccountNotExistsOrDeactivated(accountId: AccountId) {
+    context (TransactionalScope) override suspend fun throwIfAccountNotExistsOrDeactivated(accountId: AccountId) {
         throwIfAccountNotExists(accountId)
     }
 
-    override suspend fun TransactionalScope.findAccountByUsernameCredential(
+    context (TransactionalScope) override suspend fun findAccountByUsernameCredential(
         username: String,
         password: String,
     ): AccountEntity {
@@ -44,21 +47,17 @@ class PostgresAccountsRepository(
         return account
     }
 
-    override suspend fun TransactionalScope.createAccount(username: String, password: String): AccountEntity {
+    context (TransactionalScope) override suspend fun createAccount(username: String, password: String): AccountEntity {
         val currentDate = Clock.System.now().toLocalDateTime(TimeZone.UTC)
-        val accountId = AccountTable.insertEntityAndGetId(username = username, creationDate = currentDate)
+        val account = AccountTable.insertAndGetEntity(username = username, creationDate = currentDate)
         AccountPasswordCredentialTable.insertEntity(
-            accountId = accountId,
+            accountId = account.id,
             password = authPasswordEncoder.encode(password)
         )
-        return AccountEntity(
-            id = accountId,
-            username = username,
-            creationDate = currentDate,
-        )
+        return account
     }
 
-    override suspend fun TransactionalScope.changePassword(
+    context (TransactionalScope) override suspend fun changePassword(
         accountId: AccountId,
         oldPassword: String,
         newPassword: String,
@@ -72,11 +71,11 @@ class PostgresAccountsRepository(
         return account
     }
 
-    override suspend fun TransactionalScope.findAccountById(accountId: AccountId): AccountEntity {
+    context (TransactionalScope) override suspend fun findAccountById(accountId: AccountId): AccountEntity {
         return AccountTable.findById(accountId.id) ?: throw AccountNotExists(accountId.id.toString())
     }
 
-    override suspend fun TransactionalScope.findAccountDataById(accountId: AccountId): AccountDataEntity {
+    context (TransactionalScope) override suspend fun findAccountDataById(accountId: AccountId): AccountDataEntity {
         return AccountDataTable.selectLatest { AccountDataTable.accountId eq accountId.id }?.toAccountDataEntity()
             ?: throw AccountNotExists(accountId.id.toString())
     }

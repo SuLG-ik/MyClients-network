@@ -9,9 +9,8 @@ import beauty.shafran.network.services.enity.ServiceInfoEntity
 import beauty.shafran.network.services.enity.TypedServiceConfigurationEntity
 import beauty.shafran.network.services.repository.ServicesRepository
 import beauty.shafran.network.utils.Transactional
-import org.koin.core.annotation.Single
 
-@Single
+
 class ServicesExecutorImpl(
     private val converter: ServicesConverter,
     private val servicesRepository: ServicesRepository,

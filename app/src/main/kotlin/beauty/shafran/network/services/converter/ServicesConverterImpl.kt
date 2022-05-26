@@ -3,9 +3,8 @@ package beauty.shafran.network.services.converter
 import beauty.shafran.network.assets.converter.AssetsConverter
 import beauty.shafran.network.services.data.*
 import beauty.shafran.network.services.enity.*
-import org.koin.core.annotation.Single
 
-@Single
+
 class ServicesConverterImpl(
     private val converter: AssetsConverter,
 ) : ServicesConverter {

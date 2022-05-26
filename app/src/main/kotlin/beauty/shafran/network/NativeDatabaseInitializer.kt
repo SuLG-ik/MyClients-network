@@ -1,15 +1,12 @@
 package beauty.shafran.network
 
-import beauty.shafran.network.gender.Gender
 import io.ktor.util.logging.*
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.Transaction
 import org.jetbrains.exposed.sql.transactions.transaction
-import org.koin.core.annotation.Factory
 import ru.sulgik.exposed.generated.createAnnotatedMissingTablesAndColumns
 
-@Factory
 class NativeDatabaseInitializer(
     private val logger: Logger,
 ) : DatabaseInitializer {

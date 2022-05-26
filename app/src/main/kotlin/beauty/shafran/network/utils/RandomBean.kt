@@ -1,23 +1,15 @@
 package beauty.shafran.network.utils
 
-import kotlinx.datetime.Clock
-import org.koin.core.annotation.Module
-import org.koin.core.annotation.Single
+import org.koin.core.module.dsl.factoryOf
+import org.koin.dsl.module
 import java.security.SecureRandom
 import kotlin.random.Random
 import kotlin.random.asKotlinRandom
 
-@Module
-class RandomBean {
+val RandomModule = module {
+    factoryOf(::randomBean)
+}
 
-    @Single
-    fun randomBean(): Random {
-        return SecureRandom().asKotlinRandom()
-    }
-
-    @Single
-    fun clockBean(): Clock {
-        return Clock.System
-    }
-
+private fun randomBean(): Random {
+    return SecureRandom().asKotlinRandom()
 }

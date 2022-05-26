@@ -2,27 +2,42 @@ package beauty.shafran.network.companies.repository
 
 import beauty.shafran.network.account.data.AccountId
 import beauty.shafran.network.companies.data.CompanyId
+import beauty.shafran.network.companies.data.CompanyMemberId
+import beauty.shafran.network.companies.data.CreateCompanyRequestData
+import beauty.shafran.network.companies.entity.CompanyDataEntity
 import beauty.shafran.network.companies.entity.CompanyEntity
-import beauty.shafran.network.companies.entity.CompanyEntityData
 import beauty.shafran.network.companies.entity.CompanyMemberEntity
+import beauty.shafran.network.companies.entity.CompanyOwnerEntity
+import beauty.shafran.network.utils.PagedData
 import beauty.shafran.network.utils.TransactionalScope
 
 interface CompaniesRepository {
 
-    suspend fun TransactionalScope.findCompanyById(companyId: CompanyId): CompanyEntity
+    context (TransactionalScope) suspend fun findCompanyById(companyId: CompanyId): CompanyEntity
 
-    suspend fun TransactionalScope.findAccountMembersForAccount(accountId: AccountId): List<CompanyMemberEntity>
+    context (TransactionalScope) suspend fun findCompanyDataById(companyId: CompanyId): CompanyDataEntity
 
-    suspend fun TransactionalScope.findCompanyForAccount(accountId: AccountId): List<CompanyEntity>
+    context (TransactionalScope) suspend fun findCompaniesForAccount(
+        accountId: AccountId,
+        pagedData: PagedData,
+    ): List<CompanyMemberEntity>
 
-    suspend fun TransactionalScope.createCompany(data: CompanyEntityData, ownerAccountId: AccountId): CompanyEntity
+    context (TransactionalScope) suspend fun createCompany(
+        request: CreateCompanyRequestData,
+        ownerAccountId: AccountId,
+    ): CompanyEntity
 
-    suspend fun TransactionalScope.createCompany(data: CompanyEntityData): CompanyEntity
+    context (TransactionalScope) suspend fun pairCompanyToOwner(
+        companyId: CompanyId,
+        memberId: CompanyMemberId,
+    ): CompanyOwnerEntity
 
-    suspend fun TransactionalScope.pairCompanyToOwner(companyId: CompanyId, ownerAccountId: AccountId)
+    context (TransactionalScope) suspend fun throwIfCompanyNotExists(companyId: CompanyId)
 
-    suspend fun TransactionalScope.throwIfCompanyNotExists(companyId: CompanyId)
+    context (TransactionalScope) suspend fun isCompanyExists(companyId: CompanyId): Boolean
 
-    suspend fun TransactionalScope.isCompanyExists(companyId: CompanyId): Boolean
+    context(TransactionalScope) suspend fun findCompaniesById(companyIds: List<CompanyId>): List<CompanyEntity>
+
+    context(TransactionalScope) suspend fun findCompaniesDataById(companyIds: List<CompanyId>): Map<CompanyId, CompanyDataEntity>
 
 }

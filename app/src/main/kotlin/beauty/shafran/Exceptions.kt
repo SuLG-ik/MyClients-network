@@ -31,7 +31,9 @@ sealed class NetworkException : Exception() {
 
 @Serializable
 @SerialName("bad_request_data")
-class BadRequest : NetworkException() {
+class BadRequest(
+    override val message: String = "Bad request",
+) : NetworkException() {
     override val httpStatusCode: HttpStatusCode
         get() = HttpStatusCode.BadRequest
 }
@@ -181,7 +183,7 @@ class AccountAlreadyDeactivated(val accountId: AccountId) : NetworkException() {
 @SerialName("account_already_exists")
 class AccountAlreadyExists(val login: String) : NetworkException() {
     override val httpStatusCode: HttpStatusCode
-        get() = HttpStatusCode.NotFound
+        get() = HttpStatusCode.Conflict
 }
 
 @Serializable

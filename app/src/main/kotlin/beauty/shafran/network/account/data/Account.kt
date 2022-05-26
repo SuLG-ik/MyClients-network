@@ -17,9 +17,13 @@ data class Account(
 @JvmInline
 value class AccountId(val id: Long)
 
+@Serializable
+@JvmInline
+value class AccountUsername(val username: String)
+
 @Parcelize
 @Serializable
 data class AccountData(
     val name: String,
-    val username: String,
+    val username: AccountUsername,
 ) : Parcelable

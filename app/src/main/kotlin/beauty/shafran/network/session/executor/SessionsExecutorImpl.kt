@@ -21,9 +21,8 @@ import beauty.shafran.network.utils.MetaEntity
 import beauty.shafran.network.utils.Transactional
 import beauty.shafran.network.utils.TransactionalScope
 import kotlinx.coroutines.awaitAll
-import org.koin.core.annotation.Single
 
-@Single
+
 class SessionsExecutorImpl(
     private val sessionsConverter: SessionsConverter,
     private val customersConverter: CustomersConverter,

@@ -10,9 +10,7 @@ import beauty.shafran.network.auth.repository.AccountSessionsRepository
 import beauty.shafran.network.auth.token.TokenAuthService
 import beauty.shafran.network.companies.repository.CompaniesRepository
 import beauty.shafran.network.utils.Transactional
-import org.koin.core.annotation.Single
 
-@Single
 class AuthenticationExecutorImpl(
     private val accountsRepository: AccountsRepository,
     private val companiesRepository: CompaniesRepository,

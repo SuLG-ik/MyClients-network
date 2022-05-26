@@ -7,9 +7,8 @@ import beauty.shafran.network.cards.repository.CardsRepository
 import beauty.shafran.network.cards.token.CardTokenEncoder
 import beauty.shafran.network.utils.Transactional
 import beauty.shafran.network.utils.invoke
-import org.koin.core.annotation.Single
 
-@Single
+
 class CardsExecutorImpl(
     private val repository: CardsRepository,
     private val converter: CardsConverter,

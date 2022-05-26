@@ -10,7 +10,7 @@ import org.jetbrains.exposed.sql.select
 inline fun Table.isRowExists(
     where: SqlExpressionBuilder.() -> Op<Boolean>,
 ): Boolean {
-    return select(where).count() > 0
+    return !select(where).empty()
 }
 
 

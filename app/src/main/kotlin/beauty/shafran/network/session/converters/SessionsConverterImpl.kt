@@ -17,9 +17,8 @@ import beauty.shafran.network.utils.TransactionalScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
-import org.koin.core.annotation.Single
 
-@Single
+
 class SessionsConverterImpl(
     private val servicesRepository: ServicesRepository,
     private val servicesConverter: ServicesConverter,

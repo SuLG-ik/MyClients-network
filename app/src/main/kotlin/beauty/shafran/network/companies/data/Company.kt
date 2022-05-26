@@ -1,16 +1,24 @@
 package beauty.shafran.network.companies.data
 
+import beauty.shafran.network.utils.MetaData
 import com.arkivanov.essenty.parcelable.Parcelable
 import com.arkivanov.essenty.parcelable.Parcelize
-import kotlinx.datetime.LocalDateTime
 import kotlinx.serialization.Serializable
 
 @Serializable
 @Parcelize
 data class Company(
     val id: CompanyId,
+    val codename: CompanyCodename,
+    val meta: MetaData,
     val data: CompanyData,
 ) : Parcelable
+
+
+@JvmInline
+@Serializable
+@Parcelize
+value class CompanyCodename(val codeName: String) : Parcelable
 
 @JvmInline
 @Serializable
@@ -26,8 +34,6 @@ value class CompanyMemberId(val id: Long) : Parcelable
 @Parcelize
 data class CompanyData(
     val title: String,
-    val codeName: String,
-    val creationDate: LocalDateTime,
 ) : Parcelable
 
 

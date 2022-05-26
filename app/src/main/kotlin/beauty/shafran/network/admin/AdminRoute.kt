@@ -12,8 +12,8 @@ import io.ktor.server.routing.*
 fun Application.adminRouting() {
     routing {
         authenticate(AdminAuthScope) {
-            route("/admin") {
-                route("/company") { adminCompanyRoute() }
+            route("/v1/admin") {
+                route("/company") { adminCompanyRoute(get()) }
                 route("/account") { adminAccountsRoute(get()) }
                 route("/permission") { adminPermissionsRoute() }
             }

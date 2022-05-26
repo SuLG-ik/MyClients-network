@@ -19,22 +19,21 @@ import org.jetbrains.exposed.sql.alias
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.insertAndGetId
 import org.jetbrains.exposed.sql.select
-import org.koin.core.annotation.Single
 
-@Single
+
 class PostgresServiceSessionsRepository(
     private val servicesRepository: ServicesRepository,
 ) : ServiceSessionsRepository {
 
-    override suspend fun TransactionalScope.throwIfSessionNotExists(sessionId: ServiceSessionId) {
+    context (TransactionalScope) override suspend fun throwIfSessionNotExists(sessionId: ServiceSessionId) {
         if (!isSessionExists(sessionId)) throw SessionNotExists(sessionId.toString())
     }
 
-    override suspend fun TransactionalScope.isSessionExists(sessionId: ServiceSessionId): Boolean {
+    context (TransactionalScope) override suspend fun isSessionExists(sessionId: ServiceSessionId): Boolean {
         return ServiceSessionTable.isRowExists(sessionId.id)
     }
 
-    override suspend fun TransactionalScope.countUsagesForPeriod(
+    context (TransactionalScope) override suspend fun countUsagesForPeriod(
         period: DatePeriod,
         storageId: ServiceSessionStorageId,
         sessionId: ServiceSessionId?,
@@ -43,7 +42,7 @@ class PostgresServiceSessionsRepository(
         TODO("Not yet implemented")
     }
 
-    override suspend fun TransactionalScope.countActivationsForPeriod(
+    context (TransactionalScope) override suspend fun countActivationsForPeriod(
         period: DatePeriod,
         storageId: ServiceSessionStorageId,
         sessionId: ServiceSessionId?,
@@ -52,27 +51,27 @@ class PostgresServiceSessionsRepository(
         TODO("Not yet implemented")
     }
 
-    override suspend fun TransactionalScope.findUsagesForPeriod(
+    context (TransactionalScope) override suspend fun findUsagesForPeriod(
         period: DatePeriod,
         storageId: ServiceSessionStorageId,
     ): List<ServiceSessionUsageEntity> {
         TODO("Not yet implemented")
     }
 
-    override suspend fun TransactionalScope.countUsagesForSession(sessionId: ServiceSessionId): Long {
+    context (TransactionalScope) override suspend fun countUsagesForSession(sessionId: ServiceSessionId): Long {
         return ServiceSessionUsageTable.alias("pisos")
             .select { ServiceSessionUsageTable.serviceSessionId eq sessionId.id }
             .count()
     }
 
-    override suspend fun TransactionalScope.findLastSessionForCustomer(
+    context (TransactionalScope) override suspend fun findLastSessionForCustomer(
         customerId: CustomerId,
         storageId: ServiceSessionStorageId,
     ): ServiceSessionEntity {
         TODO("Not yet implemented")
     }
 
-    private suspend fun TransactionalScope.findSessionDeactivation(sessionId: ServiceSessionId): ServiceSessionManualDeactivationEntity? {
+    context (TransactionalScope) private suspend fun findSessionDeactivation(sessionId: ServiceSessionId): ServiceSessionManualDeactivationEntity? {
         return ServiceSessionDeactivationTable.selectLatest { ServiceSessionDeactivationTable.serviceSessionId eq sessionId.id }
             ?.let { deactivation ->
                 val id = deactivation[ServiceSessionDeactivationTable.id].value
@@ -90,7 +89,7 @@ class PostgresServiceSessionsRepository(
             }
     }
 
-    override suspend fun TransactionalScope.findSessionById(sessionId: ServiceSessionId): ServiceSessionEntity {
+    context (TransactionalScope) override suspend fun findSessionById(sessionId: ServiceSessionId): ServiceSessionEntity {
         val sessionDeferred = transactionAsync {
             ServiceSessionTable.selectLatest { ServiceSessionTable.id eq sessionId.id } ?: throw SessionNotExists(
                 sessionId.toString())
@@ -116,7 +115,7 @@ class PostgresServiceSessionsRepository(
             id = sessionId)
     }
 
-    override suspend fun TransactionalScope.findUsagesForSession(sessionId: ServiceSessionId): List<ServiceSessionUsageEntity> {
+    context (TransactionalScope) override suspend fun findUsagesForSession(sessionId: ServiceSessionId): List<ServiceSessionUsageEntity> {
         val usages =
             ServiceSessionUsageTable.select { ServiceSessionUsageTable.serviceSessionId eq sessionId.id }
                 .associateBy { it[ServiceSessionUsageTable.id].value }
@@ -149,14 +148,14 @@ class PostgresServiceSessionsRepository(
         }
     }
 
-    override suspend fun TransactionalScope.findSessionsIgnoreDeactivatedForCustomer(
+    context (TransactionalScope) override suspend fun findSessionsIgnoreDeactivatedForCustomer(
         customerId: CustomerId,
         storageId: ServiceSessionStorageId,
     ): List<ServiceSessionEntity> {
         return findSessionsForCustomer(customerId, storageId).filter { it.deactivation != null }
     }
 
-    override suspend fun TransactionalScope.useSession(
+    context (TransactionalScope) override suspend fun useSession(
         data: ServiceSessionUsageDataEntity,
         sessionId: ServiceSessionId,
         stationId: CompanyStationId,
@@ -196,14 +195,14 @@ class PostgresServiceSessionsRepository(
         }
     }
 
-    override suspend fun TransactionalScope.findUsagesHistory(
+    context (TransactionalScope) override suspend fun findUsagesHistory(
         paged: PagedData,
         storageId: ServiceSessionStorageId,
     ): List<ServiceSessionUsageEntity> {
         TODO("Not yet implemented")
     }
 
-    override suspend fun TransactionalScope.insertSession(
+    context (TransactionalScope) override suspend fun insertSession(
         activation: ServiceSessionActivationEntity,
         storageId: ServiceSessionStorageId,
     ): ServiceSessionEntity {
@@ -229,7 +228,7 @@ class PostgresServiceSessionsRepository(
         )
     }
 
-    override suspend fun TransactionalScope.deactivateSessionForCustomer(
+    context (TransactionalScope) override suspend fun deactivateSessionForCustomer(
         sessionId: ServiceSessionId,
         data: DeactivateSessionRequestData,
     ): ServiceSessionEntity {
@@ -246,7 +245,7 @@ class PostgresServiceSessionsRepository(
         return findSessionById(sessionId)
     }
 
-    override suspend fun TransactionalScope.findSessionsForCustomer(
+    context (TransactionalScope) override suspend fun findSessionsForCustomer(
         customerId: CustomerId,
         storageId: ServiceSessionStorageId,
     ): List<ServiceSessionEntity> {

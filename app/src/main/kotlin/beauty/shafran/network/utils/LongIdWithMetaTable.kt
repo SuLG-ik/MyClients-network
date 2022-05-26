@@ -36,3 +36,6 @@ fun LongIdWithMetaTable.selectLatest(id: Long) = select { this@selectLatest.id e
     .orderBy(creationDate, order = SortOrder.DESC)
     .limit(1)
     .firstOrNull()
+
+inline fun Query.paged(pagedData: PagedData) = this
+    .limit(pagedData.offset, (pagedData.offset * pagedData.page).toLong())

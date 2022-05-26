@@ -11,9 +11,8 @@ import beauty.shafran.network.utils.Transactional
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.auth.jwt.*
-import org.koin.core.annotation.Single
 
-@Single
+
 class JwtAuthenticationValidator(
     private val accountsRepository: AccountsRepository,
     private val accountSessionsRepository: AccountSessionsRepository,
@@ -23,7 +22,8 @@ class JwtAuthenticationValidator(
 
     override suspend operator fun invoke(call: ApplicationCall, credentials: JWTCredential): Principal? {
         return transactional.withSuspendedTransaction {
-            val sessionId = credentials["sessionId"]?.toLongOrNull() ?: return@withSuspendedTransaction null
+            val sessionId =
+                credentials.payload.getClaim("sessionId").asLong() ?: return@withSuspendedTransaction null
             val session = accountSessionsRepository.run { findSessionWithId(AccountSessionId(sessionId)) }
             val account = transactionAsync { accountsRepository.run { findAccountById(session.accountId) } }
             val permissions = permissionsRepository.run { getPermissionsForSession(session.id) }

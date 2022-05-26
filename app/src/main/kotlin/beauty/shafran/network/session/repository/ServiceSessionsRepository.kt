@@ -12,69 +12,69 @@ import beauty.shafran.network.utils.TransactionalScope
 
 interface ServiceSessionsRepository {
 
-    suspend fun TransactionalScope.throwIfSessionNotExists(sessionId: ServiceSessionId)
+    context (TransactionalScope) suspend fun throwIfSessionNotExists(sessionId: ServiceSessionId)
 
-    suspend fun TransactionalScope.countUsagesForPeriod(
+    context (TransactionalScope) suspend fun countUsagesForPeriod(
         period: DatePeriod,
         storageId: ServiceSessionStorageId,
         sessionId: ServiceSessionId? = null,
         employeeId: EmployeeId? = null,
     ): Int
 
-    suspend fun TransactionalScope.countActivationsForPeriod(
+    context (TransactionalScope) suspend fun countActivationsForPeriod(
         period: DatePeriod,
         storageId: ServiceSessionStorageId,
         sessionId: ServiceSessionId? = null,
         employeeId: EmployeeId? = null,
     ): Int
 
-    suspend fun TransactionalScope.findUsagesForPeriod(
+    context (TransactionalScope) suspend fun findUsagesForPeriod(
         period: DatePeriod,
         storageId: ServiceSessionStorageId,
     ): List<ServiceSessionUsageEntity>
 
-    suspend fun TransactionalScope.countUsagesForSession(sessionId: ServiceSessionId): Long
+    context (TransactionalScope) suspend fun countUsagesForSession(sessionId: ServiceSessionId): Long
 
-    suspend fun TransactionalScope.findLastSessionForCustomer(
+    context (TransactionalScope) suspend fun findLastSessionForCustomer(
         customerId: CustomerId,
         storageId: ServiceSessionStorageId,
     ): ServiceSessionEntity
 
-    suspend fun TransactionalScope.findSessionById(sessionId: ServiceSessionId): ServiceSessionEntity
+    context (TransactionalScope) suspend fun findSessionById(sessionId: ServiceSessionId): ServiceSessionEntity
 
-    suspend fun TransactionalScope.findUsagesForSession(sessionId: ServiceSessionId): List<ServiceSessionUsageEntity>
+    context (TransactionalScope) suspend fun findUsagesForSession(sessionId: ServiceSessionId): List<ServiceSessionUsageEntity>
 
-    suspend fun TransactionalScope.findSessionsIgnoreDeactivatedForCustomer(
+    context (TransactionalScope) suspend fun findSessionsIgnoreDeactivatedForCustomer(
         customerId: CustomerId,
         storageId: ServiceSessionStorageId,
     ): List<ServiceSessionEntity>
 
-    suspend fun TransactionalScope.isSessionExists(
+    context (TransactionalScope) suspend fun isSessionExists(
         sessionId: ServiceSessionId,
     ): Boolean
 
-    suspend fun TransactionalScope.useSession(
+    context (TransactionalScope) suspend fun useSession(
         data: ServiceSessionUsageDataEntity,
         sessionId: ServiceSessionId,
         stationId: CompanyStationId,
     ): ServiceSessionUsageEntity
 
-    suspend fun TransactionalScope.findUsagesHistory(
+    context (TransactionalScope) suspend fun findUsagesHistory(
         paged: PagedData,
         storageId: ServiceSessionStorageId,
     ): List<ServiceSessionUsageEntity>
 
-    suspend fun TransactionalScope.insertSession(
+    context (TransactionalScope) suspend fun insertSession(
         activation: ServiceSessionActivationEntity,
         storageId: ServiceSessionStorageId,
     ): ServiceSessionEntity
 
-    suspend fun TransactionalScope.deactivateSessionForCustomer(
+    context (TransactionalScope) suspend fun deactivateSessionForCustomer(
         sessionId: ServiceSessionId,
         data: DeactivateSessionRequestData,
     ): ServiceSessionEntity
 
-    suspend fun TransactionalScope.findSessionsForCustomer(
+    context (TransactionalScope) suspend fun findSessionsForCustomer(
         customerId: CustomerId,
         storageId: ServiceSessionStorageId,
     ): List<ServiceSessionEntity>

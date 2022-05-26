@@ -7,16 +7,14 @@ import beauty.shafran.network.employees.data.*
 import beauty.shafran.network.employees.repository.EmployeesRepository
 import beauty.shafran.network.utils.Transactional
 import beauty.shafran.network.utils.TransactionalScope
-import org.koin.core.annotation.Single
 
-@Single
+
 class EmployeesExecutorImpl(
     private val employeesConverter: EmployeesConverter,
     private val employeesRepository: EmployeesRepository,
     private val auth: AuthorizationValidator,
     private val transactional: Transactional,
 ) : EmployeesExecutor {
-
 
     override suspend fun createEmployee(
         request: CreateEmployeeRequest,
@@ -70,7 +68,7 @@ class EmployeesExecutorImpl(
         }
     }
 
-    private suspend fun TransactionalScope.loadEmployee(employeeId: EmployeeId): Employee {
+    context(TransactionalScope) private suspend fun loadEmployee(employeeId: EmployeeId): Employee {
         val employee = transactionAsync { employeesRepository.run { findEmployeeById(employeeId) } }
         val data = transactionAsync { employeesRepository.run { findEmployeeDataById(employeeId) } }
         val layoff = transactionAsync { employeesRepository.run { findEmployeeLayoffById(employeeId) } }

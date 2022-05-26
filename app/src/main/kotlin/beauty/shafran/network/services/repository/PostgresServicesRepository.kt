@@ -15,12 +15,11 @@ import org.jetbrains.exposed.sql.SortOrder
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.insertAndGetId
 import org.jetbrains.exposed.sql.select
-import org.koin.core.annotation.Single
 
-@Single
+
 class PostgresServicesRepository : ServicesRepository {
 
-    override suspend fun TransactionalScope.updateServiceInfo(
+    context (TransactionalScope)  override suspend fun updateServiceInfo(
         serviceId: ServiceId,
         info: ServiceInfoEntity,
     ): ServiceEntity {
@@ -33,7 +32,7 @@ class PostgresServicesRepository : ServicesRepository {
         return findServiceById(serviceId)
     }
 
-    private suspend fun TransactionalScope.findServiceInfo(serviceId: ServiceId): ServiceInfoEntity {
+    context (TransactionalScope) private suspend fun findServiceInfo(serviceId: ServiceId): ServiceInfoEntity {
         val data = ServicesDataTable.selectLatest(serviceId.id) ?: throw ServiceNotExists(serviceId.toString())
         return ServiceInfoEntity(
             title = data[ServicesDataTable.title],
@@ -41,7 +40,7 @@ class PostgresServicesRepository : ServicesRepository {
         )
     }
 
-    private suspend fun TransactionalScope.findServiceConfigurations(serviceId: ServiceId): List<ServiceConfigurationEntity> {
+    context (TransactionalScope) private suspend fun findServiceConfigurations(serviceId: ServiceId): List<ServiceConfigurationEntity> {
         val configurations =
             ServicesConfigurationsTable.select { ServicesConfigurationsTable.serviceId eq serviceId.id }
                 .map { it[ServicesConfigurationsTable.id].value }
@@ -54,7 +53,8 @@ class PostgresServicesRepository : ServicesRepository {
             ServicesConfigurationsWithLimitTable.select { ServicesConfigurationsWithLimitTable.configurationId inList configurations }
                 .orderBy(ServicesConfigurationsWithLimitTable.creationDate, SortOrder.ASC).associate {
                     it[ServicesConfigurationsWithLimitTable.configurationId].value to TypedServiceConfigurationEntity.WithAmountLimit(
-                        amount = it[ServicesConfigurationsWithLimitTable.amount])
+                        amount = it[ServicesConfigurationsWithLimitTable.amount]
+                    )
                 }
         }
         return data.await().mapNotNull {
@@ -71,7 +71,7 @@ class PostgresServicesRepository : ServicesRepository {
         }
     }
 
-    override suspend fun TransactionalScope.findServiceById(serviceId: ServiceId): ServiceEntity {
+    context (TransactionalScope) override suspend fun findServiceById(serviceId: ServiceId): ServiceEntity {
         throwIfServiceNotExists(serviceId)
         val info = transactionAsync { findServiceInfo(serviceId) }
         val configurations = transactionAsync { findServiceConfigurations(serviceId) }
@@ -83,12 +83,12 @@ class PostgresServicesRepository : ServicesRepository {
 
     }
 
-    override suspend fun TransactionalScope.findServiceByConfigurationId(configurationId: ServiceConfigurationId): ServiceEntity {
+    context (TransactionalScope) override suspend fun findServiceByConfigurationId(configurationId: ServiceConfigurationId): ServiceEntity {
         val configuration = findServiceConfiguration(configurationId)
         return findServiceById(configuration.serviceId)
     }
 
-    override suspend fun TransactionalScope.findServiceConfiguration(configurationId: ServiceConfigurationId): ServiceConfigurationEntity {
+    context (TransactionalScope) override suspend fun findServiceConfiguration(configurationId: ServiceConfigurationId): ServiceConfigurationEntity {
         val serviceId =
             ServicesConfigurationsTable.selectLatest(configurationId.id)?.get(ServicesConfigurationsTable.serviceId)
                 ?: throw ConfigurationNotExists(configurationId.toString())
@@ -113,7 +113,7 @@ class PostgresServicesRepository : ServicesRepository {
         )
     }
 
-    override suspend fun TransactionalScope.findAllServices(
+    context (TransactionalScope) override suspend fun findAllServices(
         paged: PagedData,
         storageId: ServicesStorageId,
     ): List<ServiceEntity> {
@@ -123,7 +123,7 @@ class PostgresServicesRepository : ServicesRepository {
             }.awaitAll()
     }
 
-    override suspend fun TransactionalScope.createService(
+    context (TransactionalScope) override suspend fun createService(
         info: ServiceInfoEntity,
         storageId: ServicesStorageId,
     ): ServiceEntity {
@@ -135,7 +135,7 @@ class PostgresServicesRepository : ServicesRepository {
         return ServiceEntity(info = info, id = ServiceId(serviceId))
     }
 
-    override suspend fun TransactionalScope.addConfiguration(
+    context (TransactionalScope) override suspend fun addConfiguration(
         serviceId: ServiceId,
         data: ServiceConfigurationEntityData,
     ): ServiceEntity {
@@ -162,19 +162,19 @@ class PostgresServicesRepository : ServicesRepository {
         return findServiceById(serviceId)
     }
 
-    override suspend fun TransactionalScope.throwIfServiceNotExists(serviceId: ServiceId) {
+    context (TransactionalScope) override suspend fun throwIfServiceNotExists(serviceId: ServiceId) {
         if (!isServiceExists(serviceId)) throw ServiceNotExists(serviceId.toString())
     }
 
-    override suspend fun TransactionalScope.throwIfServiceConfigurationNotExists(configurationId: ServiceConfigurationId) {
+    context (TransactionalScope) override suspend fun throwIfServiceConfigurationNotExists(configurationId: ServiceConfigurationId) {
         if (!isServiceConfigurationExists(configurationId)) throw ConfigurationNotExists(configurationId.toString())
     }
 
-    override suspend fun TransactionalScope.isServiceConfigurationExists(configurationId: ServiceConfigurationId): Boolean {
+    context (TransactionalScope) override suspend fun isServiceConfigurationExists(configurationId: ServiceConfigurationId): Boolean {
         return ServicesConfigurationsTable.isRowExists(configurationId.id)
     }
 
-    override suspend fun TransactionalScope.isServiceExists(serviceId: ServiceId): Boolean {
+    context (TransactionalScope) override suspend fun isServiceExists(serviceId: ServiceId): Boolean {
         return ServicesTable.isRowExists(serviceId.id)
     }
 }

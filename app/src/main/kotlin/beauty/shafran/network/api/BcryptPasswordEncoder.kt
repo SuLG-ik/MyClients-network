@@ -1,20 +1,27 @@
 package beauty.shafran.network.api
 
-import org.koin.core.annotation.Module
-import org.koin.core.annotation.Single
+import at.favre.lib.crypto.bcrypt.BCrypt
+import org.koin.core.module.dsl.factoryOf
+import org.koin.dsl.module
 
 
-@Module
-class PasswordModule {
+val PasswordModule = module {
+    factoryOf(::bCryptPasswordEncoder)
+    factoryOf(::generalPasswordEncoder)
+}
 
-    @Single
-    fun generalPasswordEncoder(bCryptPasswordEncoder: BCryptPasswordEncoder): AuthPasswordEncoder {
-        return GeneralPasswordEncoder(
-            mapOf("bcrypt" to bCryptPasswordEncoder),
-            "bcrypt"
-        )
-    }
+private fun bCryptPasswordEncoder(
+    hasher: BCrypt.Hasher,
+    verifier: BCrypt.Verifyer,
+): BCryptPasswordEncoder {
+    return BCryptPasswordEncoder(hasher, verifier)
+}
 
+private fun generalPasswordEncoder(bCryptPasswordEncoder: BCryptPasswordEncoder): AuthPasswordEncoder {
+    return GeneralPasswordEncoder(
+        mapOf("bcrypt" to bCryptPasswordEncoder),
+        "bcrypt"
+    )
 }
 
 interface AuthPasswordEncoder {

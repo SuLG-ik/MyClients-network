@@ -1,44 +1,51 @@
 package beauty.shafran.network.companies.entity
 
-import beauty.shafran.network.companies.data.CompanyId
+import beauty.shafran.network.account.entity.AccountTable
 import beauty.shafran.network.utils.LongIdWithMetaTable
-import beauty.shafran.network.utils.MetaEntity
-import kotlinx.serialization.Serializable
-import org.jetbrains.exposed.sql.ResultRow
+import ru.sulgik.exposed.PropertyOfEntity
 import ru.sulgik.exposed.TableToCreation
+import ru.sulgik.exposed.TableWithEntity
 
 @TableToCreation
+@TableWithEntity
 object CompanyTable : LongIdWithMetaTable("company") {
+    @PropertyOfEntity
     val codename = varchar("codename", 64).uniqueIndex()
 }
 
 @TableToCreation
+@TableWithEntity
 object CompanyDataTable : LongIdWithMetaTable("company_data") {
+
+    @PropertyOfEntity
     val title = varchar("title", 255)
+
+    @PropertyOfEntity
     val companyId = reference("company", CompanyTable)
+
 }
 
-fun ResultRow.toCompanyEntity(companiesDataResult: ResultRow): CompanyEntity {
-    return CompanyEntity(
-        id = CompanyId(get(CompanyTable.id).value),
-        data = CompanyEntityData(
-            codename = get(CompanyTable.codename),
-            title = companiesDataResult[CompanyDataTable.title]
-        ),
-        meta = MetaEntity(
-            creationDate = get(CompanyTable.creationDate)
-        )
-    )
+@TableToCreation
+@TableWithEntity
+object CompanyMemberTable : LongIdWithMetaTable("company_member") {
+
+    @PropertyOfEntity
+    val accountId = reference("account", AccountTable)
+
+    @PropertyOfEntity
+    val companyId = reference("company", CompanyTable)
+
 }
 
-data class CompanyEntity(
-    val data: CompanyEntityData,
-    val meta: MetaEntity,
-    val id: CompanyId,
-)
+@TableToCreation
+@TableWithEntity
+object CompanyOwnerTable : LongIdWithMetaTable("company_owner") {
 
-@Serializable
-data class CompanyEntityData(
-    val title: String,
-    val codename: String,
-)
+    @PropertyOfEntity
+    val companyId = reference("company", CompanyTable)
+
+    @PropertyOfEntity
+    val memberId = reference("member", CompanyMemberTable)
+
+
+}

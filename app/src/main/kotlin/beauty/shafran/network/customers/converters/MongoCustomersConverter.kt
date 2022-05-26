@@ -7,9 +7,8 @@ import beauty.shafran.network.customers.entity.CustomerDataEntity
 import beauty.shafran.network.customers.entity.CustomerEntity
 import beauty.shafran.network.phone.converters.PhoneNumberConverter
 import beauty.shafran.network.utils.toMetaData
-import org.koin.core.annotation.Single
 
-@Single
+
 class MongoCustomersConverter(private val phoneNumberConverter: PhoneNumberConverter) : CustomersConverter {
     override fun buildCustomer(entity: CustomerEntity, data: CustomerDataEntity): Customer {
         return Customer(

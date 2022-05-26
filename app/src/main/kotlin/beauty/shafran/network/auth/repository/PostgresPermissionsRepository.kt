@@ -5,9 +5,8 @@ import beauty.shafran.network.auth.data.AuthorizedAccount
 import beauty.shafran.network.auth.entity.*
 import beauty.shafran.network.utils.TransactionalScope
 import org.jetbrains.exposed.sql.select
-import org.koin.core.annotation.Single
 
-@Single
+
 class PostgresPermissionsRepository : PermissionsRepository {
 
     override fun TransactionalScope.isAccessedForAccount(

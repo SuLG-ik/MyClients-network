@@ -5,9 +5,7 @@ import beauty.shafran.network.auth.data.AuthorizedAccount
 import beauty.shafran.network.auth.entity.PermissionEntity
 import beauty.shafran.network.companies.data.CompanyId
 import beauty.shafran.network.companies.entity.AccessScope
-import org.koin.core.annotation.Single
 
-@Single
 class AlwaysValid : AuthorizationValidator {
     override fun hasAccess(scope: AuthorizationScope, account: AuthorizedAccount): Boolean {
         return true

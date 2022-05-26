@@ -42,8 +42,7 @@ class ExposedTableSymbolProcessor(
         if (invoked)
             return emptyList()
         logger.info("Start processing")
-        val annotations = toCreationProducer.produce(toCreationFilter.filter(resolver))
-        generateEntityProducer.produce(generateEntityFilter.filter(resolver))
+        val annotations = toCreationProducer.produce(toCreationFilter.filter(resolver)) + generateEntityProducer.produce(generateEntityFilter.filter(resolver))
         logger.info("End processing")
         invoked = true
         return annotations

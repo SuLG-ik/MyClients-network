@@ -1,5 +1,6 @@
 package beauty.shafran.network.auth.token
 
+import beauty.shafran.BadRequest
 import beauty.shafran.IllegalToken
 import beauty.shafran.TokenExpired
 import beauty.shafran.network.auth.data.*
@@ -11,10 +12,9 @@ import com.auth0.jwt.algorithms.Algorithm
 import com.auth0.jwt.exceptions.JWTDecodeException
 import com.auth0.jwt.exceptions.JWTVerificationException
 import com.auth0.jwt.exceptions.TokenExpiredException
-import org.koin.core.annotation.Single
 import java.util.*
 
-@Single
+
 class JwtTokenAuthService(
     private val jwtConfig: JwtConfig,
     private val algorithm: Algorithm,
@@ -36,7 +36,8 @@ class JwtTokenAuthService(
 
     private fun extractSessionId(token: String): AccountSessionId {
         return try {
-            AccountSessionId(verifier.verify(token).getClaim("sessionId").asLong())
+            val id = verifier.verify(token).getClaim("sessionId").asLong() ?: throw BadRequest()
+            AccountSessionId(id)
         } catch (e: TokenExpiredException) {
             throw TokenExpired()
         } catch (e: JWTVerificationException) {
@@ -67,7 +68,7 @@ class JwtTokenAuthService(
         val jwt = JWT.create()
             .withIssuer(jwtConfig.issuer)
             .withExpiresAt(expiresIn)
-            .withClaim("sessionId", session.id.id.toString())
+            .withClaim("sessionId", session.id.id)
             .withIssuedAt(Date())
             .withAudience(jwtConfig.audience)
             .sign(algorithm)
@@ -78,7 +79,7 @@ class JwtTokenAuthService(
         val jwt = JWT.create()
             .withIssuer(jwtConfig.issuer)
             .withExpiresAt(Date(System.currentTimeMillis() + jwtConfig.refreshTokenExpiresAfter))
-            .withClaim("sessionId", session.id.toString())
+            .withClaim("sessionId", session.id.id)
             .withIssuedAt(Date())
             .withAudience(jwtConfig.audience)
             .sign(algorithm)
