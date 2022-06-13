@@ -1,53 +1,97 @@
-interface Dependencies {
-
-    object Kotlin {
-        val version = "1.7.0-RC"
+interface Config {
+    object Application {
+        const val version = "0.0.1"
+        const val group = "beauty.shafran.network"
     }
 
+    object Compile {
+        val archiveName = "network"
+    }
+
+}
+
+interface Dependencies {
+
+    object Shadow {
+        val plugin = "com.github.johnrengelman.shadow"
+        val version = "7.1.2"
+
+    }
+
+    object Kotlin {
+        const val version = "1.7.0"
+    }
+
+    object Coroutines {
+        const val version = "1.6.2"
+        const val core = "org.jetbrains.kotlinx:kotlinx-coroutines-core:$version"
+    }
+
+
     object Ktor {
-        val version = "2.0.2"
-        var core = "io.ktor:ktor-server-core:$version"
-        var netty = "io.ktor:ktor-server-netty:$version"
-        var contentNegotiation = "io.ktor:ktor-server-content-negotiation:$version"
-        val json = "io.ktor:ktor-serialization-kotlinx-json:$version"
-        var auth = "io.ktor:ktor-server-auth:$version"
-        var authJwt = "io.ktor:ktor-server-auth-jwt:$version"
-        var statusPages = "io.ktor:ktor-server-status-pages:$version"
-        var httpRedirect = "io.ktor:ktor-server-http-redirect:$version"
-        var callLogging = "io.ktor:ktor-server-call-logging:$version"
+        const val version = "2.0.2"
+        const val core = "io.ktor:ktor-server-core:$version"
+        const val netty = "io.ktor:ktor-server-netty:$version"
+        const val contentNegotiation = "io.ktor:ktor-server-content-negotiation:$version"
+        const val contentNegotiationJson = "io.ktor:ktor-serialization-kotlinx-json:$version"
+        const val auth = "io.ktor:ktor-server-auth:$version"
+        const val authJwt = "io.ktor:ktor-server-auth-jwt:$version"
+        const val statusPages = "io.ktor:ktor-server-status-pages:$version"
+        const val httpRedirect = "io.ktor:ktor-server-http-redirect:$version"
+        const val callLogging = "io.ktor:ktor-server-call-logging:$version"
     }
 
     object Koin {
-        val version = "3.2.0"
-
-        val core = "io.insert-koin:koin-core:$version"
+        const val version = "3.2.0"
+        const val core = "io.insert-koin:koin-core:$version"
     }
 
     object BCrypt {
-        val favreLib = "at.favre.lib:bcrypt:0.9.0"
+        const val favreLib = "at.favre.lib:bcrypt:0.9.0"
+        const val mindrotLib  = "org.mindrot:jbcrypt:0.4"
     }
 
     object Logback {
-        val version = "1.2.11"
-        val classic = "ch.qos.logback:logback-classic:$version"
+        const val version = "1.2.11"
+        const val classic = "ch.qos.logback:logback-classic:$version"
     }
 
     object Exposed {
-        val version = "0.38.2"
-        val core = "org.jetbrains.exposed:exposed-core:$version"
-        val jdbc = "org.jetbrains.exposed:exposed-jdbc:$version"
-        val datetime = "org.jetbrains.exposed:exposed-kotlin-datetime:$version"
+        const val version = "0.38.2"
+        const val core = "org.jetbrains.exposed:exposed-core:$version"
+        const val jdbc = "org.jetbrains.exposed:exposed-jdbc:$version"
+        const val datetime = "org.jetbrains.exposed:exposed-kotlin-datetime:$version"
     }
 
     object Postgres {
-        val driver = "org.postgresql:postgresql:42.3.5"
-        val postgis = "net.postgis:postgis-jdbc:2021.1.0"
+        const val driver = "org.postgresql:postgresql:42.3.5"
+        const val postgis = "net.postgis:postgis-jdbc:2021.1.0"
+    }
+
+    object Datetime {
+        const val version = "0.3.2"
+        const val core = "org.jetbrains.kotlinx:kotlinx-datetime:$version"
     }
 
     object Serialization {
-        val version = "1.3.3"
-        val json = "org.jetbrains.kotlinx:kotlinx-serialization-json:$version"
-        val core = "org.jetbrains.kotlinx:kotlinx-serialization-core:$version"
+        const val version = "1.3.3"
+        const val json = "org.jetbrains.kotlinx:kotlinx-serialization-json:$version"
+        const val core = "org.jetbrains.kotlinx:kotlinx-serialization-core:$version"
+    }
+
+    object KotlinPoet {
+        const val version = "1.11.0"
+        const val core = "com.squareup:kotlinpoet:$version"
+        const val ksp = "com.squareup:kotlinpoet-ksp:$version"
+    }
+
+    object Ksp {
+        const val version = "1.7.0-1.0.6"
+        const val core = "com.google.devtools.ksp:symbol-processing-api:$version"
+        const val plugin = "com.google.devtools.ksp"
+        fun installPlugin() {
+
+        }
     }
 
 }

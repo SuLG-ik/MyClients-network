@@ -1,0 +1,36 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Start" type="KtorApplicationConfigurationType" factoryName="Ktor">
+    <module name="MyClients-network.app.main" />
+    <option name="alternativeJrePath" value="17" />
+    <option name="alternativeJrePathEnabled" value="true" />
+    <option name="includeProvidedScope" value="true" />
+    <option name="mainClass" value="beauty.shafran.network.ApplicationKt" />
+    <option name="passParentEnvs" value="true" />
+    <option name="programParameters" value="" />
+    <option name="shortenCommandLine" value="NONE" />
+    <option name="vmParameters" value="" />
+    <option name="workingDirectory" value="$ProjectFileDir$\run" />
+    <envs>
+      <env name="API_HEADER" value="api_code" />
+      <env name="API_KEY" value="sulgik" />
+      <env name="DATABASE_PASSWORD" value="s6sd546f987sdfsa5d4f" />
+      <env name="DATABASE_URL" value="jdbc:postgresql://localhost:5432/network" />
+      <env name="DATABASE_USERNAME" value="shafran" />
+      <env name="JWT_ACCESS_EXPIRE" value="100000000" />
+      <env name="JWT_ALIAS" value="sulgik" />
+      <env name="JWT_AUDIENCE" value="http://localhost:8080/auth/login" />
+      <env name="JWT_ISSUER" value="http://localhost:8080/" />
+      <env name="JWT_PASSWORD" value="sulgik" />
+      <env name="JWT_REALM" value="clients" />
+      <env name="JWT_REFRESH_EXPIRE" value="9999999999" />
+      <env name="JWT_STORE" value="./keys/key.jks" />
+      <env name="JWT_STORE_PASSWORD" value="sulgik" />
+      <env name="PUBLIC_ASSETS_URL" value="http://localhost:8080/assets" />
+      <env name="SERVER_PORT" value="8080" />
+      <env name="SERVER_SSL_PORT" value="432" />
+    </envs>
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

@@ -1,10 +1,9 @@
 plugins {
-    kotlin("jvm") version "1.6.21"
+    kotlin("jvm") version Dependencies.Kotlin.version
 }
 
-group = "beauty.shafran"
-version = "0.0.1"
-
+group = Config.Application.group
+version = Config.Application.version
 
 dependencies {
 }
