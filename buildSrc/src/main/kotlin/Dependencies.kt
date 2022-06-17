@@ -19,7 +19,7 @@ interface Dependencies {
     }
 
     object Kotlin {
-        const val version = "1.7.0"
+        const val version = "1.6.21"
     }
 
     object Coroutines {
@@ -86,7 +86,7 @@ interface Dependencies {
     }
 
     object Ksp {
-        const val version = "1.7.0-1.0.6"
+        const val version = "1.6.21-1.0.6"
         const val core = "com.google.devtools.ksp:symbol-processing-api:$version"
         const val plugin = "com.google.devtools.ksp"
         fun installPlugin() {

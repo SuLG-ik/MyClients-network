@@ -27,6 +27,7 @@ class ToCreationProducer(
                             .defaultValue("false")
                             .build()
                     )
+                    .addModifiers(KModifier.INTERNAL)
                     .addParameter(
                         ParameterSpec.builder("withLogs", typeNameOf<Boolean>())
                             .defaultValue("true")
@@ -56,6 +57,7 @@ class ToCreationProducer(
                             .defaultValue("false")
                             .build()
                     )
+                    .addModifiers(KModifier.INTERNAL)
                     .apply {
                         if (tables.isNotEmpty())
                             addCode("""
@@ -72,8 +74,7 @@ class ToCreationProducer(
                     .build()
             )
             .build()
-        file.writeTo(codeGenerator, Dependencies(false))
-        codeGenerator.associateWithClasses(tables, packageName, fileName)
+        file.writeTo(codeGenerator, Dependencies(true, *tables.mapNotNull { it.containingFile }.toTypedArray()))
         return tables
     }
 

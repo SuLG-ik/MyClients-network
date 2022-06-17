@@ -4,6 +4,7 @@ import beauty.shafran.network.accounts.AccountsModule
 import beauty.shafran.network.auth.AuthModule
 import beauty.shafran.network.companies.CompaniesModule
 import beauty.shafran.network.datetime.DatetimeModule
+import beauty.shafran.network.employees.EmployeesModule
 import beauty.shafran.network.exposed.ExposedModule
 import beauty.shafran.network.serialization.SerializationModule
 import io.ktor.server.application.*
@@ -19,7 +20,9 @@ fun Application.koin() {
             ExposedModule,
             AuthModule,
             AccountsModule,
-            CompaniesModule
+            CompaniesModule,
+            EmployeesModule,
+
         )
     }
 }

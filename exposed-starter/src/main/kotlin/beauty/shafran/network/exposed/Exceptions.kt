@@ -17,13 +17,13 @@ import org.koin.dsl.module
 import ru.sulgik.config.ConfigurationProperties
 import ru.sulgik.config.PropertySuffix
 
-
 @ConfigurationProperties("exposed.datasource")
 internal class DatabaseConfiguration(
     @PropertySuffix("url") val url: String,
     @PropertySuffix("user") val user: String,
     @PropertySuffix("password") val password: String,
     @PropertySuffix("driver") val driver: String,
+    @PropertySuffix("createOnSetup") val isEnabled: Boolean,
 )
 
 val ExposedModule = module {
@@ -45,11 +45,13 @@ private fun buildDatabase(configuration: DatabaseConfiguration): Database {
 
 private class ExposedSetupTransactional(
     private val db: Database,
+    private val config: DatabaseConfiguration,
 ) : SetupTransactional {
     override fun setup(statement: () -> Unit) {
-        return transaction(db = db) {
-            statement()
-        }
+        if (config.isEnabled)
+            transaction(db = db) {
+                statement()
+            }
     }
 }
 

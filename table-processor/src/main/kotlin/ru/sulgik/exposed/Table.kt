@@ -47,10 +47,11 @@ class ExposedTableSymbolProcessor(
         if (invoked)
             return emptyList()
         logger.info("Start processing")
-        val annotations =
-            toCreationProducer.produce(toCreationFilter.filter(resolver)) + generateEntityProducer.produce(
-                generateEntityFilter.filter(resolver)
-            )
+        val annotations = mutableListOf<KSAnnotated>()
+        if (options.getOrDefault("generate_creation_utils", "true").toBooleanStrict())
+            annotations.addAll(toCreationProducer.produce(toCreationFilter.filter(resolver)))
+        if (options.getOrDefault("generate_entities", "true").toBooleanStrict())
+            annotations.addAll(generateEntityProducer.produce(generateEntityFilter.filter(resolver)))
         logger.info("End processing")
         invoked = true
         return annotations

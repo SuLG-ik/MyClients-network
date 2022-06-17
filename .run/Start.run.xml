@@ -26,7 +26,7 @@
       <env name="JWT_STORE" value="./keys/key.jks" />
       <env name="JWT_STORE_PASSWORD" value="sulgik" />
       <env name="PUBLIC_ASSETS_URL" value="http://localhost:8080/assets" />
-      <env name="SERVER_PORT" value="8080" />
+      <env name="SERVER_PORT" value="8081" />
       <env name="SERVER_SSL_PORT" value="432" />
     </envs>
     <method v="2">

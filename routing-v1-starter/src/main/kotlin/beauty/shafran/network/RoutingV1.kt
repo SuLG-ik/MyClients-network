@@ -3,8 +3,8 @@ package beauty.shafran.network
 import beauty.shafran.network.accounts.route.accountsRoute
 import beauty.shafran.network.auth.route.authRoute
 import beauty.shafran.network.companies.route.companiesRoute
+import beauty.shafran.network.employees.route.employeesRoute
 import io.ktor.server.application.*
-import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import ru.sulgik.config.ConfigurationProperties
 import ru.sulgik.config.PropertySuffix
@@ -27,6 +27,7 @@ fun Application.routing() {
                 route("/accounts") { accountsRoute() }
                 route("/companies") { companiesRoute() }
                 route("/auth") { authRoute() }
+                route("/employees") { employeesRoute() }
             }
         }
 

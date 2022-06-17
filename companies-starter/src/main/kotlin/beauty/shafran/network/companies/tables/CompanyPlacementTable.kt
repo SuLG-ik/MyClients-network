@@ -1,5 +1,6 @@
 package beauty.shafran.network.companies.tables
 
+import beauty.shafran.network.accounts.tables.AccountTable
 import beauty.shafran.network.exposed.LongIdWithMetaTable
 import org.jetbrains.exposed.sql.ReferenceOption
 import ru.sulgik.exposed.PropertyOfEntity
@@ -40,6 +41,9 @@ object CompanyPlacementMemberTable : LongIdWithMetaTable("company_placement_memb
 
     @PropertyOfEntity
     val memberId = reference("member_id", CompanyMemberTable, onDelete = ReferenceOption.RESTRICT)
+
+    @PropertyOfEntity
+    val accountId = reference("account_id", AccountTable, onDelete = ReferenceOption.RESTRICT)
 
 
 }

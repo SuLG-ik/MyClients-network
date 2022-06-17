@@ -20,8 +20,16 @@ include(
     "accounts-data",
 )
 include(
+    "employees-starter",
+    "employees-data",
+)
+include(
     "companies-starter",
     "companies-data",
+)
+include(
+    "services-starter",
+    "services-data",
 )
 
 include(

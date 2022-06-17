@@ -22,5 +22,14 @@ interface CompaniesRouter {
         account: AuthorizedAccount,
     ): CreatePlacementResponse
 
+    suspend fun getAvailableCompanyPlacements(
+        request: GetAvailableCompanyPlacementsRequest,
+        account: AuthorizedAccount,
+    ): GetAvailableCompanyPlacementsResponse
+
+    suspend fun getCompaniesPlacements(
+        request: GetCompaniesPlacementsRequest,
+        account: AuthorizedAccount,
+    ): GetCompaniesPlacementsResponse
 
 }

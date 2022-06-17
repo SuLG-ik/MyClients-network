@@ -8,6 +8,7 @@ import beauty.shafran.network.companies.repository.CompanyPlacementRepository
 import beauty.shafran.network.companies.repository.CompanyRepository
 import beauty.shafran.network.database.Transactional
 import beauty.shafran.network.database.invoke
+import kotlinx.coroutines.awaitAll
 
 internal class CompaniesRouterImpl(
     private val transactional: Transactional,
@@ -79,6 +80,55 @@ internal class CompaniesRouterImpl(
                     placementData = placementData,
                     isMember = false
                 )
+            )
+        }
+    }
+
+    override suspend fun getAvailableCompanyPlacements(
+        request: GetAvailableCompanyPlacementsRequest,
+        account: AuthorizedAccount,
+    ): GetAvailableCompanyPlacementsResponse {
+        return transactional {
+            val accountId = request.accountId ?: AccountId(account.accountId)
+            val placements =
+                placementRepository.getAvailablePlacements(
+                    companyId = request.companyId,
+                    accountId = accountId
+                )
+            GetAvailableCompanyPlacementsResponse(
+                placements.map {
+                    converter.toCompanyPlacement(
+                        placementEntity = it.first,
+                        placementData = it.second,
+                        isMember = AccountId(account.accountId) == accountId
+                    )
+                }
+            )
+        }
+    }
+
+    override suspend fun getCompaniesPlacements(
+        request: GetCompaniesPlacementsRequest,
+        account: AuthorizedAccount,
+    ): GetCompaniesPlacementsResponse {
+        return transactional {
+            val placements =
+                placementRepository.getCompanyPlacementsList(
+                    companyId = request.companyId,
+                )
+            GetCompaniesPlacementsResponse(
+                placements.map {
+                    transactionAsync {
+                        converter.toCompanyPlacement(
+                            placementEntity = it.first,
+                            placementData = it.second,
+                            isMember = placementRepository.isMemberOfPlacement(
+                                accountId = AccountId(account.accountId),
+                                placementId = CompanyPlacementId(it.first.id),
+                            )
+                        )
+                    }
+                }.awaitAll()
             )
         }
     }

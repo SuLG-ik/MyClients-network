@@ -88,8 +88,8 @@ private class SingleTableToEntityProducer(
                 )
             )
             .build()
-        fileSpec.writeTo(codeGenerator, Dependencies(false))
-        codeGenerator.associateWithClasses(listOf(table), table.packageName.asString(), fileName)
+        fileSpec.writeTo(codeGenerator, Dependencies(true, table.containingFile!!))
+
         logger.info("Entity has been generated for ${table.qualifiedName?.asString()}")
         return table
     }
