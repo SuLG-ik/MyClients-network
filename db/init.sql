@@ -190,7 +190,18 @@ create table company_employee_data
         constraint fk_company_employee_data_employee_id__id
             references company_employee
             on update restrict on delete restrict,
-    name        varchar(64) not null
+    name        varchar(64) not null,
+    description text        not null
 );
 
+create table service
+(
+    id         bigserial
+        primary key,
+    created_at timestamp not null,
+    company_id bigint    not null
+        constraint fk_service_company_id__id
+            references company
+            on update restrict on delete restrict
+);
 

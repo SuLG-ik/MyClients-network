@@ -36,6 +36,15 @@ internal class EmployeeRepositoryImpl : EmployeeRepository {
         return placements
     }
 
+    context(TransactionalScope) override suspend fun getEmployeesEntitiesAndData(employeesIds: List<EmployeeId>): List<Pair<EmployeeCompanyEntity, EmployeeDataEntity>> {
+        return EmployeeCompanyTable.join(
+            EmployeeDataTable,
+            JoinType.RIGHT,
+            additionalConstraint = { EmployeeCompanyTable.id eq EmployeeDataTable.employeeId })
+            .select { EmployeeCompanyTable.id inList employeesIds.map { it.value } }
+            .map { it.toEmployeeCompanyEntity() to it.toEmployeeDataEntity() }
+    }
+
     context (TransactionalScope) override suspend fun getEmployeeEntityAndData(employeeId: EmployeeId): Pair<EmployeeCompanyEntity, EmployeeDataEntity>? {
         return EmployeeCompanyTable.join(
             EmployeeDataTable,

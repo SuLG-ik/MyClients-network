@@ -75,7 +75,19 @@ internal class EmployeesRouterImpl(
         account: AuthorizedAccount,
     ): GetEmployeesByIdsResponse {
         return transactional {
-            TODO()
+            GetEmployeesByIdsResponse(
+                employees = employeeRepository.getEmployeesEntitiesAndData(
+                    request.employeeIds,
+                ).map {
+                    transactionAsync {
+                        converter.toEmployee(
+                            employeeEntity = it.first,
+                            employeeData = it.second,
+                            placements = employeeRepository.getEmployeePlacements(EmployeeId(it.first.id))
+                        )
+                    }
+                }.awaitAll()
+            )
         }
     }
 

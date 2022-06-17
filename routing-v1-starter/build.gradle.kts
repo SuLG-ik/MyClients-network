@@ -24,6 +24,7 @@ dependencies {
     implementation(projects.accountsStarter)
     implementation(projects.companiesStarter)
     implementation(projects.employeesStarter)
+    implementation(projects.servicesStarter)
     implementation(projects.configCore)
     ksp(projects.configProcessor)
 }

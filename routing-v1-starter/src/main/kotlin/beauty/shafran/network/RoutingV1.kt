@@ -4,6 +4,7 @@ import beauty.shafran.network.accounts.route.accountsRoute
 import beauty.shafran.network.auth.route.authRoute
 import beauty.shafran.network.companies.route.companiesRoute
 import beauty.shafran.network.employees.route.employeesRoute
+import beauty.shafran.network.services.route.servicesRoute
 import io.ktor.server.application.*
 import io.ktor.server.routing.*
 import ru.sulgik.config.ConfigurationProperties
@@ -28,6 +29,7 @@ fun Application.routing() {
                 route("/companies") { companiesRoute() }
                 route("/auth") { authRoute() }
                 route("/employees") { employeesRoute() }
+                route("/services") { servicesRoute() }
             }
         }
 

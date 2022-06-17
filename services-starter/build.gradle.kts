@@ -16,7 +16,7 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
     }
 }
 ksp {
-    arg("tables_package", "beauty.shafran.network.employees.schema")
+    arg("tables_package", "beauty.shafran.network.services.schema")
 }
 
 

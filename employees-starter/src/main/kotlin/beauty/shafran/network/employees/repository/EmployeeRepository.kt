@@ -33,4 +33,5 @@ interface EmployeeRepository {
 
     context(TransactionalScope) suspend fun getPlacementEmployeeEntities(placementIds: List<CompanyPlacementId>): List<EmployeeCompanyEntity>
     context(TransactionalScope) suspend fun getPlacementEmployeeEntitiesAndData(placementIds: List<CompanyPlacementId>): List<Pair<EmployeeCompanyEntity, EmployeeDataEntity>>
+    context(TransactionalScope) suspend fun getEmployeesEntitiesAndData(employeesIds: List<EmployeeId>): List<Pair<EmployeeCompanyEntity, EmployeeDataEntity>>
 }

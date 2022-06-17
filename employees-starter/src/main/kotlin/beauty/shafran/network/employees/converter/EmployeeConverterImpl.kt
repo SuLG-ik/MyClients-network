@@ -31,7 +31,7 @@ class EmployeeConverterImpl : EmployeeConverter {
         return EmployeeCompanyMember(
             employeeId = EmployeeId(employeeEntity.id),
             companyId = CompanyId(employeeEntity.companyId),
-            placements = placements.map { CompanyPlacementId(it.placementId) }
+            placementsIds = placements.map { CompanyPlacementId(it.placementId) }
         )
     }
 

@@ -7,6 +7,7 @@ import beauty.shafran.network.datetime.DatetimeModule
 import beauty.shafran.network.employees.EmployeesModule
 import beauty.shafran.network.exposed.ExposedModule
 import beauty.shafran.network.serialization.SerializationModule
+import beauty.shafran.network.services.ServicesModule
 import io.ktor.server.application.*
 
 fun main(args: Array<String>) = io.ktor.server.netty.EngineMain.main(args)
@@ -22,7 +23,7 @@ fun Application.koin() {
             AccountsModule,
             CompaniesModule,
             EmployeesModule,
-
+            ServicesModule,
         )
     }
 }

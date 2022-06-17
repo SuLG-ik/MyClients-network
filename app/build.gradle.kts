@@ -42,4 +42,5 @@ dependencies {
     implementation(projects.accountsStarter)
     implementation(projects.companiesStarter)
     implementation(projects.employeesStarter)
+    implementation(projects.servicesStarter)
 }
