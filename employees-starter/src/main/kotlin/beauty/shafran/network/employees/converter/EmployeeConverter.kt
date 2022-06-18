@@ -1,5 +1,7 @@
 package beauty.shafran.network.employees.converter
 
+import beauty.shafran.network.companies.data.Company
+import beauty.shafran.network.companies.data.CompanyPlacement
 import beauty.shafran.network.employees.data.Employee
 import beauty.shafran.network.employees.data.EmployeeCompanyMember
 import beauty.shafran.network.employees.tables.EmployeeCompanyEntity
@@ -11,11 +13,13 @@ interface EmployeeConverter {
     fun toEmployee(
         employeeEntity: EmployeeCompanyEntity,
         employeeData: EmployeeDataEntity,
-        placements: List<EmployeePlacementCompanyEntity>,
     ): Employee
+
 
     fun toEmployeeCompanyMember(
         employeeEntity: EmployeeCompanyEntity,
-        placements: List<EmployeePlacementCompanyEntity>
+        company: Company,
+        placements: List<CompanyPlacement>
     ): EmployeeCompanyMember
+
 }

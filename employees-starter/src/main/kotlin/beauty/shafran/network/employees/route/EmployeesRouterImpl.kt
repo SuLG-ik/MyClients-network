@@ -1,19 +1,23 @@
 package beauty.shafran.network.employees.route
 
 import beauty.shafran.network.auth.AuthorizedAccount
+import beauty.shafran.network.companies.converter.CompanyConverter
 import beauty.shafran.network.companies.data.CompanyId
 import beauty.shafran.network.companies.repository.CompanyPlacementRepository
+import beauty.shafran.network.companies.route.CompaniesRouter
 import beauty.shafran.network.database.Transactional
 import beauty.shafran.network.database.invoke
 import beauty.shafran.network.employees.converter.EmployeeConverter
 import beauty.shafran.network.employees.data.*
 import beauty.shafran.network.employees.repository.EmployeeRepository
+import beauty.shafran.network.paged.data.toResponse
 import kotlinx.coroutines.awaitAll
 
 internal class EmployeesRouterImpl(
     private val transactional: Transactional,
     private val converter: EmployeeConverter,
     private val employeeRepository: EmployeeRepository,
+    private val companyRouter: CompaniesRouter,
     private val placementsRepository: CompanyPlacementRepository,
 ) : EmployeesRouter {
 
@@ -33,7 +37,7 @@ internal class EmployeesRouterImpl(
                 request.companyPlacementIds,
             )
             CreateEmployeeResponse(
-                employee = converter.toEmployee(employee, employeeData, employeePlacements)
+                employee = converter.toEmployee(employee, employeeData)
             )
         }
     }
@@ -50,8 +54,9 @@ internal class EmployeesRouterImpl(
                 employeeId = request.employeeId,
                 placementIds = request.placementIds
             )
+            val company = companyRouter
             AddEmployeeToCompanyPlacementsResponse(
-                employeeCompanyMember = converter.toEmployeeCompanyMember(employee, placements)
+                employeeCompanyMember = converter.toEmployeeCompanyMember(employee, )
             )
         }
     }
@@ -65,7 +70,7 @@ internal class EmployeesRouterImpl(
                 ?: throw EmployeeNotExists()
             val placements = employeeRepository.getEmployeePlacements(request.employeeId)
             GetEmployeeByIdResponse(
-                employee = converter.toEmployee(employeeEntity, employeeData, placements)
+                employee = converter.toEmployee(employeeEntity, employeeData)
             )
         }
     }
@@ -83,7 +88,6 @@ internal class EmployeesRouterImpl(
                         converter.toEmployee(
                             employeeEntity = it.first,
                             employeeData = it.second,
-                            placements = employeeRepository.getEmployeePlacements(EmployeeId(it.first.id))
                         )
                     }
                 }.awaitAll()
@@ -96,9 +100,11 @@ internal class EmployeesRouterImpl(
         account: AuthorizedAccount,
     ): GetCompanyEmployeesResponse {
         return transactional {
+            val employees = employeeRepository.getCompanyEmployeeEntities(request.companyId)
+                .map { EmployeeId(it.id) }
             GetCompanyEmployeesResponse(
-                employeeIds = employeeRepository.getCompanyEmployeeEntities(request.companyId)
-                    .map { EmployeeId(it.id) }
+                employeeIds = employees,
+                pagedData = request.pagedData.toResponse(employees.size)
             )
         }
     }
@@ -116,7 +122,6 @@ internal class EmployeesRouterImpl(
                         converter.toEmployee(
                             employeeEntity = it.first,
                             employeeData = it.second,
-                            placements = employeeRepository.getEmployeePlacements(EmployeeId(it.first.id))
                         )
                     }
                 }.awaitAll()
@@ -149,7 +154,6 @@ internal class EmployeesRouterImpl(
                         converter.toEmployee(
                             employeeEntity = it.first,
                             employeeData = it.second,
-                            placements = employeeRepository.getEmployeePlacements(EmployeeId(it.first.id))
                         )
                     }
                 }.awaitAll()

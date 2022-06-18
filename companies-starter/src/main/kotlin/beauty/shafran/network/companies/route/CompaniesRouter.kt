@@ -6,6 +6,16 @@ import beauty.shafran.network.companies.data.*
 
 interface CompaniesRouter {
 
+    suspend fun getCompanyPlacementsByIds(
+        request: CreateCompanyRequest,
+        account: AuthorizedAccount,
+    ): CreateCompanyResponse
+
+    suspend fun getCompanyById(
+        request: CreateCompanyRequest,
+        account: AuthorizedAccount,
+    ): CreateCompanyResponse
+
     suspend fun createCompany(
         request: CreateCompanyRequest,
         account: AuthorizedAccount,

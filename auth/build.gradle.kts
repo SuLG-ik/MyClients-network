@@ -13,5 +13,6 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
 dependencies {
     implementation(Dependencies.Ktor.core)
     implementation(Dependencies.Ktor.auth)
+    implementation(Dependencies.)
     implementation(projects.exceptionsData)
 }

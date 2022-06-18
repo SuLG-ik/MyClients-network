@@ -2,6 +2,8 @@ package beauty.shafran.network.employees.data
 
 import beauty.shafran.network.companies.data.CompanyId
 import beauty.shafran.network.companies.data.CompanyPlacementId
+import beauty.shafran.network.paged.data.PagedDataRequest
+import beauty.shafran.network.paged.data.PagedDataResponse
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -27,11 +29,13 @@ class GetEmployeesByIdsResponse(
 @Serializable
 class GetCompanyEmployeesRequest(
     val companyId: CompanyId,
+    val pagedData: PagedDataRequest,
 )
 
 @Serializable
 class GetCompanyEmployeesResponse(
     val employeeIds: List<EmployeeId>,
+    val pagedData: PagedDataResponse,
 )
 
 @Serializable
@@ -56,8 +60,7 @@ class GetPlacementEmployeesResponse(
 )
 
 @Serializable
-class
-GetPlacementEmployeesAndLoadRequest(
+class GetPlacementEmployeesAndLoadRequest(
     val placementsIds: List<CompanyPlacementId>,
 )
 

@@ -27,6 +27,7 @@ dependencies {
     implementation(projects.companiesData)
     implementation(projects.accountsStarter)
     implementation(projects.accountsData)
+    implementation(projects.servicesData)
     implementation(projects.employeesData)
     implementation(projects.pagedData)
     implementation(projects.koinExt)

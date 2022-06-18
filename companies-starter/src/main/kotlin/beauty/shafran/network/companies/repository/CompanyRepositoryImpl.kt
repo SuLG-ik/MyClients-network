@@ -4,7 +4,7 @@ import beauty.shafran.network.accounts.data.AccountId
 import beauty.shafran.network.companies.data.CompanyCodename
 import beauty.shafran.network.companies.tables.*
 import beauty.shafran.network.database.TransactionalScope
-import beauty.shafran.network.paged.data.PagedData
+import beauty.shafran.network.paged.data.PagedDataRequest
 import beauty.shafran.network.paged.exposed.paged
 import org.jetbrains.exposed.sql.JoinType
 import org.jetbrains.exposed.sql.select
@@ -36,7 +36,7 @@ internal class CompanyRepositoryImpl : CompanyRepository {
 
     context(TransactionalScope) override suspend fun getAvailableCompanies(
         accountId: AccountId,
-        pagedData: PagedData?,
+        pagedData: PagedDataRequest?,
     ): List<Triple<CompanyEntity, CompanyDataEntity, CompanyOwnerEntity>> {
         return CompanyMemberTable.join(
             otherTable = CompanyTable,

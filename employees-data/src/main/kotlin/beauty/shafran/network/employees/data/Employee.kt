@@ -12,7 +12,6 @@ value class EmployeeId(
 data class Employee(
     val id: EmployeeId,
     val data: EmployeeData,
-    val member: EmployeeCompanyMember,
 )
 
 @Serializable
