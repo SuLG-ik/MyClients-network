@@ -1,25 +1,36 @@
 package beauty.shafran.network.companies.repository
 
-import beauty.shafran.network.accounts.data.AccountId
-import beauty.shafran.network.companies.data.CompanyCodename
-import beauty.shafran.network.companies.tables.CompanyDataEntity
-import beauty.shafran.network.companies.tables.CompanyEntity
-import beauty.shafran.network.companies.tables.CompanyOwnerEntity
-import beauty.shafran.network.database.TransactionalScope
-import beauty.shafran.network.paged.data.PagedDataRequest
+import beauty.shafran.network.accounts.entities.AccountEntity
+import beauty.shafran.network.companies.entities.CompanyEntity
+import beauty.shafran.network.companies.entities.CompanyMemberEntity
+import beauty.shafran.network.companies.entities.CompanyOwnerEntity
+import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.querydsl.QuerydslPredicateExecutor
+import org.springframework.graphql.data.GraphQlRepository
 
 
-interface CompanyRepository {
+@GraphQlRepository
+interface CompanyRepository : JpaRepository<CompanyEntity, Long>, QuerydslPredicateExecutor<CompanyEntity> {
+
+    fun findByCodename(codename: String): CompanyEntity?
+
+}
 
 
-    context(TransactionalScope) suspend fun createCompany(
-        codename: CompanyCodename,
-        ownerId: AccountId,
-        title: String,
-    ): Triple<CompanyEntity, CompanyDataEntity, CompanyOwnerEntity>
+@GraphQlRepository
+interface CompanyOwnerRepository : JpaRepository<CompanyOwnerEntity, Long>,
+    QuerydslPredicateExecutor<CompanyOwnerEntity> {
 
-    context(TransactionalScope) suspend fun getAvailableCompanies(
-        accountId: AccountId,
-        pagedData: PagedDataRequest?,
-    ): List<Triple<CompanyEntity, CompanyDataEntity, CompanyOwnerEntity>>
+    fun findByCompany(company: CompanyEntity): CompanyOwnerEntity?
+
+}
+
+@GraphQlRepository
+interface CompanyMemberRepository : JpaRepository<CompanyMemberEntity, Long>,
+    QuerydslPredicateExecutor<CompanyMemberEntity> {
+
+    fun findAllByCompany(company: CompanyEntity): List<CompanyMemberEntity>
+
+    fun findByCompanyAndAccount(company: CompanyEntity, account: AccountEntity): CompanyMemberEntity
+
 }

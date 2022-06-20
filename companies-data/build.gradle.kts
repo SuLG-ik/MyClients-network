@@ -11,6 +11,5 @@ dependencies {
     implementation(Dependencies.Serialization.core)
     implementation(Dependencies.Datetime.core)
     implementation(projects.pagedData)
-    implementation(projects.accountsData)
     api(projects.exceptionsData)
 }

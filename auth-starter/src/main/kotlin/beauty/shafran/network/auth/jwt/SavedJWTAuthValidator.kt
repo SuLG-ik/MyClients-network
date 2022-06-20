@@ -1,59 +1,46 @@
 package beauty.shafran.network.auth.jwt
 
-import beauty.shafran.network.auth.AccessedAuthorizedAccount
-import beauty.shafran.network.auth.AuthorizedAccount
-import beauty.shafran.network.auth.AuthorizedAccountPrincipal
-import beauty.shafran.network.auth.RefreshAuthorizedAccount
-import beauty.shafran.network.accounts.data.AccountSessionId
-import beauty.shafran.network.auth.data.TokenId
-import beauty.shafran.network.auth.token.AuthTokenService
-import beauty.shafran.network.database.Transactional
-import beauty.shafran.network.database.invoke
-import com.auth0.jwt.interfaces.JWTVerifier
-import io.ktor.server.application.*
-import io.ktor.server.auth.jwt.*
+import beauty.shafran.network.auth.AccessAuthorizedAuthentication
+import beauty.shafran.network.auth.AuthorizedAuthentication
+import beauty.shafran.network.auth.RefreshAuthorizedAuthentication
+import beauty.shafran.network.auth.repository.AccountRefreshTokensRepository
+import beauty.shafran.network.auth.repository.AccountSessionsRepository
+import org.springframework.data.repository.findByIdOrNull
+import org.springframework.http.HttpStatus
+import org.springframework.security.authentication.AuthenticationManager
+import org.springframework.security.authentication.BadCredentialsException
+import org.springframework.security.authentication.ProviderNotFoundException
+import org.springframework.security.core.Authentication
+import org.springframework.stereotype.Component
+import org.springframework.web.server.ResponseStatusException
 
-internal class SavedJWTAuthValidator(
-    configuration: JWTAuthenticationConfig,
-    private val service: AuthTokenService,
-    private val transactional: Transactional,
-    override val verifier: JWTVerifier,
-) : JWTAuthentication {
-
-    override val configuration = "clients"
-
-    override val realm: String = configuration.realm
-
-    override val validator: suspend ApplicationCall.(JWTCredential) -> AuthorizedAccountPrincipal? = this::validate
-
-    private suspend fun validateInternal(call: ApplicationCall, credential: JWTCredential): AuthorizedAccount? {
-        val sessionId = credential.getClaim("sessionId", Long::class)
-        return transactional {
-            if (sessionId != null) {
-                if (!service.isSessionAuthorized(AccountSessionId(sessionId)))
-                    return@transactional null
-                AccessedAuthorizedAccount(
-                    sessionId = sessionId,
-                    accountId = credential.getClaim("accountId", Long::class)!!,
-                    authorities = credential.getListClaim("authorities", String::class),
-                )
-            } else {
-                val tokenId = credential.jwtId?.toLongOrNull()!!
-                if (!service.isRefreshTokenAuthorized(TokenId(tokenId)))
-                    return@transactional null
-                RefreshAuthorizedAccount(
-                    accountId = credential.getClaim("accountId", Long::class)!!,
-                    tokenId = tokenId,
-                    authorities = credential.getListClaim("authorities", String::class),
-                )
+@Component
+class JWTAuthenticationProvider(
+    val sessionsRepository: AccountSessionsRepository,
+    val refreshTokensRepository: AccountRefreshTokensRepository,
+) : AuthenticationManager {
+    @org.springframework.transaction.annotation.Transactional
+    override fun authenticate(authentication: Authentication): AuthorizedAuthentication {
+        return when (val jwt = authentication as? AuthorizedAuthentication) {
+            is AccessAuthorizedAuthentication -> {
+                val session = sessionsRepository.findByIdOrNull(jwt.account.sessionId)
+                if (session?.isDeactivated != false)
+                    throw BadCredentialsException("Session does not exists or deactivated")
+                jwt
             }
 
+            is RefreshAuthorizedAuthentication -> {
+                val refresh = refreshTokensRepository.findByIdOrNull(jwt.account.tokenId)
+                    ?: throw ResponseStatusException(HttpStatus.FORBIDDEN)
+                if (refresh.id != jwt.account.tokenId) {
+                    throw BadCredentialsException("Refresh token already expired")
+                }
+                jwt
+            }
+
+            null -> {
+                throw ProviderNotFoundException("Can't encode authentication")
+            }
         }
-
     }
-
-    private suspend fun validate(call: ApplicationCall, credential: JWTCredential): AuthorizedAccountPrincipal? {
-        return validateInternal(call, credential)?.let { AuthorizedAccountPrincipal(it) }
-    }
-
 }

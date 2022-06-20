@@ -12,6 +12,17 @@ interface Config {
 
 interface Dependencies {
 
+    object Spring {
+        val version =   "2.7.0"
+        val bom = "org.springframework.boot:spring-boot-dependencies:$version"
+        val jpaStarter =   "org.springframework.boot:spring-boot-starter-data-jpa"
+        val graphQlStarter = "org.springframework.boot:spring-boot-starter-graphql"
+        val queryDslCore = "com.querydsl:querydsl-core"
+        val queryDslJpa = "com.querydsl:querydsl-jpa"
+        val queryDslKapt = "com.querydsl:querydsl-apt:5.0.0:jpa"
+        val webStarter = "org.springframework.boot:spring-boot-starter-web"
+        val securityStarter = "org.springframework.boot:spring-boot-starter-security"
+    }
     object Shadow {
         val plugin = "com.github.johnrengelman.shadow"
         val version = "7.1.2"
@@ -19,7 +30,8 @@ interface Dependencies {
     }
 
     object Kotlin {
-        const val version = "1.6.21"
+        const val version = "1.7.0"
+        const val reflect = "org.jetbrains.kotlin:kotlin-reflect:$version"
     }
 
     object Coroutines {
@@ -45,6 +57,11 @@ interface Dependencies {
         const val version = "3.2.0"
         const val core = "io.insert-koin:koin-core:$version"
     }
+
+    object Auth0 {
+        const val jwt = "com.auth0:java-jwt:3.19.2"
+    }
+
 
     object BCrypt {
         const val favreLib = "at.favre.lib:bcrypt:0.9.0"
@@ -77,6 +94,7 @@ interface Dependencies {
         const val version = "1.3.3"
         const val json = "org.jetbrains.kotlinx:kotlinx-serialization-json:$version"
         const val core = "org.jetbrains.kotlinx:kotlinx-serialization-core:$version"
+        const val jackson = "com.fasterxml.jackson.module:jackson-module-kotlin"
     }
 
     object KotlinPoet {

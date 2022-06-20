@@ -1,35 +1,57 @@
 package beauty.shafran.network.auth
 
-import beauty.shafran.network.AccessDenied
-import io.ktor.server.auth.*
+import org.springframework.security.authentication.AbstractAuthenticationToken
+import org.springframework.security.core.authority.SimpleGrantedAuthority
+import org.springframework.security.core.context.SecurityContextHolder
 
-class AuthorizedAccountPrincipal(
-    val account: AuthorizedAccount,
-) : Principal
 
-abstract class AuthorizedAccount {
-    abstract val accountId: Long
-    abstract val authorities: List<String>
+sealed class AuthorizedAccount(
+    val accountId: Long,
+    val authorities: List<String>,
+) {
+
+    companion object {
+        fun get() = AuthorizedAuthentication.get().account
+
+    }
 }
 
-class AccessedAuthorizedAccount(
-    override val accountId: Long,
-    val sessionId: Long,
-    override val authorities: List<String>,
-) : AuthorizedAccount()
+class AccessAuthorizedAccount(accountId: Long, val sessionId: Long, authority: List<String>) :
+    AuthorizedAccount(accountId = accountId, authorities = authority)
 
-class RefreshAuthorizedAccount(
-    override val accountId: Long,
-    val tokenId: Long,
-    override val authorities: List<String>,
-) : AuthorizedAccount()
+class RefreshAuthorizedAccount(accountId: Long, val tokenId: Long, authority: List<String>) :
+    AuthorizedAccount(accountId = accountId, authorities = authority)
 
-fun AuthorizedAccount.hasAuthority(authority: String): Boolean {
-    return authority in authorities
+sealed class AuthorizedAuthentication(
+    authorities: List<String>,
+) : AbstractAuthenticationToken(authorities.map { SimpleGrantedAuthority(it) }) {
+
+
+    abstract val token: String
+    abstract val account: AuthorizedAccount
+
+    override fun getCredentials(): Any {
+        return token
+    }
+
+    override fun getPrincipal(): AuthorizedAccount {
+        return account
+    }
+
+    companion object {
+        fun get() = SecurityContextHolder.getContext().authentication as AuthorizedAuthentication
+    }
+
 }
 
-fun AuthorizedAccount.hasAuthorityStrict(authority: String): Boolean {
-    if (!hasAuthority(authority))
-        throw AccessDenied()
-    return true
+data class AccessAuthorizedAuthentication(override val token: String, override val account: AccessAuthorizedAccount) :
+    AuthorizedAuthentication(account.authorities) {
+    override fun getName(): String = toString()
+
+}
+
+class RefreshAuthorizedAuthentication(override val token: String, override val account: RefreshAuthorizedAccount) :
+    AuthorizedAuthentication(account.authorities) {
+    override fun getName(): String = toString()
+
 }

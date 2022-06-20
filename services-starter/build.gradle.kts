@@ -1,37 +1,31 @@
 plugins {
-    kotlin("jvm") version Dependencies.Kotlin.version
-    id(Dependencies.Ksp.plugin) version Dependencies.Ksp.version
+    id("org.springframework.boot")
+    kotlin("plugin.spring")
+    kotlin("plugin.jpa")
+    kotlin("jvm")
+    kotlin("kapt")
+}
+
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+    this.kotlinOptions {
+        this.jvmTarget = "17"
+    }
 }
 
 group = "ru.myclients"
 version = "0.0.1"
 
-sourceSets.main {
-    java.srcDirs("build/generated/ksp/main/kotlin")
-}
-
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-    kotlinOptions {
-        freeCompilerArgs = freeCompilerArgs + "-Xcontext-receivers"
-    }
-}
-ksp {
-    arg("tables_package", "beauty.shafran.network.services.schema")
-}
-
 
 dependencies {
-    implementation(Dependencies.Ktor.core)
+    implementation(platform(Dependencies.Spring.bom))
+    implementation(Dependencies.Spring.jpaStarter)
+    implementation(Dependencies.Spring.webStarter)
+    implementation(Dependencies.Spring.securityStarter)
+    implementation(Dependencies.Spring.graphQlStarter)
+    implementation(Dependencies.Spring.queryDslCore)
+    implementation(Dependencies.Spring.queryDslJpa)
     implementation(projects.auth)
-    implementation(projects.companiesStarter)
-    implementation(projects.companiesData)
     implementation(projects.accountsStarter)
-    implementation(projects.accountsData)
-    implementation(projects.servicesData)
-    implementation(projects.employeesData)
-    implementation(projects.pagedData)
-    implementation(projects.koinExt)
-    implementation(projects.databaseTransactional)
-    implementation(projects.exposedExt)
-    ksp(projects.tableProcessor)
+    implementation(projects.companiesStarter)
+    kapt(Dependencies.Spring.queryDslKapt)
 }

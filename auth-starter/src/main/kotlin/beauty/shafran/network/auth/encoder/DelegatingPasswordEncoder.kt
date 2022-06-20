@@ -1,19 +1,20 @@
 package beauty.shafran.network.auth.encoder
 
-class DelegatingPasswordEncoder(
-    private val primary: String,
-    private val encoders: Map<String, PasswordEncoder>,
-) : PasswordEncoder {
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
+import org.springframework.security.crypto.password.DelegatingPasswordEncoder
+import org.springframework.stereotype.Component
 
-    private val primaryEncoder = encoders.getValue(primary)
+@Component
+class DelegatingPasswordEncoder : PasswordEncoder {
+
+    private val encoders = DelegatingPasswordEncoder("bcrypt", mapOf("bcrypt" to BCryptPasswordEncoder()))
 
     override fun matches(rawPassword: String, passwordHash: String): Boolean {
-        val encoder = encoders.firstNotNullOf { if (passwordHash.startsWith("{${it.key}}")) it else null }
-        return encoder.value.matches(rawPassword, passwordHash.removePrefix("{${encoder.key}}"))
+        return encoders.matches(rawPassword, passwordHash)
     }
 
     override fun hashPassword(rawPassword: String): String {
-        return "{${primary}}${primaryEncoder.hashPassword(rawPassword)}"
+        return encoders.encode(rawPassword)
     }
 
 }

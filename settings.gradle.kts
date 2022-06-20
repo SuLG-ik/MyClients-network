@@ -10,47 +10,50 @@ rootProject.name = "MyClients-network"
 
 include("app")
 
-include(
-    "auth-data",
-    "auth",
-    "auth-starter",
-)
+//include(
+//    "auth-data",
+//    "auth",
+//    "auth-starter",
+//)
 include(
     "accounts-starter",
-    "accounts-data",
-)
-include(
-    "employees-starter",
-    "employees-data",
-)
-include(
     "companies-starter",
-    "companies-data",
-)
-include(
     "services-starter",
-    "services-data",
+    "auth-starter",
+    "auth",
 )
-
-include(
-    "logging-starter",
-    "https-redirect-starter",
-    "routing-v1-starter",
-    "serialization-starter",
-    "exceptions-starter",
-    "exposed-starter",
-)
-include(
-    "table-core",
-    "table-processor",
-    "config-core",
-    "config-processor",
-)
-include(
-    "koin-ext",
-    "exposed-ext",
-    "exceptions-data",
-    "paged-data",
-    "datetime-koin",
-    "database-transactional",
-)
+//include(
+//    "employees-starter",
+//    "employees-data",
+//)
+//include(
+//    "companies-starter",
+//    "companies-data",
+//)
+//include(
+//    "services-starter",
+//    "services-data",
+//)
+//
+//include(
+//    "logging-starter",
+//    "https-redirect-starter",
+//    "routing-v1-starter",
+//    "serialization-starter",
+//    "exceptions-starter",
+//    "exposed-starter",
+//)
+//include(
+//    "table-core",
+//    "table-processor",
+//    "config-core",
+//    "config-processor",
+//)
+//include(
+//    "koin-ext",
+//    "exposed-ext",
+//    "exceptions-data",
+//    "paged-data",
+//    "datetime-koin",
+//    "database-transactional",
+//)

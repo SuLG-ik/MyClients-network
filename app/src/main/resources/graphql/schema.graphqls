@@ -1,0 +1,120 @@
+type AccountsQuery {
+    account(id: ID, nickname: String): Account!
+}
+
+type CompanyQuery {
+    company(id: ID, codename: String): Company!
+}
+
+type Account {
+    id: ID!
+    username: String!
+    data: AccountData!
+}
+
+type AccountData {
+    name: String!
+}
+
+type CompanyData {
+    title: String!
+}
+
+type CompanyMember {
+    id: ID!
+    account: Account!
+}
+
+
+type CompanyOwner {
+    id: ID!
+    member: CompanyMember!
+}
+
+type Company{
+    id: ID!
+    codename: String!
+    data: CompanyData!
+    owner: CompanyOwner!
+    members: [CompanyMember!]!,
+    placements: [CompanyPlacement!]!
+}
+
+
+
+type CompanyPlacementMember{
+    id: ID!
+    account: Account!
+}
+
+type CompanyPlacementData {
+    title: String!
+}
+
+type CompanyPlacement {
+    id: ID!
+    company: Company!
+    codename: String!
+    data: CompanyPlacementData!
+    members: [CompanyPlacementMember!]!
+}
+
+type Service {
+    id: ID!
+    company: Company!
+    data: ServiceData!
+    placements: [CompanyPlacement!]!
+}
+
+type ServiceData {
+    title: String!
+    description: String!
+}
+
+type ServicesQuery {
+    service(id: ID!): Service!
+}
+
+type Query {
+    accounts: AccountsQuery!
+    companies: CompanyQuery!
+    services: ServicesQuery!
+}
+
+input AddCompanyInput {
+    codename: String!
+    title: String!
+}
+
+input AddServiceToPlacementInput {
+    placementId: ID!
+    serviceId: ID!
+}
+
+input AddPlacementInput {
+    companyId: ID!
+    codename: String!,
+    title: String!,
+    addToMembers: Boolean!,
+}
+
+type CompaniesMutation {
+    addCompany(input: AddCompanyInput!): Company!
+    addPlacement(input: AddPlacementInput): CompanyPlacement!
+}
+
+input AddServiceInput {
+    companyId: String!
+    title: String!
+    description: String!
+}
+
+type ServicesMutation {
+    addService(input: AddServiceInput!): Service!
+    addToPlacement(input: AddServiceToPlacementInput!): Service!
+}
+
+type Mutation {
+    companies: CompaniesMutation!
+    services: ServicesMutation!
+}
