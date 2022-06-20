@@ -17,7 +17,7 @@ class EmployeeEntity(
     var company: CompanyEntity,
     @Id
     @GeneratedValue
-    var id: Long,
+    var id: Long = 0,
 )
 
 @Table(name = "employee_to_placement")
@@ -31,7 +31,7 @@ class EmployeeToPlacementEntity(
     var placement: CompanyPlacementEntity,
     @Id
     @GeneratedValue
-    var id: Long,
+    var id: Long = 0,
 )
 
 @Table(name = "employee_data")
@@ -44,5 +44,5 @@ class EmployeeDataEntity(
     var description: String,
     @Id
     @GeneratedValue
-    var id: Long,
+    var id: Long = 0,
 )

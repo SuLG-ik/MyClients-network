@@ -4,31 +4,6 @@ import beauty.shafran.network.companies.entities.CompanyEntity
 import beauty.shafran.network.companies.entities.CompanyPlacementEntity
 import javax.persistence.*
 
-@Table(name = "service_info")
-@Entity
-class ServiceInfoEntity(
-    var durationOfWork: Long,
-    @ManyToOne(targetEntity = ServiceEntity::class, fetch = FetchType.LAZY)
-    @JoinColumn(name = "service_id", referencedColumnName = "id")
-    var service: ServiceEntity,
-    @GeneratedValue
-    @Id
-    var id: Long = 0,
-)
-
-
-@Table(name = "service_limit_times")
-@Entity
-class TimesLimitedServiceEntity(
-    var times: Int,
-    @ManyToOne(targetEntity = ServiceEntity::class, fetch = FetchType.LAZY)
-    @JoinColumn(name = "service_id", referencedColumnName = "id")
-    var service: ServiceEntity,
-    @GeneratedValue
-    @Id
-    var id: Long = 0,
-)
-
 @Table(name = "service")
 @Entity
 class ServiceEntity(

@@ -1,6 +1,7 @@
 package beauty.shafran.network.employees.repository
 
 import beauty.shafran.network.companies.entities.CompanyEntity
+import beauty.shafran.network.companies.entities.CompanyPlacementEntity
 import beauty.shafran.network.employees.entities.EmployeeDataEntity
 import beauty.shafran.network.employees.entities.EmployeeEntity
 import beauty.shafran.network.employees.entities.EmployeeToPlacementEntity
@@ -29,5 +30,6 @@ interface EmployeeToPlacementRepository : JpaRepository<EmployeeToPlacementEntit
 
     fun findAllByEmployee(employee: EmployeeEntity): List<EmployeeToPlacementEntity>
 
+    fun existsByEmployeeAndPlacement(employee: EmployeeEntity, placement: CompanyPlacementEntity): Boolean
 
 }

@@ -2,8 +2,12 @@ package beauty.shafran.network.services.route
 
 import beauty.shafran.network.companies.repository.CompanyPlacementRepository
 import beauty.shafran.network.companies.repository.CompanyRepository
-import beauty.shafran.network.services.entities.*
-import beauty.shafran.network.services.repository.*
+import beauty.shafran.network.services.entities.ServiceDataEntity
+import beauty.shafran.network.services.entities.ServiceEntity
+import beauty.shafran.network.services.entities.ServiceToPlacementEntity
+import beauty.shafran.network.services.repository.ServiceDataRepository
+import beauty.shafran.network.services.repository.ServiceRepository
+import beauty.shafran.network.services.repository.ServiceToPlacementRepository
 import graphql.schema.DataFetchingEnvironment
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.graphql.data.method.annotation.Argument
@@ -14,12 +18,10 @@ import org.springframework.transaction.annotation.Transactional
 
 class ServicesMutation
 
-class AddTimesLimitedServiceInput(
+class AddServiceInput(
     val companyId: Long,
     val title: String,
     val description: String,
-    val times: Int,
-    val durationOfWork: Long,
 )
 
 
@@ -35,8 +37,6 @@ class MutationServiceController(
     private val companyRepository: CompanyRepository,
     private val placementRepository: CompanyPlacementRepository,
     private val serviceToPlacementRepository: ServiceToPlacementRepository,
-    private val timesLimitedServiceRepository: TimesLimitedServiceRepository,
-    private val serviceInfoRepository: ServiceInfoRepository,
 ) {
 
 
@@ -46,10 +46,7 @@ class MutationServiceController(
 
     @Transactional
     @SchemaMapping(typeName = "ServicesMutation")
-    fun addTimesLimitedService(
-        @Argument input: AddTimesLimitedServiceInput,
-        environment: DataFetchingEnvironment,
-    ): Service {
+    fun addService(@Argument input: AddServiceInput, environment: DataFetchingEnvironment): Service {
         val service = serviceRepository.save(
             ServiceEntity(
                 company = companyRepository.getReferenceById(input.companyId)
@@ -60,15 +57,6 @@ class MutationServiceController(
                 service = service,
                 title = input.title,
                 description = input.description,
-            )
-        )
-        timesLimitedServiceRepository.save(
-            TimesLimitedServiceEntity(times = input.times, service = service)
-        )
-        serviceInfoRepository.save(
-            ServiceInfoEntity(
-                durationOfWork = input.durationOfWork,
-                service = service,
             )
         )
         return Service(

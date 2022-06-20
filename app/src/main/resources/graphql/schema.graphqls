@@ -39,6 +39,22 @@ type Employee {
     placements: [CompanyPlacement!]
 }
 
+input AddEmployeeInput {
+    companyId: ID
+    username: String
+    name: String
+}
+
+input AddEmployeeToPlacementInput {
+    employeeId: ID!
+    placementId:ID!
+}
+
+type EmployeesMutation {
+    addEmployee(input: AddEmployeeInput!): Employee!
+    addToPlacement(input: AddEmployeeToPlacementInput!): Employee!
+}
+
 type EmployeeData {
     name: String!
     description: String
@@ -73,9 +89,19 @@ type CompanyPlacement {
     members: [CompanyPlacementMember!]!
 }
 
+interface ServiceInfo {
+    durationOfWork: Int
+}
+
+type TimesLimitedServiceInfo implements ServiceInfo {
+    durationOfWork: Int
+    times: Int
+}
+
 type Service {
     id: ID!
     company: Company!
+    info: ServiceInfo!
     data: ServiceData!
     placements: [CompanyPlacement!]!
 }
@@ -89,11 +115,6 @@ type ServicesQuery {
     service(id: ID!): Service!
 }
 
-type Query {
-    accounts: AccountsQuery!
-    companies: CompanyQuery!
-    services: ServicesQuery!
-}
 
 input AddCompanyInput {
     codename: String!
@@ -107,9 +128,9 @@ input AddServiceToPlacementInput {
 
 input AddPlacementInput {
     companyId: ID!
-    codename: String!,
-    title: String!,
-    addToMembers: Boolean!,
+    codename: String!
+    title: String!
+    addToMembers: Boolean!
 }
 
 type CompaniesMutation {
@@ -117,18 +138,27 @@ type CompaniesMutation {
     addPlacement(input: AddPlacementInput): CompanyPlacement!
 }
 
-input AddServiceInput {
+input AddTimesLimitedServiceInput {
     companyId: String!
     title: String!
     description: String!
+    times: Int!
+    durationOfWork: Int!
 }
 
 type ServicesMutation {
-    addService(input: AddServiceInput!): Service!
+    addTimesLimitedService(input: AddTimesLimitedServiceInput!): Service!
     addToPlacement(input: AddServiceToPlacementInput!): Service!
+}
+
+type Query {
+    accounts: AccountsQuery!
+    companies: CompanyQuery!
+    services: ServicesQuery!
 }
 
 type Mutation {
     companies: CompaniesMutation!
     services: ServicesMutation!
+    employees: EmployeesMutation!
 }

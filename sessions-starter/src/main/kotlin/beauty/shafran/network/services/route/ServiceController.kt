@@ -3,7 +3,9 @@ package beauty.shafran.network.services.route
 import beauty.shafran.network.companies.repository.CompanyRepository
 import beauty.shafran.network.companies.route.Company
 import beauty.shafran.network.companies.route.CompanyPlacement
-import beauty.shafran.network.services.repository.*
+import beauty.shafran.network.services.repository.ServiceDataRepository
+import beauty.shafran.network.services.repository.ServiceRepository
+import beauty.shafran.network.services.repository.ServiceToPlacementRepository
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.graphql.data.method.annotation.Argument
 import org.springframework.graphql.data.method.annotation.QueryMapping
@@ -23,22 +25,12 @@ class ServiceData(
     val description: String,
 )
 
-interface ServiceInfo {
-    val durationOfWork: Long
-}
-
-class TimesLimitedServiceInfo(
-    val times: Int, override val durationOfWork: Long,
-) : ServiceInfo
-
 @Controller
 class ServiceController(
     private val serviceRepository: ServiceRepository,
     private val companyRepository: CompanyRepository,
     private val serviceDataRepository: ServiceDataRepository,
     private val serviceToPlacementRepository: ServiceToPlacementRepository,
-    private val timesLimitedServiceRepository: TimesLimitedServiceRepository,
-    private val serviceInfoRepository: ServiceInfoRepository,
 ) {
 
 
@@ -53,19 +45,6 @@ class ServiceController(
         return Service(
             id = service.id,
             companyId = service.company.id
-        )
-    }
-
-    @SchemaMapping
-    @Transactional
-    fun info(source: Service): ServiceInfo {
-        val reference = serviceRepository.getReferenceById(source.id)
-        val timesLimited =
-            timesLimitedServiceRepository.findByService(reference) ?: TODO()
-        val info = serviceInfoRepository.findByService(reference) ?: TODO()
-        return TimesLimitedServiceInfo(
-            times = timesLimited.times,
-            durationOfWork = info.durationOfWork
         )
     }
 
