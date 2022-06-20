@@ -25,4 +25,5 @@ dependencies {
     implementation(projects.companiesStarter)
     implementation(projects.servicesStarter)
     implementation(projects.authStarter)
+    implementation(projects.employeesStarter)
 }

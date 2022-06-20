@@ -79,7 +79,8 @@ class ServiceController(
             CompanyPlacement(
                 id = it.placement.id,
                 codename = it.placement.codename,
-                companyId = it.placement.company.id
+                companyId = it.placement.company.id,
+                title = it.placement.title
             )
         }
     }

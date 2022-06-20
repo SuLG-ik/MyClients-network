@@ -31,6 +31,19 @@ type CompanyOwner {
     member: CompanyMember!
 }
 
+type Employee {
+    id: ID!
+    username: String!
+    data: EmployeeData!
+    company: Company!
+    placements: [CompanyPlacement!]
+}
+
+type EmployeeData {
+    name: String!
+    description: String
+}
+
 type Company{
     id: ID!
     codename: String!
@@ -38,6 +51,7 @@ type Company{
     owner: CompanyOwner!
     members: [CompanyMember!]!,
     placements: [CompanyPlacement!]!
+    employees: [Employee!]!
 }
 
 

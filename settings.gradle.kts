@@ -20,10 +20,11 @@ include(
     "companies-starter",
     "services-starter",
     "auth-starter",
+    "employees-starter",
     "auth",
 )
 //include(
-//    "employees-starter",
+//
 //    "employees-data",
 //)
 //include(

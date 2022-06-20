@@ -96,7 +96,7 @@ class MutationCompanyController(
             id = placement.id,
             companyId = input.companyId,
             codename = input.codename,
-            data = CompanyPlacementData(title = input.title),
+            title = input.title,
         )
     }
 

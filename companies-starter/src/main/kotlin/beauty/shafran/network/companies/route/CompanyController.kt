@@ -44,11 +44,10 @@ class CompanyPlacementData(
 )
 
 class CompanyPlacement(
-    var id: Long,
+    val id: Long,
     val companyId: Long,
-    var codename: String,
-    var data: CompanyPlacementData? = null,
-    var members: List<CompanyPlacementMember>? = null,
+    val codename: String,
+    val title: String,
 )
 
 @Controller
@@ -138,10 +137,18 @@ class CompanyController(
                 id = it.id,
                 companyId = source.id,
                 codename = it.codename,
-                data = CompanyPlacementData(it.title)
+                title = it.title
             )
         }
     }
+
+
+    @Transactional
+    @SchemaMapping
+    fun data(source: CompanyPlacement): CompanyPlacementData {
+        return CompanyPlacementData(title = source.title)
+    }
+
 
     @Transactional
     @SchemaMapping
