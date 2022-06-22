@@ -23,9 +23,13 @@ dependencies {
     implementation(Dependencies.Spring.securityStarter)
     implementation(Dependencies.Spring.graphQlStarter)
     implementation(Dependencies.Spring.queryDslCore)
+    implementation(Dependencies.Spring.validationStarter)
     implementation(Dependencies.Spring.queryDslJpa)
     implementation(projects.auth)
     implementation(projects.accountsStarter)
     implementation(projects.companiesStarter)
+    implementation(projects.servicesStarter)
+    implementation(projects.customersStarter)
+    implementation(projects.employeesStarter)
     kapt(Dependencies.Spring.queryDslKapt)
 }

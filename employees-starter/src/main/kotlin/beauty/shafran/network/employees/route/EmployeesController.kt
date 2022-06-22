@@ -50,7 +50,6 @@ class EmployeesController(
         return EmployeeData(source)
     }
 
-    @Transactional
     @SchemaMapping
     fun name(source: EmployeeData): String {
         return source.employee.name

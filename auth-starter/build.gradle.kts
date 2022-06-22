@@ -17,6 +17,7 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
 }
 
 
+
 dependencies {
     implementation(platform(Dependencies.Spring.bom))
     implementation(Dependencies.Spring.jpaStarter)

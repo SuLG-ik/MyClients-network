@@ -40,9 +40,9 @@ type Employee {
 }
 
 input AddEmployeeInput {
-    companyId: ID
-    username: String
-    name: String
+    companyId: ID!
+    username: String!
+    name: String!
 }
 
 input AddEmployeeToPlacementInput {
@@ -68,6 +68,8 @@ type Company{
     members: [CompanyMember!]!,
     placements: [CompanyPlacement!]!
     employees: [Employee!]!
+    services: [Service!]!
+    customers: [Customer!]!
 }
 
 
@@ -90,12 +92,12 @@ type CompanyPlacement {
 }
 
 interface ServiceInfo {
-    durationOfWork: Int
+    durationOfWork: Int!
 }
 
 type TimesLimitedServiceInfo implements ServiceInfo {
-    durationOfWork: Int
-    times: Int
+    durationOfWork: Int!
+    times: Int!
 }
 
 type Service {
@@ -151,14 +153,98 @@ type ServicesMutation {
     addToPlacement(input: AddServiceToPlacementInput!): Service!
 }
 
+type CustomersQuery {
+    customer(id: ID): Customer!
+    card(token: String): Card!
+}
+
+type Card {
+    token: String!
+    customer: Customer
+}
+
+
+type Customer {
+    id: ID!
+    data: CustomerData!
+    card: Card
+}
+
+type CustomerData {
+    name: String!
+    description: String
+}
+
+input AddCustomerAndCardInput {
+    companyId: ID!
+    name: String!
+    description: String
+}
+
+type CustomersMutation {
+    addCustomerAndCard(input: AddCustomerAndCardInput!): Card!
+}
+
+type Session {
+    id: ID!
+    data: SessionData!
+    customer: Customer!
+    service :Service!
+    company: Company!
+    employees: [Employee!]!
+    usages: [SessionUsage!]!
+}
+
+type SessionData {
+    description: String
+}
+
+type SessionUsage {
+    id: ID!
+    data: SessionUsageData!
+    session: Session!
+    employees: [Employee!]!
+}
+
+type SessionUsageData {
+    description: String
+}
+
+type SessionsQuery{
+    session(id: ID!): Session!
+}
+
+input AddSessionInput {
+    serviceId: ID!
+    customerId: ID!
+    employeesIds: [ID!]!
+    description: String
+}
+
+input UseSessionInput {
+    sessionId: ID!
+    employeesIds: [ID!]!
+    description: String
+}
+
+type SessionsMutation {
+    addSession(input: AddSessionInput!): Session!
+    useSession(input: UseSessionInput!): SessionUsage!
+}
+
 type Query {
     accounts: AccountsQuery!
     companies: CompanyQuery!
     services: ServicesQuery!
+    customers: CustomersQuery!
+    sessions: SessionsQuery!
 }
+
 
 type Mutation {
     companies: CompaniesMutation!
     services: ServicesMutation!
     employees: EmployeesMutation!
+    customers: CustomersMutation!
+    sessions: SessionsMutation!
 }

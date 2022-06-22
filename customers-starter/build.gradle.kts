@@ -16,6 +16,7 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
 group = "ru.myclients"
 version = "0.0.1"
 
+
 dependencies {
     implementation(platform(Dependencies.Spring.bom))
     implementation(Dependencies.Spring.jpaStarter)
@@ -25,5 +26,7 @@ dependencies {
     implementation(Dependencies.Spring.queryDslCore)
     implementation(Dependencies.Spring.queryDslJpa)
     implementation(projects.auth)
+    implementation(projects.accountsStarter)
+    implementation(projects.companiesStarter)
     kapt(Dependencies.Spring.queryDslKapt)
 }

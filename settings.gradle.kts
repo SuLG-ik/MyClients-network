@@ -3,6 +3,14 @@ dependencyResolutionManagement {
     repositories {
         mavenCentral()
         maven("https://jitpack.io")
+        maven("https://repo.spring.io/release")
+    }
+}
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        mavenCentral()
+        maven("https://repo.spring.io/release")
     }
 }
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
@@ -19,8 +27,10 @@ include(
     "accounts-starter",
     "companies-starter",
     "services-starter",
+    "sessions-starter",
     "auth-starter",
     "employees-starter",
+    "customers-starter",
     "auth",
 )
 //include(

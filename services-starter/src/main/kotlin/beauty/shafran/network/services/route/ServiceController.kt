@@ -23,7 +23,7 @@ class ServiceData(
     val description: String,
 )
 
-interface ServiceInfo {
+sealed interface ServiceInfo {
     val durationOfWork: Long
 }
 
@@ -54,6 +54,18 @@ class ServiceController(
             id = service.id,
             companyId = service.company.id
         )
+    }
+
+    @SchemaMapping
+    @Transactional
+    fun services(source: Company): List<Service> {
+        val services = serviceRepository.findAllByCompany(companyRepository.getReferenceById(source.id))
+        return services.map { service ->
+            Service(
+                id = service.id,
+                companyId = source.id
+            )
+        }
     }
 
     @SchemaMapping

@@ -22,6 +22,7 @@ interface Dependencies {
         val queryDslKapt = "com.querydsl:querydsl-apt:5.0.0:jpa"
         val webStarter = "org.springframework.boot:spring-boot-starter-web"
         val securityStarter = "org.springframework.boot:spring-boot-starter-security"
+        val validationStarter = "org.springframework.boot:spring-boot-starter-validation"
     }
     object Shadow {
         val plugin = "com.github.johnrengelman.shadow"

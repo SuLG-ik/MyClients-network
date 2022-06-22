@@ -5,7 +5,7 @@ import org.springframework.boot.context.properties.ConstructorBinding
 
 @ConfigurationProperties("security.api.jwt")
 @ConstructorBinding
-internal class JWTAuthenticationConfig(
+class JWTAuthenticationConfig(
     val issuer: String,
     val audience: String,
     val path: String,

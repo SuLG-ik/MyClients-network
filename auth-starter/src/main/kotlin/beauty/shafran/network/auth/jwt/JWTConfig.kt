@@ -4,9 +4,7 @@ import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import com.auth0.jwt.interfaces.JWTVerifier
 import org.springframework.beans.factory.annotation.Qualifier
-import org.springframework.boot.context.properties.ConfigurationPropertiesBinding
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan
-import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Primary
@@ -19,7 +17,7 @@ import java.security.interfaces.RSAPublicKey
 
 @Configuration
 @ConfigurationPropertiesScan
-private class JWTConfig {
+class JWTConfig {
 
     @Bean
     fun keystore(config: JWTAuthenticationConfig): KeyStore {
@@ -32,12 +30,12 @@ private class JWTConfig {
     }
 
     @Bean
-    fun public(certificate: Certificate): RSAPublicKey {
+    fun publicKey(certificate: Certificate): RSAPublicKey {
         return certificate.publicKey.let { if (it is RSAPublicKey) it else throw IllegalArgumentException("Public key does not rsa") }
     }
 
     @Bean
-    fun private(certificate: KeyStore, config: JWTAuthenticationConfig): RSAPrivateKey {
+    fun privateKey(certificate: KeyStore, config: JWTAuthenticationConfig): RSAPrivateKey {
         return certificate.getKey(config.alias, config.password.toCharArray())
             .let { if (it is RSAPrivateKey) it else throw IllegalArgumentException("Public key does not rsa") }
     }
