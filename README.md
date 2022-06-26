@@ -10,25 +10,12 @@
 
 | What         | How                                                                      |
 |--------------|--------------------------------------------------------------------------|
-| 🧠 Framework | [Ktor 2.0](https://github.com/ktorio/ktor)                               |                                                                                          ||
-| 💉 DI        | [Koin 3.0](https://github.com/InsertKoinIO/koin)                         |                                                                                                                             |
-| 🌊 Async     | [Coroutines](https://kotlinlang.org/docs/coroutines-overview.html)       |
-| 📄 JSON      | [kotlinx.serialization](https://github.com/Kotlin/kotlinx.serialization) ||
+| 🧠 Framework | [Spring Boot 2.7](https://spring.io/projects/spring-boot)                |                                                                                          ||
+| 💉 API       | [GraphQl](https://spring.io/projects/spring-graphql)                     |                                                                                                                             |
 | 🛣️ Auth     | [JWT](https://jwt.io/)                                                   |
-| ⌨ DB         | Deploy - Mongo, in process - migrate to postgres                         |
+| ⌨ DB         | Postgres                                                                 |
 
-## 🥼 Primary entrypoint
-
-#### Each entrypoint has prefix `/v1` as api version
-
-- /customers
-- /cards
-- /employees
-- /accounts
-- /auth
-- /companies
-- /services
-- /sessions
+## 🥼 [Schema](app/src/main/resources/graphql/schema.graphqls)
 
 ## ✍️ Author
 
@@ -39,8 +26,8 @@
 
 ## ☑️ TODO
 
-- [ ] Migrate to postgres
-- [ ] Add companies and stations separations
+- [x] Migrate to postgres
+- [x] Add companies and stations separations
 - [ ] Add records
 - [ ] Add salary calculating
 - [ ] Add more statistic
