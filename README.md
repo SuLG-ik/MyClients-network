@@ -4,7 +4,7 @@
 
 ### ✨ Demo
 
-- [Watch](/docs/DEMO.md) demo
+- [Watch](docs/DEMO.md) demo
 
 ## 🏗️️ Built with
 
