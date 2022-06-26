@@ -5,7 +5,7 @@ import org.springframework.security.crypto.password.DelegatingPasswordEncoder
 import org.springframework.stereotype.Component
 
 @Component
-class DelegatingPasswordEncoder : PasswordEncoder {
+internal class DelegatingPasswordEncoder : PasswordEncoder {
 
     private val encoders = DelegatingPasswordEncoder("bcrypt", mapOf("bcrypt" to BCryptPasswordEncoder()))
 

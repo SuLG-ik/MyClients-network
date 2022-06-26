@@ -1,10 +1,9 @@
 package beauty.shafran.network.auth.token
 
-import beauty.shafran.network.auth.Authority
 import beauty.shafran.network.auth.AuthorizationService
-import beauty.shafran.network.auth.data.AccessTokenData
-import beauty.shafran.network.auth.data.RefreshTokenData
 import beauty.shafran.network.auth.jwt.JWTAuthenticationConfig
+import beauty.shafran.network.auth.route.AccessTokenData
+import beauty.shafran.network.auth.route.RefreshTokenData
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import com.auth0.jwt.interfaces.DecodedJWT
@@ -27,14 +26,9 @@ internal class TokenService(
     private val config: JWTAuthenticationConfig,
 ) {
 
-    fun createAccessToken(accountId: Long, sessionId: Long, authorities: List<String>): AccessTokenData {
-        val expiresAt =
-            LocalDateTime.ofInstant(
-                Instant.ofEpochMilli(System.currentTimeMillis() + config.accessTokenExpiresAfter),
-                ZoneId.systemDefault(),
-            )
+    fun createAccessToken(accountId: Long, sessionId: Long, authorities: List<String>, expiresAt: LocalDateTime): AccessTokenData {
         return AccessTokenData(
-            accessToken = signAccessToken(accountId, sessionId, authorities, expiresAt),
+            token = signAccessToken(accountId, sessionId, authorities, expiresAt),
             sessionId = sessionId.toString(),
             accountId = accountId.toString(),
             expiresAt = expiresAt,
@@ -43,7 +37,7 @@ internal class TokenService(
 
     fun createRefreshToken(accountId: Long, tokenId: Long): RefreshTokenData {
         return RefreshTokenData(
-            refreshToken = signRefreshToken(accountId, tokenId),
+            token = signRefreshToken(accountId, tokenId),
             tokenId = tokenId.toString(),
             accountId = accountId.toString(),
         )
@@ -80,9 +74,11 @@ internal class TokenService(
             "access" -> {
                 decodeAccessToken(jwt)
             }
+
             "refresh" -> {
                 decodeRefreshToken(jwt)
             }
+
             else -> {
                 throw IllegalArgumentException("Token does not match any type (access or refresh)")
             }

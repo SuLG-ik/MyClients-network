@@ -3,7 +3,7 @@ package beauty.shafran.network.auth.jwt
 import beauty.shafran.network.auth.AccessAuthorizedAuthentication
 import beauty.shafran.network.auth.AuthorizedAuthentication
 import beauty.shafran.network.auth.RefreshAuthorizedAuthentication
-import beauty.shafran.network.auth.repository.AccountRefreshTokensRepository
+import beauty.shafran.network.auth.repository.AccountRefreshTokenRepository
 import beauty.shafran.network.auth.repository.AccountSessionsRepository
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatus
@@ -15,9 +15,9 @@ import org.springframework.stereotype.Component
 import org.springframework.web.server.ResponseStatusException
 
 @Component
-class JWTAuthenticationProvider(
+internal class JWTAuthenticationProvider(
     val sessionsRepository: AccountSessionsRepository,
-    val refreshTokensRepository: AccountRefreshTokensRepository,
+    val refreshTokensRepository: AccountRefreshTokenRepository,
 ) : AuthenticationManager {
     @org.springframework.transaction.annotation.Transactional
     override fun authenticate(authentication: Authentication): AuthorizedAuthentication {

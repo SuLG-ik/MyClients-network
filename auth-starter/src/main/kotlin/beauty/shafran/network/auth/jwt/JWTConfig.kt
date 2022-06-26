@@ -17,7 +17,7 @@ import java.security.interfaces.RSAPublicKey
 
 @Configuration
 @ConfigurationPropertiesScan
-class JWTConfig {
+internal class JWTConfig {
 
     @Bean
     fun keystore(config: JWTAuthenticationConfig): KeyStore {

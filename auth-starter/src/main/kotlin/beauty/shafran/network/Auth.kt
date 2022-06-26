@@ -29,10 +29,8 @@ private class AuthConfiguration {
                 UsernamePasswordAuthenticationFilter::class.java
             )
             .authorizeRequests()
-            .antMatchers("/auth/login").permitAll()
-            .antMatchers("/auth/register").permitAll()
-            .antMatchers("/graphql").authenticated()
-            .antMatchers("//").authenticated()
+            .antMatchers("/graphql").permitAll()
+            .anyRequest().denyAll()
             .and()
             .build()
     }

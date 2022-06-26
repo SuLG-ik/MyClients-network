@@ -1,3 +1,44 @@
+scalar LocalDateTime
+
+input LoginInput {
+    username: String!
+    password: String!
+}
+
+input RegisterInput {
+    username: String!
+    password: String!
+    name: String!
+}
+
+input RefreshInput {
+    accessToken: String
+}
+
+type AuthMutation {
+    login(input: LoginInput): TokensData!
+    refresh(input: RefreshInput): TokensData!
+    register(input: RegisterInput): TokensData!
+}
+
+type TokensData {
+    accessToken: AccessToken!
+    refreshToken: RefreshToken!
+    account: Account!
+}
+
+type AccessToken {
+    token: String!
+    sessionId: ID!
+    expiresAt: LocalDateTime!
+}
+
+type RefreshToken {
+    token: String!
+    tokenId: ID!
+}
+
+
 type AccountsQuery {
     account(id: ID, nickname: String): Account!
 }
@@ -240,11 +281,11 @@ type Query {
     sessions: SessionsQuery!
 }
 
-
 type Mutation {
     companies: CompaniesMutation!
     services: ServicesMutation!
     employees: EmployeesMutation!
     customers: CustomersMutation!
     sessions: SessionsMutation!
+    auth: AuthMutation!
 }

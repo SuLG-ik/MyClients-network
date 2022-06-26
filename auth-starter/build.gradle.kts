@@ -23,6 +23,7 @@ dependencies {
     implementation(Dependencies.Spring.jpaStarter)
     implementation(Dependencies.Spring.webStarter)
     implementation(Dependencies.Spring.securityStarter)
+    implementation(Dependencies.Spring.graphQlStarter)
     implementation(Dependencies.Datetime.core)
     implementation(Dependencies.Auth0.jwt)
     implementation(projects.accountsStarter)

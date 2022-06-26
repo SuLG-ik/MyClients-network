@@ -8,7 +8,7 @@ import org.springframework.transaction.annotation.Transactional
 
 
 @Component
-class AuthPasswordRepository(
+internal class AuthPasswordRepository(
     private val passwordEncoder: PasswordEncoder,
     private val accountPasswordRepository: AccountPasswordRepository,
     private val accountRepository: AccountRepository,

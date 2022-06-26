@@ -1,6 +1,6 @@
 package beauty.shafran.network.auth.encoder
 
-interface PasswordEncoder {
+internal interface PasswordEncoder {
 
     fun matches(rawPassword: String, passwordHash: String): Boolean
 

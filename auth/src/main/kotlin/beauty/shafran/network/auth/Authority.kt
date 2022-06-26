@@ -12,11 +12,6 @@ public annotation class DelicateAuthorizationApi
 
 enum class Authority(private val authority: String) : GrantedAuthority {
     /**
-     * Register new account
-     */
-    SCOPE_CREATE_USER("SCOPE_create_user"),
-
-    /**
      * Read username
      */
     SCOPE_READ_PRIMARY_ACCOUNT_INFO("SCOPE_read_primary_account_info"),
@@ -29,7 +24,18 @@ enum class Authority(private val authority: String) : GrantedAuthority {
     /**
      * Has only refresh token to generate access token
      */
-    SCOPE_REFRESH("SCOPE_refresh");
+    SCOPE_REFRESH("SCOPE_refresh"),
+
+
+    /**
+     * Create account and generate tokens for him
+     */
+    SCOPE_REGISTER_ACCOUNT("SCOPE_register_account"),
+
+    /**
+     * Generate tokens for registered token by credentials
+     */
+    SCOPE_LOGIN_ACCOUNT("SCOPE_login_account");
 
     override fun getAuthority(): String {
         return authority
@@ -39,12 +45,4 @@ enum class Authority(private val authority: String) : GrantedAuthority {
         return authority
     }
 
-    companion object {
-        private val fullAccessedAuthorities by lazy { Authority.values().toList() - SCOPE_REFRESH }
-
-        @DelicateAuthorizationApi
-        fun fullAccessAuthorities(): List<Authority> {
-            return fullAccessedAuthorities
-        }
-    }
 }

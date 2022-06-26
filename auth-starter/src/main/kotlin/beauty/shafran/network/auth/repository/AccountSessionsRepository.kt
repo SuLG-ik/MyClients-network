@@ -16,7 +16,7 @@ interface AccountSessionsRepository : JpaRepository<AccountSessionEntity, Long> 
 
 }
 
-interface AccountRefreshTokensRepository : JpaRepository<AccountRefreshTokenEntity, Long> {
+interface AccountRefreshTokenRepository : JpaRepository<AccountRefreshTokenEntity, Long> {
 
     fun deleteAllByAccount(account: AccountEntity)
 

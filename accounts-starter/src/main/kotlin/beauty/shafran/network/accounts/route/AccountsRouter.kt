@@ -17,7 +17,6 @@ class AccountsQuery(
 class Account(
     val id: Long,
     val username: String,
-    val data: AccountData? = null,
 )
 
 class AccountData(
@@ -60,5 +59,4 @@ private class AccountsRouter(
             name = data.name
         )
     }
-
 }
